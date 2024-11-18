@@ -33,8 +33,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     private ?string $plainPassword = null;
 
-//    #[ORM\Column]
-//    private bool $isVerified = false;
+    #[ORM\Column]
+    private bool $isVerified = false;
+
+    #[ORM\Column(nullable: true)]
+    private ?string $passwordToken = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $passwordTokenExpiration = null;
 
     // Getter - Setter
 
@@ -113,6 +119,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPlainPassword(?string $plainPassword): static
     {
         $this->plainPassword = $plainPassword;
+        return $this;
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->isVerified;
+    }
+    public function setIsVerified(bool $isVerified): static
+    {
+        $this->isVerified = $isVerified;
+        return $this;
+    }
+
+    public function getPasswordToken(): ?string
+    {
+        return $this->passwordToken;
+    }
+    public function setPasswordToken(?string $passwordToken): static
+    {
+        $this->passwordToken = $passwordToken;
+        return $this;
+    }
+
+    public function getPasswordTokenExpiration(): ?\DateTimeImmutable
+    {
+        return $this->passwordTokenExpiration;
+    }
+    public function setPasswordTokenExpiration(?\DateTimeImmutable $passwordTokenExpiration): static
+    {
+        $this->passwordTokenExpiration = $passwordTokenExpiration;
         return $this;
     }
 

@@ -26,6 +26,7 @@ security:
         main:
             lazy: true
             provider: app_user_provider_chained
+            user_checker: App\Security\UserChecker
             form_login:
                 login_path: app_login
                 check_path: app_login
@@ -41,6 +42,8 @@ security:
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/register/set-password, roles: ROLE_USER }
         - { path: ^/register, roles: PUBLIC_ACCESS }
+        - { path: ^/wait, roles: PUBLIC_ACCESS }
+        - { path: ^/verify, roles: PUBLIC_ACCESS }
         - { path: /admin, roles: ROLE_ADMIN }
         - { path: ^/, roles: ROLE_USER }
 

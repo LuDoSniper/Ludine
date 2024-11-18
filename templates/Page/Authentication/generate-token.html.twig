@@ -1,0 +1,18 @@
+{% extends 'Layout/base.html.twig' %}
+
+{% block title %}
+    Generate Token
+{% endblock %}
+
+{% block body %}
+    <h1>Envoyer un mail de vérification</h1>
+
+    {% if invalidCredentials %}
+        <p>Invalid credentials</p>
+    {% endif %}
+
+    {{ form_start(form) }}
+    {{ form_rest(form) }}
+    <button>Renvoyer</button>
+    {{ form_end(form) }}
+{% endblock %}
