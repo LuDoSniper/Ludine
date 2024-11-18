@@ -1,0 +1,15 @@
+{% extends 'Layout/base.html.twig' %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block body %}
+    {{ form_start(form) }}
+    {{ form_rest(form) }}
+    <button>S'inscrire</button>
+    <a href="{{ path('app_login_google') }}">S'inscrire avec Google</a>
+    {{ form_end(form) }}
+    <a href="{{ path('app_login') }}">Se connecter</a>
+{% endblock %}
+
