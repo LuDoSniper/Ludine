@@ -20,6 +20,9 @@ class GoogleUserProvider extends OAuthUserProvider
         $user = $this->findUserByGoogleEmail($response->getEmail(), $entityManager);
         dd($user);
         die();
+        //? Tout cela est assez étrange, il semblerais que nous ne passons jamais ici...
+        //? Le code reste comme ça avec un die au cas où ce bout de code serais appelé.
+        //? Necessaire pour le debug
 
         if (!$user) {
 //            // Si l'utilisateur n'existe pas, tu peux en créer un
