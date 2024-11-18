@@ -1,0 +1,12 @@
+{% extends 'Layout/base.html.twig' %}
+
+{% block title %}
+    Set password
+{% endblock %}
+
+{% block body %}
+    {{ form_start(form) }}
+    {{ form_rest(form) }}
+    <button>Valider</button>
+    {{ form_end(form) }}
+{% endblock %}

@@ -50,7 +50,7 @@ class GoogleAuthenticator extends OAuth2Authenticator implements UserProviderInt
         return $this->fetchAccessToken($this->getGoogleClient());
     }
 
-    public function getUser($credentials, UserProviderInterface $userProvider): ?UserInterface
+    public function getUser($credentials, UserProviderInterface $userProvider): UserInterface | RedirectResponse | null
     {
         /** @var GoogleUser $googleUser */
         $googleUser = $this->getGoogleClient()->fetchUserFromToken($credentials);
@@ -74,6 +74,16 @@ class GoogleAuthenticator extends OAuth2Authenticator implements UserProviderInt
 
     public function onAuthenticationSuccess(Request $request, $token, string $firewallName): RedirectResponse
     {
+        // Récupérer l'utilisateur actuellement connecté
+        /** @var User $user */
+        $user = $token->getUser(); // Symfony gère l'utilisateur authentifié ici
+
+        // Vérifier si l'utilisateur a un mot de passe vide
+        if ($user && $user->getPassword() === "") {
+            // Si le mot de passe est vide, rediriger vers la page de changement de mot de passe
+            return new RedirectResponse($this->router->generate('app_register_google'));
+        }
+
         return new RedirectResponse($this->router->generate('app_home'));
     }
 
@@ -122,7 +132,7 @@ class GoogleAuthenticator extends OAuth2Authenticator implements UserProviderInt
 
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $identifier]);
+        $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $identifier]);
 
         if (!$user) {
             throw new UserNotFoundException();
