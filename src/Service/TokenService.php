@@ -5,10 +5,10 @@ namespace App\Service;
 use App\Entity\Authentication\User;
 use Doctrine\ORM\EntityManagerInterface;
 
-class TokenService
+readonly class TokenService
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager
     ){}
 
     public function generateToken(): string

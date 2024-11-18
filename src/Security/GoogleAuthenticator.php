@@ -5,14 +5,15 @@ namespace App\Security;
 use App\Entity\Authentication\User;
 use Doctrine\ORM\EntityManagerInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
+use KnpU\OAuth2ClientBundle\Client\OAuth2ClientInterface;
 use KnpU\OAuth2ClientBundle\Security\Authenticator\OAuth2Authenticator;
 use KnpU\OAuth2ClientBundle\Security\User\OAuthUser;
 use League\OAuth2\Client\Provider\GoogleUser;
+use League\OAuth2\Client\Token\AccessToken;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -21,31 +22,19 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 class GoogleAuthenticator extends OAuth2Authenticator implements UserProviderInterface
 {
-    private ClientRegistry $clientRegistry;
-    private RouterInterface $router;
-    private UserProviderInterface $userProvider;
-
-    private EntityManagerInterface $entityManager;
-
     public function __construct(
-        ClientRegistry        $clientRegistry,
-        RouterInterface       $route,
-        UserProviderInterface $userProvider,
-        EntityManagerInterface $entityManager
-    )
-    {
-        $this->clientRegistry = $clientRegistry;
-        $this->router = $route;
-        $this->userProvider = $userProvider;
-        $this->entityManager = $entityManager;
-    }
+        private readonly ClientRegistry $clientRegistry,
+        private readonly RouterInterface $router,
+        private readonly UserProviderInterface $userProvider,
+        private readonly EntityManagerInterface $entityManager
+    ){}
 
     public function supports(Request $request): ?bool
     {
         return $request->attributes->get('_route') === 'app_login_google_check';
     }
 
-    public function getCredentials(Request $request)
+    public function getCredentials(Request $request): AccessToken
     {
         return $this->fetchAccessToken($this->getGoogleClient());
     }
@@ -54,34 +43,22 @@ class GoogleAuthenticator extends OAuth2Authenticator implements UserProviderInt
     {
         /** @var GoogleUser $googleUser */
         $googleUser = $this->getGoogleClient()->fetchUserFromToken($credentials);
-
         $email = $googleUser->getEmail();
 
-        // Option 1: Charger l'utilisateur depuis la base de données
-        $existingUser = $userProvider->loadUserByIdentifier($email);
-        if ($existingUser) {
-            return $existingUser;
-        }
-
-        // Option 2: Créer un nouvel utilisateur si nécessaire
-        $user = new \App\Entity\Authentication\User();
-        $user->setEmail($googleUser->getEmail());
-        $user->setUsername($googleUser->getName());
-        // Persiste l'utilisateur avec Doctrine si nécessaire
-        return $user;
+        // Si le user existe dans la bdd, alors il est sélectionné. Sinon, un nouveau user est créé
+        return $userProvider->loadUserByIdentifier($email);
     }
 
 
     public function onAuthenticationSuccess(Request $request, $token, string $firewallName): RedirectResponse
     {
-        // Récupérer l'utilisateur actuellement connecté
         /** @var OAuthUser $oauthUser */
-        $oauthUser = $token->getUser(); // Symfony gère l'utilisateur authentifié ici
+        $oauthUser = $token->getUser();
+        // Ici user peut valoir null car loadUserByIdentifierFromBDD renvoi User ou null
         $user = $this->loadUserByIdentifierFromBDD($oauthUser->getUserIdentifier());
 
-        // Regarder si l'utilisateur existe dans la bdd
+        // Regarder si l'utilisateur n'existe pas dans la bdd auquel cas, redirection vers /register/google
         if (!$user) {
-            // Si le mot de passe est vide, rediriger vers la page de changement de mot de passe
             return new RedirectResponse($this->router->generate('app_register_google'));
         }
 
@@ -90,11 +67,10 @@ class GoogleAuthenticator extends OAuth2Authenticator implements UserProviderInt
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): RedirectResponse
     {
-//        dd($exception);
         return new RedirectResponse($this->router->generate('app_login'));
     }
 
-    private function getGoogleClient()
+    private function getGoogleClient(): OAuth2ClientInterface
     {
         return $this->clientRegistry->getClient('google');
     }
@@ -103,7 +79,6 @@ class GoogleAuthenticator extends OAuth2Authenticator implements UserProviderInt
     {
         // Récupérer le token d'accès Google
         $credentials = $this->fetchAccessToken($this->getGoogleClient());
-
         // Récupérer les informations utilisateur depuis Google
         $googleUser = $this->getGoogleClient()->fetchUserFromToken($credentials);
 
@@ -117,8 +92,7 @@ class GoogleAuthenticator extends OAuth2Authenticator implements UserProviderInt
         $badge = new UserBadge($email, function ($email) {
             return $this->userProvider->loadUserByIdentifier($email);
         });
-        $passport = new SelfValidatingPassport($badge);
-        return $passport;
+        return new SelfValidatingPassport($badge);
     }
 
     public function refreshUser(UserInterface $user): UserInterface
