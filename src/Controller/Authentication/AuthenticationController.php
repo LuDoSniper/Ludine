@@ -59,8 +59,9 @@ class AuthenticationController extends AbstractController
         UserPasswordHasherInterface $hasher
     ): Response
     {
-        /** @var OAuthUser $user */
+        /** @var OAuthUser $oauthUser */
         $oauthUser = $this->getUser();
+
         $user = new User();
         $user
             ->setEmail($oauthUser->getUserIdentifier())

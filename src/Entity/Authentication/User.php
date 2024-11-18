@@ -33,6 +33,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     private ?string $plainPassword = null;
 
+//    #[ORM\Column]
+//    private bool $isVerified = false;
+
     // Getter - Setter
 
     public function getId(): ?int
