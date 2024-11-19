@@ -1,0 +1,15 @@
+.remember-div {
+    position: relative;
+}
+
+.remember-div input {
+    position: relative;
+}
+
+.checkbox-icon {
+    position: absolute;
+    z-index: 11;
+    left: 4px;
+    top: 3px;
+    color: #d1d3d5;
+}

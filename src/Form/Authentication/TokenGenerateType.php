@@ -14,10 +14,16 @@ class TokenGenerateType extends AbstractType
     {
         $builder
             ->add('email', EmailType::class, [
-                'required' => true
+                'required' => true,
+                'attr' => [
+                    'placeholder' => 'Email'
+                ]
             ])
             ->add('password', PasswordType::class, [
-                'required' => true
+                'required' => true,
+                'attr' => [
+                    'placeholder' => 'Mot de passe'
+                ]
             ])
         ;
     }

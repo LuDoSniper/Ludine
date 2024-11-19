@@ -1,18 +1,20 @@
-{% extends 'Layout/base.html.twig' %}
+{% extends 'Layout/Authentication/authentication.html.twig' %}
 
 {% block title %}
-    Generate Token
+    Resend
 {% endblock %}
 
-{% block body %}
-    <h1>Envoyer un mail de vérification</h1>
-
+{% block form %}
     {% if invalidCredentials %}
         <p>Invalid credentials</p>
     {% endif %}
 
     {{ form_start(form) }}
-    {{ form_rest(form) }}
-    <button>Renvoyer</button>
+    {{ form_widget(form.email) }}
+    <div>
+        {{ form_widget(form.password) }}
+        <img src="{{ asset('img/svg/eye-closed.svg') }}" class="eye">
+    </div>
+    <button class="button">Renvoyer le mail de vérification</button>
     {{ form_end(form) }}
 {% endblock %}

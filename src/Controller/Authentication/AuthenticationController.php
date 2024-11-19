@@ -62,7 +62,7 @@ class AuthenticationController extends AbstractController
                 $user->getEmail(),
                 $this->appConfig->verifyMailSubject,
                 'verify',
-                compact('token')
+                compact('token', 'user')
             );
 
             return $this->redirectToRoute('app_wait');
@@ -107,7 +107,8 @@ class AuthenticationController extends AbstractController
         }
 
         return $this->render('Page/Authentication/google-register.html.twig', [
-            'form' => $form
+            'form' => $form,
+            'user' => $user
         ]);
     }
 
@@ -128,7 +129,7 @@ class AuthenticationController extends AbstractController
             $user->setIsVerified(true);
             $this->entityManager->flush();
 
-            return $this->redirectToRoute('app_home');
+            return $this->render('Page/Authentication/verify.html.twig');
         }
 
         return $this->redirectToRoute('app_resend');
@@ -158,7 +159,7 @@ class AuthenticationController extends AbstractController
                     $user->getEmail(),
                     $this->appConfig->verifyMailSubject,
                     'verify',
-                    compact('token')
+                    compact('token', 'user')
                 );
 
                 $this->entityManager->flush();
