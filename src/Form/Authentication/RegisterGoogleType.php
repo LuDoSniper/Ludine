@@ -15,11 +15,24 @@ class RegisterGoogleType extends AbstractType
     {
         $builder
             ->add('username', TextType::class, [
-                'required' => true
+                'required' => true,
+                'attr' => [
+                    'placeholder' => 'Nom d\'utilisateur'
+                ]
             ])
             ->add('password', RepeatedType::class, [
                 'type' => PasswordType::class,
-                'required' => true
+                'required' => true,
+                'first_options' => [
+                    'attr' => [
+                        'placeholder' => 'Mot de passe'
+                    ]
+                ],
+                'second_options' => [
+                    'attr' => [
+                        'placeholder' => 'Répéter le mot de passe'
+                    ]
+                ]
             ])
         ;
     }

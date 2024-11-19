@@ -1,14 +1,37 @@
-{% extends 'Layout/base.html.twig' %}
+{% extends 'Layout/Authentication/authentication.html.twig' %}
 
 {% block title %}
     Login
 {% endblock %}
 
-{% block body %}
+{% block additionalStylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/Authentication/login.css') }}">
+{% endblock %}
+
+{% block form %}
     {{ form_start(form) }}
-    {{ form_rest(form) }}
-    <button>Connexion</button>
-    <a href="{{ path('app_login_google') }}">Se connecter avec Google</a>
+    {{ form_widget(form._username) }}
+    <div>
+        {{ form_widget(form._password) }}
+        <img src="{{ asset('img/svg/eye-closed.svg') }}" class="eye">
+    </div>
+    <div class="remember-div">
+        {{ form_widget(form._remember_me) }}
+        <label for="_remember_me">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" class="checkbox-icon">
+                <path d="M12.6 4L5.44048 11.2L3 8.74572" stroke="#d1d3d5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </label>
+        {{ form_label(form._remember_me) }}
+    </div>
+    <div class="text-end">
+        <a href="en developpement" class="text-end">Mot de passe oublié</a>
+    </div>
+    <button class="button">Connexion</button>
+    <a class="button" href="{{ path('app_login_google') }}">
+        <img src="{{ asset('img/svg/google.svg') }}">
+        Se connecter avec Google
+    </a>
+    <a href="{{ path('app_register') }}">Pas encore de compte ?</a>
     {{ form_end(form) }}
-    <a href="{{ path('app_register') }}">S'inscrire</a>
 {% endblock %}

@@ -17,13 +17,20 @@ class LoginType extends AbstractType
         $builder
             ->add('_username', TextType::class, [
                 'mapped' => false,
-                'required' => true
+                'required' => true,
+                'attr' => [
+                    'placeholder' => 'Email ou nom d\'utilisateur'
+                ]
             ])
             ->add('_password', PasswordType::class, [
-                'required' => true
+                'required' => true,
+                'attr' => [
+                    'placeholder' => 'Mot de passe'
+                ]
             ])
             ->add('_remember_me', CheckboxType::class, [
-                'required' => false
+                'required' => false,
+                'label' => 'Se souvenir de moi'
             ])
         ;
     }

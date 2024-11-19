@@ -1,0 +1,18 @@
+{% extends 'Layout/base.html.twig' %}
+
+{% block title %}
+    Vérification
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/Authentication/verify.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div id="overlay"></div>
+    <h1>Votre email est vérifié et votre compte validé !</h1>
+    <p>Vous pouvez désormais accéder à toutes les fonctionnalités que propose Ludine !</p>
+    <div class="button-container">
+        <a href="{{ path('app_login') }}" class="button">Se connecter</a>
+    </div>
+{% endblock %}
