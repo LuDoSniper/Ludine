@@ -59,12 +59,13 @@ class AuthenticationController extends AbstractController
             $this->entityManager->persist($user);
             $this->entityManager->flush();
 
+            $contactMail = $this->appConfig->contactMail;
             $mailService->send(
                 $this->appConfig->noReplyMail,
                 $user->getEmail(),
                 $this->appConfig->verifyMailSubject,
                 'verify',
-                compact('token', 'user')
+                compact('token', 'user', 'contactMail')
             );
 
             return $this->redirectToRoute('app_wait');
@@ -164,12 +165,13 @@ class AuthenticationController extends AbstractController
                 $user->setPasswordToken($token);
                 $user->setPasswordTokenExpiration((new \DateTimeImmutable())->modify('+1 day'));
 
+                $contactMail = $this->appConfig->contactMail;
                 $mailService->send(
                     $this->appConfig->noReplyMail,
                     $user->getEmail(),
                     $this->appConfig->verifyMailSubject,
                     'verify',
-                    compact('token', 'user')
+                    compact('token', 'user', 'contactMail')
                 );
 
                 $this->entityManager->flush();
@@ -209,12 +211,13 @@ class AuthenticationController extends AbstractController
                 ;
                 $this->entityManager->flush();
 
+                $contactMail = $this->appConfig->contactMail;
                 $mailService->send(
                     $this->appConfig->noReplyMail,
                     $user->getEmail(),
                     $this->appConfig->forgottenPasswordMailSubject,
                     'reset-password',
-                    compact('user', 'token')
+                    compact('user', 'token', 'contactMail')
                 );
             }
         }

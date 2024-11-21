@@ -10,6 +10,9 @@ class AppConfig
         #[Autowire(env: 'NO_REPLY_MAIL')]
         public string $noReplyMail,
 
+        #[Autowire(env: 'CONTACT_MAIL')]
+        public string $contactMail,
+
         #[Autowire(env: 'VERIFY_MAIL_SUBJECT')]
         public string $verifyMailSubject,
 
