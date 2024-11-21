@@ -16,11 +16,6 @@ services:
 
     App\Security\GoogleUserProvider: ~ # S'assure que le service GoogleUserProvider est défini
 
-    App\Config\AppConfig:
-        arguments:
-            $noReplyMail: '%env(NO_REPLY_MAIL)%'
-            $verifyMailSubject: '%env(VERIFY_MAIL_SUBJECT)%'
-
     App\:
         resource: '../src/'
         exclude:
