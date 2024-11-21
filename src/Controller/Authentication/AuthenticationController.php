@@ -59,12 +59,13 @@ class AuthenticationController extends AbstractController
             $this->entityManager->persist($user);
             $this->entityManager->flush();
 
+            $contactMail = $this->appConfig->contactMail;
             $mailService->send(
                 $this->appConfig->noReplyMail,
                 $user->getEmail(),
                 $this->appConfig->verifyMailSubject,
                 'verify',
-                compact('token', 'user')
+                compact('token', 'user', 'contactMail')
             );
 
             return $this->redirectToRoute('app_wait');
@@ -164,12 +165,13 @@ class AuthenticationController extends AbstractController
                 $user->setPasswordToken($token);
                 $user->setPasswordTokenExpiration((new \DateTimeImmutable())->modify('+1 day'));
 
+                $contactMail = $this->appConfig->contactMail;
                 $mailService->send(
                     $this->appConfig->noReplyMail,
                     $user->getEmail(),
                     $this->appConfig->verifyMailSubject,
                     'verify',
-                    compact('token', 'user')
+                    compact('token', 'user', 'contactMail')
                 );
 
                 $this->entityManager->flush();
@@ -196,16 +198,12 @@ class AuthenticationController extends AbstractController
         $form = $this->createForm(ResetPasswordType::class);
         $form->handleRequest($request);
 
-        $invalidCredentials = false;
-        $mailSent = false;
+        $info = false;
         if ($form->isSubmitted() && $form->isValid()) {
-            $invalidCredentials = true;
+            $info = true;
 
             $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $form->get('email')->getData()]);
             if ($user) {
-                $mailSent = true;
-                $invalidCredentials = false;
-
                 $token = $tokenService->generateToken();
                 $user
                     ->setPasswordToken($token)
@@ -213,20 +211,20 @@ class AuthenticationController extends AbstractController
                 ;
                 $this->entityManager->flush();
 
+                $contactMail = $this->appConfig->contactMail;
                 $mailService->send(
                     $this->appConfig->noReplyMail,
                     $user->getEmail(),
                     $this->appConfig->forgottenPasswordMailSubject,
                     'reset-password',
-                    compact('user', 'token')
+                    compact('user', 'token', 'contactMail')
                 );
             }
         }
 
         return $this->render('Page/Authentication/reset-password.html.twig', [
             'form' => $form,
-            'invalidCredentials' => $invalidCredentials,
-            'mailSent' => $mailSent
+            'info' => $info
         ]);
     }
 
@@ -253,7 +251,7 @@ class AuthenticationController extends AbstractController
             return $this->redirectToRoute('app_reset_password');
         }
 
-        return $this->render('PAge/Authentication/reset-password-token.html.twig', [
+        return $this->render('Page/Authentication/reset-password-token.html.twig', [
             'form' => $form
         ]);
     }

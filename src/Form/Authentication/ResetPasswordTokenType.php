@@ -16,7 +16,17 @@ class ResetPasswordTokenType extends AbstractType
         $builder
             ->add('password', RepeatedType::class, [
                 'type' => PasswordType::class,
-                'required' => true
+                'required' => true,
+                'first_options' => [
+                    'attr' => [
+                        'placeholder' => 'Nouveau mot de passe'
+                    ]
+                ],
+                'second_options' => [
+                    'attr' => [
+                        'placeholder' => 'Répéter le nouveau mot de passe'
+                    ]
+                ]
             ])
         ;
     }
