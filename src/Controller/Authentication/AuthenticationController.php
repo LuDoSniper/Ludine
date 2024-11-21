@@ -196,16 +196,12 @@ class AuthenticationController extends AbstractController
         $form = $this->createForm(ResetPasswordType::class);
         $form->handleRequest($request);
 
-        $invalidCredentials = false;
-        $mailSent = false;
+        $info = false;
         if ($form->isSubmitted() && $form->isValid()) {
-            $invalidCredentials = true;
+            $info = true;
 
             $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $form->get('email')->getData()]);
             if ($user) {
-                $mailSent = true;
-                $invalidCredentials = false;
-
                 $token = $tokenService->generateToken();
                 $user
                     ->setPasswordToken($token)
@@ -225,8 +221,7 @@ class AuthenticationController extends AbstractController
 
         return $this->render('Page/Authentication/reset-password.html.twig', [
             'form' => $form,
-            'invalidCredentials' => $invalidCredentials,
-            'mailSent' => $mailSent
+            'info' => $info
         ]);
     }
 
@@ -253,7 +248,7 @@ class AuthenticationController extends AbstractController
             return $this->redirectToRoute('app_reset_password');
         }
 
-        return $this->render('PAge/Authentication/reset-password-token.html.twig', [
+        return $this->render('Page/Authentication/reset-password-token.html.twig', [
             'form' => $form
         ]);
     }

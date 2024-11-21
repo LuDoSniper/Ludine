@@ -15,7 +15,10 @@ class ResetPasswordType extends AbstractType
     {
         $builder
             ->add('email', EmailType::class, [
-                'required' => true
+                'required' => true,
+                'attr' => [
+                    'placeholder' => 'Email'
+                ]
             ])
         ;
     }

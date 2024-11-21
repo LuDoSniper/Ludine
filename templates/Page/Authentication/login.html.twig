@@ -25,7 +25,7 @@
         {{ form_label(form._remember_me) }}
     </div>
     <div class="text-end">
-        <a href="en developpement" class="text-end">Mot de passe oublié</a>
+        <a href="{{ path('app_reset_password') }}" class="text-end">Mot de passe oublié</a>
     </div>
     <button class="button">Connexion</button>
     <a class="button" href="{{ path('app_login_google') }}">
