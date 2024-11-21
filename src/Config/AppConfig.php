@@ -11,6 +11,9 @@ class AppConfig
         public string $noReplyMail,
 
         #[Autowire(env: 'VERIFY_MAIL_SUBJECT')]
-        public string $verifyMailSubject
+        public string $verifyMailSubject,
+
+        #[Autowire(env: 'FORGOTTEN_PASSWORD_MAIL_SUBJECT')]
+        public string $forgottenPasswordMailSubject
     ){}
 }

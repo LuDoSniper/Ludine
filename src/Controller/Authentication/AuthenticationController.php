@@ -7,6 +7,8 @@ use App\Entity\Authentication\User;
 use App\Form\Authentication\LoginType;
 use App\Form\Authentication\RegisterType;
 use App\Form\Authentication\RegisterGoogleType;
+use App\Form\Authentication\ResetPasswordTokenType;
+use App\Form\Authentication\ResetPasswordType;
 use App\Form\Authentication\TokenGenerateType;
 use App\Service\SendMailService;
 use App\Service\TokenService;
@@ -123,6 +125,10 @@ class AuthenticationController extends AbstractController
         TokenService $tokenService
     ): Response
     {
+        if ($this->getUser() && $this->getUser()->isVerified()) {
+            return $this->redirectToRoute('app_home');
+        }
+
         $user = $tokenService->getUserByToken($token);
         if ($user && $tokenService->isTokenValid($token)) {
             $user->setIsVerified(true);
@@ -149,6 +155,10 @@ class AuthenticationController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $form->get('email')->getData()]);
             if ($user && $hasher->isPasswordValid($user, $form->get('password')->getData())) {
+                if ($user->isVerified()) {
+                    return $this->redirectToRoute('app_home');
+                }
+
                 $token = $tokenService->generateToken();
                 $user->setPasswordToken($token);
                 $user->setPasswordTokenExpiration((new \DateTimeImmutable())->modify('+1 day'));
@@ -172,6 +182,78 @@ class AuthenticationController extends AbstractController
         return $this->render('Page/Authentication/generate-token.html.twig', [
             'form' => $form,
             'invalidCredentials' => $invalidCredentials
+        ]);
+    }
+
+    #[Route('/reset/password', 'app_reset_password')]
+    public function resetPassword(
+        Request $request,
+        TokenService $tokenService,
+        SendMailService $mailService,
+    ): Response
+    {
+        $form = $this->createForm(ResetPasswordType::class);
+        $form->handleRequest($request);
+
+        $invalidCredentials = false;
+        $mailSent = false;
+        if ($form->isSubmitted() && $form->isValid()) {
+            $invalidCredentials = true;
+
+            $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $form->get('email')->getData()]);
+            if ($user) {
+                $mailSent = true;
+                $invalidCredentials = false;
+
+                $token = $tokenService->generateToken();
+                $user
+                    ->setPasswordToken($token)
+                    ->setPasswordTokenExpiration((new \DateTimeImmutable())->modify('+1 day'))
+                ;
+                $this->entityManager->flush();
+
+                $mailService->send(
+                    $this->appConfig->noReplyMail,
+                    $user->getEmail(),
+                    $this->appConfig->forgottenPasswordMailSubject,
+                    'reset-password',
+                    compact('user', 'token')
+                );
+            }
+        }
+
+        return $this->render('Page/Authentication/reset-password.html.twig', [
+            'form' => $form,
+            'invalidCredentials' => $invalidCredentials,
+            'mailSent' => $mailSent
+        ]);
+    }
+
+    #[Route('/reset/password/{token}', 'app_reset_password_token')]
+    public function resetPasswordToken(
+        Request $request,
+        TokenService $tokenService,
+        UserPasswordHasherInterface $hasher,
+        string $token
+    ): Response
+    {
+        $form = $this->createForm(ResetPasswordTokenType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user = $tokenService->getUserByToken($token);
+            if ($tokenService->isTokenValid($token)) {
+                $user->setPassword($hasher->hashPassword($user, $form->get('password')->getData()));
+                $this->entityManager->flush();
+
+                return $this->redirectToRoute('app_login');
+            }
+
+            return $this->redirectToRoute('app_reset_password');
+        }
+
+        return $this->render('PAge/Authentication/reset-password-token.html.twig', [
+            'form' => $form
         ]);
     }
 }
