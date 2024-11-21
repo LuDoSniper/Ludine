@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     eyes.forEach((eye) => {
         eye.addEventListener('click', function() {
             let state = 'open';
-            if (eye.src.split('-')[1].split('.')[0] === "open") {
+            if (eye.src.split('-')[eye.src.split('-').length - 1].split('.')[0] === "open") {
                 state = 'closed'
             }
             eye.src = '/img/svg/eye-' + state + '.svg';
