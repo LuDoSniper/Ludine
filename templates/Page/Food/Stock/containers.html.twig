@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Ref</th>
+                <th>Frais</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for container in containers %}
+                <tr>
+                    <td>{{ container.name }}</td>
+                    <td>{{ container.ref }}</td>
+                    <td>{{ container.cool }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td>Aucune donnée</td>
+                    <td>Aucune donnée</td>
+                    <td>Aucune donnée</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
