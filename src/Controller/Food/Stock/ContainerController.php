@@ -26,7 +26,7 @@ class ContainerController extends AbstractController
         ]);
     }
 
-    #[Route('/food/stock/containers/create', 'food_stock_containers_create')]
+    #[Route('/food/stock/container/create', 'food_stock_container_create')]
     public function create(
         Request $request
     ): Response
@@ -48,7 +48,7 @@ class ContainerController extends AbstractController
         ]);
     }
 
-    #[Route('/food/stock/containers/update/{id}', 'food_stock_containers_update')]
+    #[Route('/food/stock/container/update/{id}', 'food_stock_container_update')]
     public function update(
         Container $container,
         Request $request
@@ -68,7 +68,7 @@ class ContainerController extends AbstractController
         ]);
     }
 
-    #[Route('/food/stock/containers/remove/{id}', 'food_stock_containers_remove')]
+    #[Route('/food/stock/container/remove/{id}', 'food_stock_container_remove')]
     public function remove(
         Container $container
     ): Response

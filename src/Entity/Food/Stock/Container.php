@@ -3,6 +3,8 @@
 namespace App\Entity\Food\Stock;
 
 use App\Repository\Food\Stock\ContainerRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -28,6 +30,17 @@ class Container
 
     #[ORM\Column(length: 255)]
     private ?string $ref = null;
+
+    /**
+     * @var Collection<int, StockedProduct>
+     */
+    #[ORM\OneToMany(targetEntity: StockedProduct::class, mappedBy: 'container')]
+    private Collection $stockedProducts;
+
+    public function __construct()
+    {
+        $this->stockedProducts = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -90,6 +103,36 @@ class Container
     public function setRef(string $ref): static
     {
         $this->ref = $ref;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, StockedProduct>
+     */
+    public function getStockedProducts(): Collection
+    {
+        return $this->stockedProducts;
+    }
+
+    public function addStockedProduct(StockedProduct $stockedProduct): static
+    {
+        if (!$this->stockedProducts->contains($stockedProduct)) {
+            $this->stockedProducts->add($stockedProduct);
+            $stockedProduct->setContainer($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStockedProduct(StockedProduct $stockedProduct): static
+    {
+        if ($this->stockedProducts->removeElement($stockedProduct)) {
+            // set the owning side to null (unless already changed)
+            if ($stockedProduct->getContainer() === $this) {
+                $stockedProduct->setContainer(null);
+            }
+        }
 
         return $this;
     }

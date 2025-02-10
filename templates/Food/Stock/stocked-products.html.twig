@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Description</th>
+                <th>Date d'arrivée</th>
+                <th>Date de péremption</th>
+                <th>Stackable</th>
+                <th>Frais</th>
+                <th>Conteneur</th>
+                <th>Etage</th>
+                <th>Emplacement</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stockedProduct in stockedProducts %}
+                <tr>
+                    <td>{{ stockedProduct.product.name }}</td>
+                    <td>{{ stockedProduct.product.description }}</td>
+                    <td>{{ stockedProduct.arivalDate | date }}</td>
+                    <td>{{ stockedProduct.expirationDate | date }}</td>
+                    <td>{{ stockedProduct.stackable }}</td>
+                    <td>{{ stockedProduct.cool }}</td>
+                    <td>{{ stockedProduct.container.name }}</td>
+                    <td>{{ stockedProduct.floor }}</td>
+                    <td>{{ stockedProduct.location }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td>Aucune donnée</td>
+                    <td>Aucune donnée</td>
+                    <td>Aucune donnée</td>
+                    <td>Aucune donnée</td>
+                    <td>Aucune donnée</td>
+                    <td>Aucune donnée</td>
+                    <td>Aucune donnée</td>
+                    <td>Aucune donnée</td>
+                    <td>Aucune donnée</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
