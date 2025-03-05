@@ -21,7 +21,7 @@ class StockedProductController extends AbstractController
     {
         $stockedProducts = $this->entityManager->getRepository(StockedProduct::class)->findAll();
 
-        return $this->render('Food/Stock/stocked-products.html.twig', [
+        return $this->render('Page/Food/Stock/stocked-products.html.twig', [
             'stockedProducts' => $stockedProducts
         ]);
     }
@@ -43,7 +43,7 @@ class StockedProductController extends AbstractController
             return $this->redirectToRoute('food_stock_stocked_products');
         }
 
-        return $this->render('Food/Stock/stocked-products-create.html.twig', [
+        return $this->render('Page/Food/Stock/stocked-products-create.html.twig', [
             'form' => $form->createView()
         ]);
     }
@@ -63,7 +63,7 @@ class StockedProductController extends AbstractController
             return $this->redirectToRoute('food_stock_stocked_products');
         }
 
-        return $this->render('Food/Stock/stocked-products-update.html.twig', [
+        return $this->render('Page/Food/Stock/stocked-products-update.html.twig', [
             'form' => $form->createView()
         ]);
     }

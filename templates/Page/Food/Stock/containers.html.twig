@@ -12,6 +12,7 @@
         <thead>
             <tr>
                 <th>Nom</th>
+                <th>Description</th>
                 <th>Ref</th>
                 <th>Frais</th>
             </tr>
@@ -20,11 +21,13 @@
             {% for container in containers %}
                 <tr>
                     <td>{{ container.name }}</td>
+                    <td>{{ container.description }}</td>
                     <td>{{ container.ref }}</td>
                     <td>{{ container.cool }}</td>
                 </tr>
             {% else %}
                 <tr>
+                    <td>Aucune donnée</td>
                     <td>Aucune donnée</td>
                     <td>Aucune donnée</td>
                     <td>Aucune donnée</td>
