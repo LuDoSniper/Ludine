@@ -1,16 +1,112 @@
-<!doctype html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-    {{ form_start(form) }}
-    {{ form_rest(form) }}
-    <button>Créer</button>
-    {{ form_end(form) }}
-</body>
-</html>
+{% extends 'Layout/base-modules.html.twig' %}
+
+{% block title %}
+    Ludine - Create container
+{% endblock %}
+
+{% block main %}
+    {% include 'Widget/module-header.html.twig' with {
+        header: {
+            h1: 'Nourriture',
+            h2: {
+                'Repas': {
+                    selected: false,
+                    url: '#'
+                },
+                'Stock': {
+                    selected: true,
+                    url: path('food_stock_containers')
+                }
+            },
+            h3: {
+                'Conteneurs': {
+                    selected: true,
+                    url: path('food_stock_containers')
+                },
+                'Produits': {
+                    selected: false,
+                    url: path('food_stock_products')
+                },
+                'Produits stockés': {
+                    selected: false,
+                    url: path('food_stock_stocked_products')
+                }
+            }
+        }
+    } %}
+
+    <div id="content" class="form">
+    <div id="content-header">
+        <div class="group">
+            {% include 'Widget/button.html.twig' with {
+                'btn': {
+                    'name': 'Nouveau',
+                    'url': path('food_stock_container_create'),
+                    'type': 'primary'
+                }
+            } %}
+
+            <a href="" id="save"><img src="{{ asset('img/svg/save.svg') }}"></a>
+        </div>
+    </div>
+
+        {{ form_start(form) }}
+        <input type="hidden" name="id" value="{{ id }}">
+        {% if nbFloor is defined %}
+            <input type="hidden" name="nbFloor" value="{{ nbFloor }}">
+        {% endif %}
+        <div class="group">
+            <div class="field">
+                {{ form_label(form.name) }}
+                {{ form_widget(form.name) }}
+            </div>
+            <div class="field">
+                {{ form_label(form.description) }}
+                {{ form_widget(form.description) }}
+            </div>
+            <div class="field">
+                {{ form_label(form.ref) }}
+                {{ form_widget(form.ref) }}
+            </div>
+            <div class="field">
+                {{ form_label(form.cool) }}
+                {{ form_widget(form.cool) }}
+            </div>
+            <div class="field">
+                {{ form_label(form.nbFloor) }}
+                {{ form_widget(form.nbFloor) }}
+            </div>
+        </div>
+        <div class="group">
+            <div class="kanban">
+                <div id="kanban-container">
+                    {% if nbFloor is defined %}
+                        {% for card in floors %}
+                            <div id="{{ card.id }}" class="card" style="width: 100%">
+                                <div class="group" style="max-width: 100% !important;">
+                                    <div class="field">
+                                        <label class="h1">Étage {{ card.id }}</label>
+                                    </div>
+                                    <div class="field">
+                                        <label for="description">Description</label>
+                                        <input type="text" id="description" value="{{ card.description }}">
+                                    </div>
+                                    <div class="field">
+                                        <label for="locations">Nombre d'emplacement</label>
+                                        <input type="number" id="locations" value="{{ card.locations }}">
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {{ form_end(form) }}
+
+    </div>
+{% endblock %}
+
+{% block customjavascripts %}
+    <script src="{{ asset('js/Food/Stock/containers-create.js') }}"></script>
+{% endblock %}
