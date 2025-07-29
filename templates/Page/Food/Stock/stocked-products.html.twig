@@ -79,7 +79,13 @@
                             <td><input type="checkbox" {{ stockedProduct.stackable ? 'checked' : '' }} disabled></td>
                             <td><input type="checkbox" {{ stockedProduct.cool ? 'checked' : '' }} disabled></td>
                             <td>{{ stockedProduct.container.name }}</td>
-                            <td>{{ stockedProduct.container.floors[stockedProduct.floor].description }}</td>
+                            <td>
+                                {% for floor in stockedProduct.container.floors %}
+                                    {% if floor.id == stockedProduct.floor %}
+                                        {{ floor.description }}
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
                             <td>{{ stockedProduct.location }}</td>
                         </tr>
                     {% else %}
