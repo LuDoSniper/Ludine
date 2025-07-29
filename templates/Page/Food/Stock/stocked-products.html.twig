@@ -1,54 +1,130 @@
-<!doctype html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-    <table>
-        <thead>
-            <tr>
-                <th>Nom</th>
-                <th>Description</th>
-                <th>Date d'arrivée</th>
-                <th>Date de péremption</th>
-                <th>Stackable</th>
-                <th>Frais</th>
-                <th>Conteneur</th>
-                <th>Etage</th>
-                <th>Emplacement</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for stockedProduct in stockedProducts %}
-                <tr>
-                    <td>{{ stockedProduct.product.name }}</td>
-                    <td>{{ stockedProduct.product.description }}</td>
-                    <td>{{ stockedProduct.arivalDate | date }}</td>
-                    <td>{{ stockedProduct.expirationDate | date }}</td>
-                    <td>{{ stockedProduct.stackable }}</td>
-                    <td>{{ stockedProduct.cool }}</td>
-                    <td>{{ stockedProduct.container.name }}</td>
-                    <td>{{ stockedProduct.floor }}</td>
-                    <td>{{ stockedProduct.location }}</td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td>Aucune donnée</td>
-                    <td>Aucune donnée</td>
-                    <td>Aucune donnée</td>
-                    <td>Aucune donnée</td>
-                    <td>Aucune donnée</td>
-                    <td>Aucune donnée</td>
-                    <td>Aucune donnée</td>
-                    <td>Aucune donnée</td>
-                    <td>Aucune donnée</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</body>
-</html>
+{% extends 'Layout/base-modules.html.twig' %}
+
+{% block customstylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/Food/Stock/products.css') }}">
+{% endblock %}
+
+{% block title %}
+    Ludine - Stocked products
+{% endblock %}
+
+{% block main %}
+    {% include 'Widget/module-header.html.twig' with {
+        header: {
+            h1: 'Nourriture',
+            h2: {
+                'Repas': {
+                    selected: false,
+                    url: '#'
+                },
+                'Stock': {
+                    selected: true,
+                    url: path('food_stock_containers')
+                }
+            },
+            h3: {
+                'Conteneurs': {
+                    selected: false,
+                    url: path('food_stock_containers')
+                },
+                'Produits': {
+                    selected: false,
+                    url: path('food_stock_products')
+                },
+                'Produits stockés': {
+                    selected: true,
+                    url: path('food_stock_stocked_products')
+                }
+            }
+        }
+    } %}
+
+    <div id="content" class="list">
+        <div id="content-header">
+            <div class="group">
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Nouveau',
+                        'url': path('food_stock_stocked_product_create'),
+                        'type': 'primary'
+                    }
+                } %}
+
+                <a href=""><img src="{{ asset('img/svg/save.svg') }}"></a>
+            </div>
+        </div>
+
+        <div id="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Description</th>
+                        <th>Date d'arrivée</th>
+                        <th>Date de péremption</th>
+                        <th>Stackable</th>
+                        <th>Frais</th>
+                        <th>Conteneur</th>
+                        <th>Etage</th>
+                        <th>Emplacement</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stockedProduct in stockedProducts %}
+                        <tr>
+                            <td>{{ stockedProduct.product.name }}</td>
+                            <td>{{ stockedProduct.product.description }}</td>
+                            <td>{{ stockedProduct.arrivalDate | date }}</td>
+                            <td>{{ stockedProduct.expirationDate | date }}</td>
+                            <td><input type="checkbox" {{ stockedProduct.stackable ? 'checked' : '' }} disabled></td>
+                            <td><input type="checkbox" {{ stockedProduct.cool ? 'checked' : '' }} disabled></td>
+                            <td>{{ stockedProduct.container.name }}</td>
+                            <td>
+                                {% for floor in stockedProduct.container.floors %}
+                                    {% if floor.id == stockedProduct.floor %}
+                                        {{ floor.description }}
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>{{ stockedProduct.location }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                        </tr>
+                        <tr>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                        </tr>
+                        <tr>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

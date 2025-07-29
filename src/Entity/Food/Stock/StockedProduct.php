@@ -19,7 +19,7 @@ class StockedProduct
     private ?Product $product = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $arivalDate = null;
+    private ?\DateTimeInterface $arrivalDate = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $expirationDate = null;
@@ -57,14 +57,14 @@ class StockedProduct
         return $this;
     }
 
-    public function getArivalDate(): ?\DateTimeInterface
+    public function getArrivalDate(): ?\DateTimeInterface
     {
-        return $this->arivalDate;
+        return $this->arrivalDate;
     }
 
-    public function setArivalDate(\DateTimeInterface $arivalDate): static
+    public function setArrivalDate(\DateTimeInterface $arrivalDate): static
     {
-        $this->arivalDate = $arivalDate;
+        $this->arrivalDate = $arrivalDate;
 
         return $this;
     }

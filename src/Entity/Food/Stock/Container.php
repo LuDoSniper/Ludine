@@ -37,6 +37,9 @@ class Container
     #[ORM\OneToMany(targetEntity: StockedProduct::class, mappedBy: 'container')]
     private Collection $stockedProducts;
 
+    #[ORM\Column(type: Types::ARRAY)]
+    private array $floors = [];
+
     public function __construct()
     {
         $this->stockedProducts = new ArrayCollection();
@@ -133,6 +136,18 @@ class Container
                 $stockedProduct->setContainer(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getFloors(): array
+    {
+        return $this->floors;
+    }
+
+    public function setFloors(array $floors): static
+    {
+        $this->floors = $floors;
 
         return $this;
     }

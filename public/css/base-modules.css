@@ -1,0 +1,354 @@
+body {
+    display: flex;
+}
+
+main {
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+}
+
+header {
+    color: white;
+    padding: var(--large);
+    display: flex;
+    flex-direction: column;
+}
+
+header #top,
+header #bottom {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+header #top {
+    gap: var(--large);
+}
+
+header #top div,
+header #bottom {
+    display: flex;
+    gap: var(--medium);
+}
+
+header a {
+    text-decoration: none;
+    color: white;
+}
+
+h1 {
+    font-size: 40px;
+}
+
+h2, h3 {
+    font-weight: normal;
+}
+
+h2.selected,
+h3.selected {
+    font-weight: bold;
+}
+
+#content.form {
+    padding: 0 var(--large);
+}
+#content.list {
+    padding: 0;
+}
+
+form,
+.custom_form {
+    display: flex;
+    width: 100%;
+    gap: var(--large);
+}
+
+.group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--large);
+    max-width: 50%;
+    width: 100%;
+}
+
+.field {
+    color: white;
+    display: flex;
+    gap: var(--medium);
+    width: 100%;
+    font-size: var(--medium);
+}
+
+.field label {
+    white-space: nowrap;
+}
+
+.field .h1{
+    font-weight: bold;
+    font-size: 24px
+}
+
+.field input:focus-visible,
+.field input {
+    background: none;
+    border: none;
+    border-bottom: 1px solid #5B5B5B;
+    outline: none;
+    color: white;
+    width: 100%;
+    font-size: var(--medium);
+}
+
+.field input:focus-visible {
+    border-bottom: 1px solid #707070;
+}
+
+.field input.invalid,
+.field input:disabled.invalid {
+    border-bottom: 1px solid #f47575;
+}
+
+.field input[type=checkbox] {
+    width: initial;
+}
+
+.field input:disabled {
+    border: none;
+}
+
+#table-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    border: 1px solid #5B5B5B;
+    border-radius: var(--tiny);
+    overflow-y: scroll;
+    flex-shrink: 1;
+    max-height: 750px;
+}
+
+#table-container::-webkit-scrollbar {
+    width: 8px; /* largeur de la scrollbar verticale */
+    height: 8px; /* hauteur de la scrollbar horizontale */
+}
+
+#table-container::-webkit-scrollbar-track {
+    background: transparent; /* fond de la piste */
+}
+
+#table-container::-webkit-scrollbar-thumb {
+    background-color: #888; /* couleur de la barre */
+    border-radius: 4px;
+    border: 2px solid transparent; /* si tu veux un effet "padding" */
+}
+
+#table-container::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa; /* au survol */
+}
+
+table {
+    width: 100%;
+    color: white;
+    border-collapse: collapse;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+table tbody {
+    top: 0;
+    position: relative;
+}
+
+table thead tr {
+    border-bottom: 1px solid #5B5B5B;
+}
+
+table thead th {
+    padding: var(--medium);
+    text-align: left;
+    background-color: #3F3F47;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+table tbody td {
+    border-top: 1px solid #5B5B5B;
+}
+
+table tbody tr:nth-child(odd) {
+    background-color: #313138;
+}
+table tbody tr:nth-child(even) {
+    background-color: #3F3F47;
+}
+
+table tbody td {
+    padding: var(--large) var(--medium);
+    text-align: left;
+}
+
+table thead th:not(:last-child),
+table tbody td:not(:last-child) {
+    border-right: 1px solid #5B5B5B;
+}
+
+table thead th.align-left,
+table tbody td.align-left {
+    text-align: left;
+}
+
+table thead th.align-center,
+table tbody td.align-center {
+    text-align: center;
+}
+
+table thead th.align-right,
+table tbody td.align-right {
+    text-align: right;
+}
+
+#content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--medium);
+    width: 100%;
+}
+
+#content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.btn {
+    border: none;
+    border-radius: var(--tiny);
+    padding: 12px 20px;
+    color: white;
+    text-decoration: none;
+}
+
+.btn.btn-primary {
+    background-color: #313138;
+}
+
+#content-header div.group {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: var(--medium);
+}
+
+select[data-widget="relational"] {
+    background: none;
+    border: none;
+    border-bottom: 1px solid #5B5B5B;
+}
+
+.choices {
+    width: 100%;
+    border-radius: 0;
+}
+
+.choices.is-disabled {
+    display: none;
+}
+
+.choices[data-type*=select-one]::after {
+    right: 6px;
+}
+
+.choices__inner{
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid #5B5B5B;
+    color: white;
+    width: 100%;
+    font-size: var(--medium);
+    border-radius: 0;
+    padding: 0;
+    min-height: 0;
+}
+
+.choices__inner.invalid {
+    border-bottom: 1px solid #f47575;
+}
+
+.choices[data-type*=select-one] .choices__inner{
+    padding-bottom: 0;
+}
+
+.choices__list {
+    border-radius: var(--tiny);
+}
+
+.choices__list--single {
+    padding: 0;
+}
+
+.choices__list--dropdown,
+.choices__list[aria-expanded] {
+    background-color: transparent;
+    border: 1px solid #5B5B5B;
+}
+
+.choices__list,
+.choices__list--dropdown {
+    max-width: 175px;
+}
+
+.choices__list--dropdown .choices__item--selectable.is-highlighted,
+.choices__list[aria-expanded] .choices__item--selectable.is-highlighted {
+    background-color: #45454e;
+}
+
+/* Lignes impaires */
+.choices__list--dropdown .choices__item--choice:nth-child(odd) {
+    background-color: #313138;
+}
+
+/* Lignes paires */
+.choices__list--dropdown .choices__item--choice:nth-child(even) {
+    background-color: #3F3F47;
+}
+
+.is-focused .choices__inner,
+.is_open .choices__inner {
+    border-color: #707070;
+}
+
+.kanban {
+    width: 100%;
+    padding: var(--medium);
+}
+
+.kanban #kanban-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--medium);
+    width: 100%;
+}
+
+.kanban .card {
+    border: 1px solid #5B5B5B;
+    padding: var(--medium);
+    width: 25%;
+    cursor: pointer;
+}
+.kanban .card:hover {
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    transform: translateY(-4px);
+}
+
+.text-muted {
+    color: #909090 !important;
+}
