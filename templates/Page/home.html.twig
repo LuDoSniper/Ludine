@@ -4,6 +4,10 @@
     Home
 {% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/Widget/sidebar.css') }}">
+{% endblock %}
+
 {% block body %}
-    <h1>Home</h1>
+    {% include 'Widget/sidebar.html.twig' with {'active': ''} %}
 {% endblock %}

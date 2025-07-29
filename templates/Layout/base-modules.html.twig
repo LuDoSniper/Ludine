@@ -18,7 +18,8 @@
 {% endblock %}
 
 {% block body %}
-    {% include 'Widget/sidebar.html.twig' %}
+    {% set sidebar_active = sidebar_active|default('') %}
+    {% include 'Widget/sidebar.html.twig'  with {'active': sidebar_active}%}
     <main>
         {% block main %}
         {% endblock %}
