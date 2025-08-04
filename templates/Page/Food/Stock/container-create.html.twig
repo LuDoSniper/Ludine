@@ -37,19 +37,21 @@
     } %}
 
     <div id="content" class="form">
-    <div id="content-header">
-        <div class="group">
-            {% include 'Widget/button.html.twig' with {
-                'btn': {
-                    'name': 'Nouveau',
-                    'url': path('food_stock_container_create'),
-                    'type': 'primary'
-                }
-            } %}
+        <meta data-context='{"id": {{ id == 'new' ? '"' : '' }}{{ id }}{{ id == 'new' ? '"' : '' }}, "url": "{{ path('food_stock_containers_get', {'id': id}) }}"}'>
 
-            <a href="" id="save"><img src="{{ asset('img/svg/save.svg') }}"></a>
+        <div id="content-header">
+            <div class="group">
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Nouveau',
+                        'url': path('food_stock_container_create'),
+                        'type': 'primary'
+                    }
+                } %}
+
+                <a href="" id="save"><img src="{{ asset('img/svg/save.svg') }}"></a>
+            </div>
         </div>
-    </div>
 
         {{ form_start(form) }}
         <input type="hidden" name="id" value="{{ id }}">

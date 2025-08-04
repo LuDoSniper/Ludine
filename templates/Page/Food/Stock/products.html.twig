@@ -66,18 +66,11 @@
                 <tbody>
                     {% for product in products %}
                         <tr>
+                            <input type="hidden" name="url" value="{{ path('food_stock_products_update', {id: product.id}) }}">
                             <td>{{ product.name }}</td>
                             <td>{{ product.description }}</td>
                         </tr>
                     {% else %}
-                        <tr>
-                            <td>Aucune donnée</td>
-                            <td>Aucune donnée</td>
-                        </tr>
-                        <tr>
-                            <td>Aucune donnée</td>
-                            <td>Aucune donnée</td>
-                        </tr>
                         <tr>
                             <td>Aucune donnée</td>
                             <td>Aucune donnée</td>

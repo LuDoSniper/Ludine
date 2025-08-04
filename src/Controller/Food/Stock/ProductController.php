@@ -64,7 +64,8 @@ class ProductController extends AbstractController
             return $this->redirectToRoute('food_stock_products');
         }
 
-        return $this->render('Page/Food/Stock/products-update.html.twig', [
+        return $this->render('Page/Food/Stock/products-create.html.twig', [
+            'id' => $product->getId(),
             'form' => $form->createView()
         ]);
     }
