@@ -67,7 +67,8 @@ class StockedProductController extends AbstractController
             return $this->redirectToRoute('food_stock_stocked_products');
         }
 
-        return $this->render('Page/Food/Stock/stocked-products-update.html.twig', [
+        return $this->render('Page/Food/Stock/stocked-products-create.html.twig', [
+            'id' => $stockedProduct->getId(),
             'form' => $form->createView()
         ]);
     }
@@ -175,5 +176,34 @@ class StockedProductController extends AbstractController
             'floor' => $stocked_product->getFloor(),
             'location' => $stocked_product->getLocation(),
         ]]);
+    }
+
+    #[Route('/food/stock/stocked-product/get/{id}', 'food_stock_stocked_product_get')]
+    public function getData(
+        StockedProduct $stockedProduct,
+    ): JsonResponse {
+        return new JsonResponse([
+            'id' => $stockedProduct->getId(),
+            'product' => [
+                'id' => $stockedProduct->getProduct()->getId(),
+                'name' => $stockedProduct->getProduct()->getName(),
+                'description' => $stockedProduct->getProduct()->getDescription()
+            ],
+            'arrivalDate' => $stockedProduct->getArrivalDate(),
+            'expirationDate' => $stockedProduct->getExpirationDate(),
+            'stackable' => $stockedProduct->isStackable(),
+            'cool' => $stockedProduct->isCool(),
+            'container' => [
+                'id' => $stockedProduct->getContainer()->getId(),
+                'name' => $stockedProduct->getContainer()->getName(),
+                'description' => $stockedProduct->getContainer()->getDescription(),
+                'cool' => $stockedProduct->getContainer()->isCool(),
+                'nbFloor' => $stockedProduct->getContainer()->getNbFloor(),
+                'ref' => $stockedProduct->getContainer()->getRef(),
+                'floors' => $stockedProduct->getContainer()->getFloors(),
+            ],
+            'floor' => $stockedProduct->getFloor(),
+            'location' => $stockedProduct->getLocation(),
+        ], Response::HTTP_OK);
     }
 }

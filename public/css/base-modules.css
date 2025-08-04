@@ -187,6 +187,11 @@ table tbody tr:nth-child(even) {
     background-color: #3F3F47;
 }
 
+table tbody tr:hover {
+    background-color: #51515a;
+    cursor: pointer;
+}
+
 table tbody td {
     padding: var(--large) var(--medium);
     text-align: left;

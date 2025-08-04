@@ -41,6 +41,8 @@
     } %}
 
     <div id="content" class="form">
+        <meta data-context='{"id": {{ id == 'new' ? '"' : '' }}{{ id }}{{ id == 'new' ? '"' : '' }}, "url": "{{ path('food_stock_products_get', {'id': id}) }}"}'>
+
         <div id="content-header">
             <div class="group">
                 {% include 'Widget/button.html.twig' with {

@@ -73,6 +73,7 @@
                 <tbody>
                     {% for stockedProduct in stockedProducts %}
                         <tr>
+                            <input type="hidden" name="url" value="{{ path('food_stock_stocked_product_update', {id: stockedProduct.id}) }}">
                             <td>{{ stockedProduct.product.name }}</td>
                             <td>{{ stockedProduct.product.description }}</td>
                             <td>{{ stockedProduct.arrivalDate | date }}</td>
@@ -90,28 +91,6 @@
                             <td>{{ stockedProduct.location }}</td>
                         </tr>
                     {% else %}
-                        <tr>
-                            <td>Aucune donnée</td>
-                            <td>Aucune donnée</td>
-                            <td>Aucune donnée</td>
-                            <td>Aucune donnée</td>
-                            <td>Aucune donnée</td>
-                            <td>Aucune donnée</td>
-                            <td>Aucune donnée</td>
-                            <td>Aucune donnée</td>
-                            <td>Aucune donnée</td>
-                        </tr>
-                        <tr>
-                            <td>Aucune donnée</td>
-                            <td>Aucune donnée</td>
-                            <td>Aucune donnée</td>
-                            <td>Aucune donnée</td>
-                            <td>Aucune donnée</td>
-                            <td>Aucune donnée</td>
-                            <td>Aucune donnée</td>
-                            <td>Aucune donnée</td>
-                            <td>Aucune donnée</td>
-                        </tr>
                         <tr>
                             <td>Aucune donnée</td>
                             <td>Aucune donnée</td>

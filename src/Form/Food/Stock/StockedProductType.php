@@ -5,8 +5,10 @@ namespace App\Form\Food\Stock;
 use App\Entity\Food\Stock\Container;
 use App\Entity\Food\Stock\Product;
 use App\Entity\Food\Stock\StockedProduct;
+use DateTimeInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -76,6 +78,23 @@ class StockedProductType extends AbstractType
                 }
             ])
         ;
+
+        $builder->get('arrivalDate')->addModelTransformer(new CallbackTransformer(
+            function (?DateTimeInterface $date): ?string {
+                return $date?->format('d/m/Y');
+            },
+            function (?string $string): ?\DateTimeInterface {
+                return $string ? \DateTime::createFromFormat('d/m/Y', $string) : null;
+            }
+        ));
+        $builder->get('expirationDate')->addModelTransformer(new CallbackTransformer(
+            function (?DateTimeInterface $date): ?string {
+                return $date?->format('d/m/Y');
+            },
+            function (?string $string): ?\DateTimeInterface {
+                return $string ? \DateTime::createFromFormat('d/m/Y', $string) : null;
+            }
+        ));
     }
 
     public function configureOptions(OptionsResolver $resolver): void

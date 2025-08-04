@@ -29,6 +29,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })
 
+    if (LudineApp.context && LudineApp.context.id !== 'new') {
+        const container = document.getElementById('stocked_product_container');
+        container.dispatchEvent(new Event('change'));
+        // fetch(LudineApp.context.url)
+        //     .then(res => res.json())
+        //     .then(data => {
+        //         const floor = document.getElementById('stocked_product_floor');
+        //         Array.from(floor.options).forEach(option => {
+        //             console.log(option);
+        //             if (option.dataset.customProperties.id === data.floor) {
+        //                 floor.selectedIndex = Array.from(floor.options).indexOf(option);
+        //                 const choice = window.LudineApp.choicesInstances.get(floor);
+        //                 if (choice) {
+        //                     choice.setChoiceByValue(option.value)
+        //                 }
+        //                 // floor.dispatchEvent(new Event('change'));
+        //                 console.log('Setting choice to', option.value, 'vs', data.floor);
+        //             }
+        //         })
+        //     })
+    }
+
     form.addEventListener('input', (e) => {
         formModified = true;
     })
