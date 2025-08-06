@@ -1,0 +1,131 @@
+{% extends 'Layout/base-modules.html.twig' %}
+
+{% block title %}
+    Ludine | Create dish
+{% endblock %}
+
+{% block context %}
+    {% set context_trees = '' %}
+    {% if trees is defined %}
+        {% set context_trees = trees %}
+    {% endif %}
+    {{ {
+        "id": id,
+        "save_path": path('food_meal_dishes_save'),
+        "model": "dish",
+        "fields": [
+            {"name": "name", "type": "char"},
+            {"name": "description", "type": "char"},
+            {"name": "instructions", "type": "text"},
+            {"name": "preparationTime", "type": "int"},
+            {"name": "cookingTime", "type": "int"},
+            {"name": "difficulty", "type": "int"},
+            {"name": "tags", "type": "relational"},
+            {"name": "ingredients", "type": "relational"},
+            {"name": "droprate", "type": "float"},
+        ],
+        "trees": trees
+    } | json_encode | raw }}
+{% endblock %}
+
+{% block main %}
+    {% include 'Widget/module-header.html.twig' with {
+        header: {
+            h1: 'Nourriture',
+            h2: {
+                'Repas': {
+                    selected: true,
+                    url: path('food_meal')
+                },
+                'Stock': {
+                    selected: false,
+                    url: path('food_stock')
+                }
+            },
+            h3: {
+                'Tableau de bord': {
+                    selected: false,
+                    url: path('food_stock_containers')
+                },
+                'Plats': {
+                    selected: true,
+                    url: path('food_meal_dishes')
+                },
+                'Tags': {
+                    selected: false,
+                    url: path('food_meal_tags')
+                },
+                'Configuration': {
+                    selected: false,
+                    url: path('food_meal_config')
+                }
+            }
+        }
+    } %}
+
+    <div id="content" class="form">
+        <div id="content-header">
+            <div class="group">
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Nouveau',
+                        'url': path('food_meal_dishes_create'),
+                        'type': 'primary',
+                        'action_type': 'redirect'
+                    }
+                } %}
+
+                {% include 'Widget/button.html.twig' with {'btn': {'action_type': 'save'}} %}
+            </div>
+        </div>
+
+        {{ form_start(form) }}
+        <input type="hidden" name="id" value="new">
+        <div class="group" style="max-width: 100% !important;">
+            <div class="field">
+                {{ form_label(form.name) }}
+                {{ form_widget(form.name) }}
+            </div>
+            <div style="display: flex; gap: var(--medium)">
+                <div class="group">
+                    <div class="field">
+                        {{ form_label(form.description) }}
+                        {{ form_widget(form.description) }}
+                    </div>
+                    <div class="field">
+                        {{ form_label(form.tags) }}
+                        {{ form_widget(form.tags) }}
+                    </div>
+                    <div class="field">
+                        {{ form_label(form.preparationTime) }}
+                        {{ form_widget(form.preparationTime) }}
+                    </div>
+                    <div class="field">
+                        {{ form_label(form.cookingTime) }}
+                        {{ form_widget(form.cookingTime) }}
+                    </div>
+                </div>
+                <div class="group">
+                    <div class="field">
+                        {{ form_label(form.difficulty) }}
+                        {{ form_widget(form.difficulty) }}
+                    </div>
+                    <div class="field">
+                        {{ form_label(form.dropRate) }}
+                        {{ form_widget(form.dropRate) }}
+                    </div>
+                    <div class="field">
+                        {{ form_label(form.instructions) }}
+                        {{ form_widget(form.instructions) }}
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="dish_ingredient">Ingrédients</label>
+                    <div id="dish_ingredient" data-widget="tree"></div>
+                </div>
+            </div>
+        </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
+

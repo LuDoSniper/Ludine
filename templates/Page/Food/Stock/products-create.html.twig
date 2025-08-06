@@ -9,6 +9,19 @@
     <link rel="stylesheet" href="{{ asset('css/Food/Stock/products-create.css') }}">
 {% endblock %}
 
+{% block context %}
+    {{ {
+        "id": id,
+        "save_path": path('food_stock_products_save'),
+        "get_path": path('food_stock_products_get', {'id': id}),
+        "model": "product",
+        "fields": [
+            {"name": "name", "type": "char"},
+            {"name": "description", "type": "char"}
+        ]
+    } | json_encode | raw }}
+{% endblock %}
+
 {% block main %}
     {% include 'Widget/module-header.html.twig' with {
         header: {
@@ -16,11 +29,11 @@
             h2: {
                 'Repas': {
                     selected: false,
-                    url: '#'
+                    url: path('food_meal')
                 },
                 'Stock': {
                     selected: true,
-                    url: path('food_stock_containers')
+                    url: path('food_stock')
                 }
             },
             h3: {
@@ -41,19 +54,18 @@
     } %}
 
     <div id="content" class="form">
-        <meta data-context='{"id": {{ id == 'new' ? '"' : '' }}{{ id }}{{ id == 'new' ? '"' : '' }}, "url": "{{ path('food_stock_products_get', {'id': id}) }}"}'>
-
         <div id="content-header">
             <div class="group">
                 {% include 'Widget/button.html.twig' with {
                     'btn': {
                         'name': 'Nouveau',
                         'url': path('food_stock_products_create'),
-                        'type': 'primary'
+                        'type': 'primary',
+                        'action_type': 'redirect'
                     }
                 } %}
 
-                <a href="" id="save"><img src="{{ asset('img/svg/save.svg') }}"></a>
+                {% include 'Widget/button.html.twig' with {'btn': {'action_type': 'save'}} %}
             </div>
         </div>
 
@@ -71,8 +83,4 @@
             </div>
         {{ form_end(form) }}
     </div>
-{% endblock %}
-
-{% block customjavascripts %}
-    <script src="{{ asset('js/Food/Stock/products-create.js') }}"></script>
 {% endblock %}

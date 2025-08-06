@@ -72,6 +72,12 @@ form,
     width: 100%;
 }
 
+.group-inline {
+    display: flex;
+    flex-direction: row;
+    gap: var(--medium);
+}
+
 .field {
     color: white;
     display: flex;
@@ -115,6 +121,20 @@ form,
 
 .field input:disabled {
     border: none;
+}
+.field textarea {
+    resize: none;
+    width: 100%;
+    border: none;
+    border-bottom: 1px solid #5B5B5B;
+    background: transparent;
+    font-size: var(--medium);
+    outline: none;
+    color: white;
+    overflow: hidden;
+}
+.field textarea:focus-visible {
+    border-bottom: 1px solid #707070;
 }
 
 #table-container {
@@ -176,10 +196,6 @@ table thead th {
     z-index: 1;
 }
 
-table tbody td {
-    border-top: 1px solid #5B5B5B;
-}
-
 table tbody tr:nth-child(odd) {
     background-color: #313138;
 }
@@ -193,6 +209,7 @@ table tbody tr:hover {
 }
 
 table tbody td {
+    border-top: 1px solid #5B5B5B;
     padding: var(--large) var(--medium);
     text-align: left;
 }
@@ -244,6 +261,9 @@ table tbody td.align-right {
 .btn.btn-primary {
     background-color: #313138;
 }
+.btn.btn-secondary {
+    border: 2px solid #313138;
+}
 
 #content-header div.group {
     display: flex;
@@ -278,6 +298,7 @@ select[data-widget="relational"] {
     border-bottom: 1px solid #5B5B5B;
     color: white;
     width: 100%;
+    height: 100%;
     font-size: var(--medium);
     border-radius: 0;
     padding: 0;
@@ -308,7 +329,7 @@ select[data-widget="relational"] {
 
 .choices__list,
 .choices__list--dropdown {
-    max-width: 175px;
+    /*max-width: 175px;*/
 }
 
 .choices__list--dropdown .choices__item--selectable.is-highlighted,
@@ -329,6 +350,18 @@ select[data-widget="relational"] {
 .is-focused .choices__inner,
 .is_open .choices__inner {
     border-color: #707070;
+}
+
+.choices__button {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' width='14' height='14'%3E%3Cpath fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' d='M1,1 L13,13 M13,1 L1,13'/%3E%3C/svg%3E") !important;
+    color: var(--bg-color);
+    background-size: 1em 1em;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.choices[data-type="select-multiple"] input[type="search"] {
+    display: none;
 }
 
 .kanban {
@@ -356,4 +389,99 @@ select[data-widget="relational"] {
 
 .text-muted {
     color: #909090 !important;
+}
+
+.text-center {
+    text-align: center;
+}
+.text-end {
+    text-align: right;
+}
+.text-start {
+    text-align: left;
+}
+
+#content.config form {
+    display: flex;
+    flex-direction: column;
+}
+
+#content.config div.section-content{
+    padding: 0 var(--large);
+    display: flex;
+    gap: var(--medium);
+}
+
+#content.config section {
+    width: 100%;
+}
+
+#content.config section .section-title {
+    display: inline-block;
+    width: 100%;
+    padding: var(--medium) var(--large);
+    background-color: #3F3F47;
+    color: white;
+    font-weight: bold;
+    margin-bottom: var(--medium);
+}
+
+.pickr .pcr-button {
+    width: 50px;
+    height: 16px;
+}
+
+.pickr .pcr-button,
+.pickr .pcr-button::before,
+.pickr .pcr-button::after {
+    border-radius: 12px;
+}
+
+.pcr-app .pcr-selection .pcr-picker {
+    transition: none;
+}
+
+input[type=checkbox] {
+    appearance: none;
+    width: 24px !important;
+    height: 24px;
+    border: 1px solid #5B5B5B;
+    border-radius: var(--tiny);
+    background-color: transparent;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    position: relative;
+}
+input[type=checkbox]:checked {
+    background-image: url("../img/svg/checkbox_check.svg");
+    background-color: #45454e;
+}
+/*input[type=checkbox]::after {*/
+/*    content: "✓";*/
+/*    color: white;*/
+/*    font-size: 16px;*/
+/*    position: absolute;*/
+/*    top: 50%;*/
+/*    left: 50%;*/
+/*    transform: translate(-50%, -55%);*/
+/*    pointer-events: none;*/
+/*}*/
+
+.stars {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: var(--small);
+}
+
+.stars .star {
+    color: #525354;
+}
+.stars .star:hover:not(.selected),
+.stars .star:hover:not(.selected) ~ .star:not(.selected) {
+    color: #666e7c;
+}
+.stars .star.selected {
+    color: #97A4BC;
 }

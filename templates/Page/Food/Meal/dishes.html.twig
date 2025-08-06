@@ -1,21 +1,23 @@
-{% set sidebar_active = 'food' %}
 {% extends 'Layout/base-modules.html.twig' %}
 
 {% block title %}
-    Ludine - Products
-{% endblock %}
-
-{% block customstylesheets %}
-    <link rel="stylesheet" href="{{ asset('css/Food/Stock/products.css') }}">
+    Ludine | Repas
 {% endblock %}
 
 {% block context %}
     {{ {
-        "save_path": path('food_stock_products_save'),
-        "model": "product",
+        "save_path": path('food_meal_dishes_save'),
+        "model": "dish",
         "fields": [
             {"name": "name", "type": "char"},
-            {"name": "description", "type": "char"}
+            {"name": "description", "type": "char"},
+            {"name": "instructions", "type": "text"},
+            {"name": "preparationTime", "type": "int"},
+            {"name": "cookingTime", "type": "int"},
+            {"name": "difficulty", "type": "int"},
+            {"name": "tags", "type": "relational"},
+            {"name": "ingredients", "type": "relational"},
+            {"name": "droprate", "type": "float"},
         ]
     } | json_encode | raw }}
 {% endblock %}
@@ -26,26 +28,30 @@
             h1: 'Nourriture',
             h2: {
                 'Repas': {
-                    selected: false,
+                    selected: true,
                     url: path('food_meal')
                 },
                 'Stock': {
-                    selected: true,
+                    selected: false,
                     url: path('food_stock')
                 }
             },
             h3: {
-                'Conteneurs': {
+                'Tableau de bord': {
                     selected: false,
                     url: path('food_stock_containers')
                 },
-                'Produits': {
+                'Plats': {
                     selected: true,
-                    url: path('food_stock_products')
+                    url: path('food_meal_dishes')
                 },
-                'Produits stockés': {
+                'Tags': {
                     selected: false,
-                    url: path('food_stock_stocked_products')
+                    url: path('food_meal_tags')
+                },
+                'Configuration': {
+                    selected: false,
+                    url: path('food_meal_config')
                 }
             }
         }
@@ -57,7 +63,7 @@
                 {% include 'Widget/button.html.twig' with {
                     'btn': {
                         'name': 'Nouveau',
-                        'url': path('food_stock_products_create'),
+                        'url': path('food_meal_dishes_create'),
                         'type': 'primary',
                         'action_type': 'redirect'
                     }
@@ -72,18 +78,27 @@
                 <thead>
                     <tr>
                         <th>Nom</th>
-                        <th>Description</th>
+                        <th>Tags</th>
+                        <th>Temps</th>
+                        <th>Difficulté</th>
+                        <th>Drop rate</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for product in products %}
+                    {% for dish in dishes %}
                         <tr>
-                            <input type="hidden" name="url" value="{{ path('food_stock_products_update', {id: product.id}) }}">
-                            <td>{{ product.name }}</td>
-                            <td>{{ product.description }}</td>
+                            <input type="hidden" name="url" value="{{ path('food_meal_dish_update', {id: dish.id}) }}">
+                            <td>{{ dish.name }}</td>
+                            <td>{{ dish.tags }}</td>
+                            <td>{{ dish.preparationTime }}</td>
+                            <td>{{ dish.difficulty }}</td>
+                            <td>{{ dish.dropRate }}</td>
                         </tr>
                     {% else %}
                         <tr>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
                             <td>Aucune donnée</td>
                             <td>Aucune donnée</td>
                         </tr>
@@ -93,3 +108,4 @@
         </div>
     </div>
 {% endblock %}
+

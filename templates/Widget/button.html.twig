@@ -1,1 +1,15 @@
-<a href="{{ btn.url }}" class="btn btn-{{ btn.type }}">{{ btn.name }}</a>
+<a
+    href="{{ btn.url is defined ? btn.url : '' }}"
+    {% if btn.action_type is defined and btn.action_type == 'save' %}
+        id="save"
+    {% endif %}
+    {% if btn.type is defined and btn.type in ['primary', 'secondary'] %}
+        class="btn btn-{{ btn.type }}"
+    {% endif %}
+>
+    {% if btn.action_type is defined and btn.action_type == 'save' and (btn.type is not defined or btn.type not in ['primary', 'secondary']) %}
+        <img src="{{ asset('img/svg/save.svg') }}">
+    {% elseif btn.name is defined %}
+        {{ btn.name }}
+    {% endif %}
+</a>

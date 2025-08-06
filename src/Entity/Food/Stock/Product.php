@@ -2,6 +2,7 @@
 
 namespace App\Entity\Food\Stock;
 
+use App\Entity\Food\Meal\Ingredient;
 use App\Repository\Food\Stock\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -28,9 +29,16 @@ class Product
     #[ORM\OneToMany(targetEntity: StockedProduct::class, mappedBy: 'product')]
     private Collection $stockedProducts;
 
+    /**
+     * @var Collection<int, Ingredient>
+     */
+    #[ORM\OneToMany(targetEntity: Ingredient::class, mappedBy: 'product')]
+    private Collection $ingredients;
+
     public function __construct()
     {
         $this->stockedProducts = new ArrayCollection();
+        $this->ingredients = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -86,6 +94,36 @@ class Product
             // set the owning side to null (unless already changed)
             if ($stockedProduct->getProduct() === $this) {
                 $stockedProduct->setProduct(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Ingredient>
+     */
+    public function getIngredients(): Collection
+    {
+        return $this->ingredients;
+    }
+
+    public function addIngredient(Ingredient $ingredient): static
+    {
+        if (!$this->ingredients->contains($ingredient)) {
+            $this->ingredients->add($ingredient);
+            $ingredient->setProduct($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIngredient(Ingredient $ingredient): static
+    {
+        if ($this->ingredients->removeElement($ingredient)) {
+            // set the owning side to null (unless already changed)
+            if ($ingredient->getProduct() === $this) {
+                $ingredient->setProduct(null);
             }
         }
 

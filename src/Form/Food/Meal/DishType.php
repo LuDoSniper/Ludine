@@ -1,0 +1,80 @@
+<?php
+
+namespace App\Form\Food\Meal;
+
+use App\Entity\Food\Meal\Dish;
+use App\Entity\Food\Meal\Tag;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+class DishType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('name', TextType::class, [
+                'label' => 'Nom',
+                'label_attr' => [
+                    'class' => 'h1',
+                ]
+            ])
+            ->add('description', TextType::class, [
+                'label' => 'Description',
+            ])
+            ->add('instructions', TextAreaType::class, [
+                'label' => 'Instructions'
+            ])
+            ->add('preparationTime', IntegerType::class, [
+                'label' => "Temps de préparation"
+            ])
+            ->add('cookingTime', IntegerType::class, [
+                'label' => "Temps de cuisson"
+            ])
+            ->add('difficulty', IntegerType::class, [
+                'label' => "Difficulté",
+                'attr' => [
+                    'data-widget' => 'star',
+                    'max' => $options['maxDifficulty']
+                ],
+            ])
+            ->add('tags', EntityType::class, [
+                'class' => Tag::class,
+                'choice_label' => 'name',
+                'multiple' => true,
+                'label' => 'Tags',
+                'attr' => [
+                    'class' => 'field',
+                    'data-widget' => 'relational',
+                    'data-placeholder' => ' '
+                ],
+                'choice_attr' => function (Tag $tag) {
+                    return [
+                        'data-id' => $tag->getId(),
+                        'data-url' => '/food/meal/tags/get/' . $tag->getId(),
+                        'data-external_id' => 'food_meal_tags',
+                        'data-color' => $tag->getColor(),
+                    ];
+                }
+            ])
+            ->add('dropRate', IntegerType::class, [
+                'label' => 'Drop rate',
+                'attr' => [
+                    'step' => '0.01',
+                ]
+            ])
+        ;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => Dish::class,
+            'maxDifficulty' => 3,
+        ]);
+    }
+}

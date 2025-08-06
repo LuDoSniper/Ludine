@@ -45,6 +45,7 @@ class ProductController extends AbstractController
         }
 
         return $this->render('Page/Food/Stock/products-create.html.twig', [
+            'id' => 'new',
             'form' => $form->createView()
         ]);
     }

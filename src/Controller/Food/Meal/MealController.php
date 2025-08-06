@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Controller\Food\Stock;
+namespace App\Controller\Food\Meal;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-class StockController extends AbstractController
+class MealController extends AbstractController
 {
-    #[Route('/food_stock', name: 'food_stock')]
+    #[Route('/food/meal', 'food_meal')]
     public function index(): Response
     {
-        return $this->redirectToRoute('food_stock_containers');
+        return $this->redirectToRoute('food_meal_tags');
     }
 }

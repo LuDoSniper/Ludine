@@ -1,0 +1,130 @@
+{% set sidebar_active = 'food' %}
+{% extends 'Layout/base-modules.html.twig' %}
+
+{% block title %}
+    Ludine - Configuration
+{% endblock %}
+
+{% block context %}
+    {{ {
+        "id": id,
+        "save_path": path('food_meal_config_save'),
+        "model": "config",
+        "fields": [
+            {"name": "selectionMode", "type": "int"},
+            {"name": "selectLunch", "type": "bool"},
+            {"name": "selectDiner", "type": "bool"},
+            {"name": "lunchTime", "type": "time"},
+            {"name": "dinerTime", "type": "time"},
+            {"name": "maxDifficulty", "type": "int"},
+        ]
+    } | json_encode | raw }}
+{% endblock %}
+
+{% block main %}
+    {% include 'Widget/module-header.html.twig' with {
+        header: {
+            h1: 'Nourriture',
+            h2: {
+                'Repas': {
+                    selected: true,
+                    url: path('food_meal')
+                },
+                'Stock': {
+                    selected: false,
+                    url: path('food_stock')
+                }
+            },
+            h3: {
+                'Tableau de bord': {
+                    selected: false,
+                    url: path('food_stock_containers')
+                },
+                'Plats': {
+                    selected: false,
+                    url: path('food_meal_dishes')
+                },
+                'Tags': {
+                    selected: false,
+                    url: path('food_meal_tags')
+                },
+                'Configuration': {
+                    selected: true,
+                    url: path('food_meal_config')
+                }
+            }
+        }
+    } %}
+
+    <div id="content" class="config">
+        <div id="content-header">
+            <div class="group">
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Enregistrer',
+                        'type': 'primary',
+                        'action_type': 'save'
+                    }
+                } %}
+
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Annuler',
+                        'url': path('food_meal_config'),
+                        'type': 'secondary',
+                        'action_type': 'redirect'
+                    }
+                } %}
+            </div>
+        </div>
+
+        {{ form_start(form) }}
+            <section id="dashboard">
+                <span class="section-title">Tableau de bord</span>
+                <div class="section-content">
+                    <div class="group">
+                        <div class="field">
+                            {{ form_label(form.selectionMode) }}
+                            {{ form_widget(form.selectionMode) }}
+                        </div>
+                    </div>
+                    <div class="group">
+                        <div class="group-inline">
+                            <div class="field" style="width: initial; align-items: center;">
+                                {{ form_label(form.selectLunch) }}
+                                {{ form_widget(form.selectLunch) }}
+                            </div>
+                            <div class="field" style="align-items: center;">
+                                {{ form_label(form.lunchTime) }}
+                                {{ form_widget(form.lunchTime) }}
+                            </div>
+                        </div>
+                        <div class="group-inline">
+                            <div class="field" style="width: initial; align-items: center;">
+                                {{ form_label(form.selectDiner) }}
+                                {{ form_widget(form.selectDiner) }}
+                            </div>
+                            <div class="field" style="align-items: center;">
+                                {{ form_label(form.dinerTime) }}
+                                {{ form_widget(form.dinerTime) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section id="dish">
+                <span class="section-title">Repas</span>
+                <div class="section-content">
+                    <div class="group">
+                        <div class="field">
+                            {{ form_label(form.maxDifficulty) }}
+                            {{ form_widget(form.maxDifficulty) }}
+                        </div>
+                    </div>
+                    <div class="group"></div>
+                </div>
+            </section>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
+
