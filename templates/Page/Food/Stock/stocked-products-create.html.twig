@@ -12,8 +12,7 @@
         "save_path": path('food_stock_stocked_products_save'),
         "model": "stocked_product",
         "fields": [
-            {"name": "name", "type": "char"},
-            {"name": "description", "type": "char"},
+            {"name": "product", "type": "relational"},
             {"name": "arrivalDate", "type": "date"},
             {"name": "expirationDate", "type": "date"},
             {"name": "stackable", "type": "bool"},

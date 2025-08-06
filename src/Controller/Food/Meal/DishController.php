@@ -38,6 +38,8 @@ class DishController extends AbstractController
         $config = $this->entityManager->getRepository(Config::class)->findAll();
         if (count($config) >= 1) {
             $config = $config[0];
+        } else {
+            $config = (new ConfigController($this->entityManager))->initializeDefault();
         }
 
         $form = $this->createForm(DishType::class, $dish, [
@@ -71,6 +73,7 @@ class DishController extends AbstractController
                     ],
                     'model' => 'ingredient',
                     'save_path' => '/food/meal/ingredients/save',
+                    'get_path' => '/food/meal/ingredients/get',
                 ]
             ],
         ]);
@@ -85,6 +88,8 @@ class DishController extends AbstractController
         $config = $this->entityManager->getRepository(Config::class)->findAll();
         if (count($config) >= 1) {
             $config = $config[0];
+        } else {
+            $config = (new ConfigController($this->entityManager))->initializeDefault();
         }
 
         $form = $this->createForm(Dish::class, $dish, [

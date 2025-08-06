@@ -26,7 +26,7 @@ class ConfigController extends AbstractController
         if (count($configs) >= 1) {
             $config = $configs[0];
         } else {
-            $config = new Config();
+            $config = $this->setToDefault(new Config());
         }
 
         $form = $this->createForm(ConfigType::class, $config);
@@ -81,7 +81,7 @@ class ConfigController extends AbstractController
         }
 
         if ($data['id'] === 'new') {
-            $config = new Config();
+            $config = $this->setToDefault(new Config());
         } else {
             $config = $this->entityManager->getRepository(Config::class)->find((int) $data['id']);
         }
@@ -107,5 +107,31 @@ class ConfigController extends AbstractController
             'dinerTime' => $config->getDinerTime(),
             'maxDifficulty' => $config->getMaxDifficulty(),
         ]]);
+    }
+
+    public function initializeDefault(): Config
+    {
+        $config = $this->setToDefault(new Config());
+
+        $this->entityManager->persist($config);
+        $this->entityManager->flush();
+
+        return $config;
+    }
+
+    public function setToDefault(
+        Config $config
+    ): Config
+    {
+        $config
+            ->setSelectionMode(1)
+            ->setSelectLunch(true)
+            ->setSelectDiner(true)
+            ->setLunchTime(new \DateTime("12:00"))
+            ->setDinerTime(new \DateTime("19:00"))
+            ->setMaxDifficulty(5)
+        ;
+
+        return $config;
     }
 }

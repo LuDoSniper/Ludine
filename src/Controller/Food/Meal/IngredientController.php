@@ -61,4 +61,24 @@ class IngredientController extends AbstractController
             'product' => $ingredient->getProduct(),
         ]]);
     }
+
+    #[Route('/food/meal/ingredients/get', 'food_meal_ingredient_get')]
+    public function get(): JSONResponse
+    {
+        $ingredients = $this->entityManager->getRepository(Ingredient::class)->findAll();
+
+        $data = ["ingredients" => []];
+        foreach ($ingredients as $ingredient) {
+            $data["ingredients"][] = [
+                'id' => $ingredient->getId(),
+                'quantity' => $ingredient->getQuantity(),
+                'product' => [
+                    'id' => $ingredient->getProduct()->getId(),
+                    'name' => $ingredient->getProduct()->getName(),
+                    'description' => $ingredient->getProduct()->getDescription(),
+                ],
+            ];
+        }
+        return new JsonResponse($data, Response::HTTP_OK);
+    }
 }

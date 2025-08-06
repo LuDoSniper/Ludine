@@ -383,7 +383,7 @@ select[data-widget="relational"] {
     cursor: pointer;
 }
 .kanban .card:hover {
-    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    box-shadow: rgba(100, 100, 111, 0.2) 0 7px 29px 0;
     transform: translateY(-4px);
 }
 
@@ -477,6 +477,7 @@ input[type=checkbox]:checked {
 
 .stars .star {
     color: #525354;
+    cursor: pointer;
 }
 .stars .star:hover:not(.selected),
 .stars .star:hover:not(.selected) ~ .star:not(.selected) {

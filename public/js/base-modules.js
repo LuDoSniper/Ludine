@@ -231,6 +231,62 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })
 
+    // Widget tree
+    const treeFields = document.querySelectorAll('[data-widget="tree"]');
+    treeFields.forEach(async (treeField) => {
+        const model = treeField.id.split('_')[0];
+        const field = treeField.id.split('_')[1];
+        if (LudineApp.context.trees[field]) {
+            treeData = LudineApp.context.trees[field];
+
+            const container = document.createElement('div');
+            container.id = 'table-container';
+
+            const form = document.createElement('form');
+            container.appendChild(form);
+
+            const table = document.createElement('table');
+            table.classList.add('editable')
+            table.id = field
+
+            const colgroup = document.createElement('colgroup');
+            for (let i = 0; i < treeData.fields.length; i++) {
+                const col = document.createElement('col');
+                col.style = `width: ${100 / treeData.fields.length}%;`;
+                colgroup.appendChild(col);
+            }
+            table.appendChild(colgroup);
+
+            const thead = document.createElement('thead');
+            table.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+            table.appendChild(tbody);
+
+            const theadTr = document.createElement('tr');
+            const tbodyTr = document.createElement('tr');
+            for (let i = 0; i < treeData.fields.length; i++) {
+                const th = document.createElement('th');
+                const td = document.createElement('td');
+
+                const treeField = LudineApp.context.trees[field]
+                th.textContent = treeField.string ? treeField.string : treeField.name;
+                // td.textContent = treeField.value;
+                td.dataset.type = treeField.type;
+                td.dataset.name = treeField.name;
+
+                try {
+                    const response = await fetch(treeField.get_path);
+                    const data = await response.json();
+
+                    
+                } catch (error) {
+                    console.log(`Erreur lors du fetch ${treeField.get_path} :`, error);
+                }
+            }
+        }
+    })
+
     // Field Text
     const textFields = document.querySelectorAll('textarea');
     textFields.forEach(textField => {
