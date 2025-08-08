@@ -63,12 +63,15 @@ class DishController extends AbstractController
                         [
                             'name' => 'quantity',
                             'type' => 'float',
-                            'string' => 'Quantité'
+                            'string' => 'Quantité',
+                            'sequence' => 2,
                         ],
                         [
                             'name' => 'product',
                             'type' => 'relational',
-                            'string' => 'Produit'
+                            'string' => 'Produit',
+                            'get_meta' => '/food/stock/products/get_meta',
+                            'sequence' => 1,
                         ],
                     ],
                     'model' => 'ingredient',

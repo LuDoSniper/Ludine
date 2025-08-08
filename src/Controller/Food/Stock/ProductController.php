@@ -138,4 +138,27 @@ class ProductController extends AbstractController
             'description' => $product->getDescription(),
         ], Response::HTTP_OK);
     }
+
+    #[Route('/food/stock/products/get_meta', 'food_stock_products_get_meta')]
+    public function getMeta(): JsonResponse
+    {
+        return new JsonResponse([
+            "fields" => [
+                [
+                    "name" => "name",
+                    "type" => "char",
+                    "string" => "Nom",
+                    'sequence' => 1
+                ],
+                [
+                    "name" => "description",
+                    "type" => "char",
+                    "string" => "Description",
+                    'sequence' => 2
+                ]
+            ],
+            "model" => "product",
+            "save_path" => '/food/stock/products/save'
+        ], Response::HTTP_OK);
+    }
 }

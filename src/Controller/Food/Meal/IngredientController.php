@@ -67,9 +67,9 @@ class IngredientController extends AbstractController
     {
         $ingredients = $this->entityManager->getRepository(Ingredient::class)->findAll();
 
-        $data = ["ingredients" => []];
+        $data = ["data" => []];
         foreach ($ingredients as $ingredient) {
-            $data["ingredients"][] = [
+            $data["data"][] = [
                 'id' => $ingredient->getId(),
                 'quantity' => $ingredient->getQuantity(),
                 'product' => [

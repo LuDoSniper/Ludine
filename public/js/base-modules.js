@@ -3,7 +3,12 @@ window.LudineApp.context = {}
 window.LudineApp.choicesInstances = new Map();
 window.LudineApp.actions = {}
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Get context
+    const tmpRaw = document.getElementById('context');
+    LudineApp.context = JSON.parse(tmpRaw.textContent);
+    LudineApp.context.params = Object.fromEntries((new URLSearchParams(window.location.search)).entries());
+
     let formModified = false;
 
     // Widget relational
@@ -232,60 +237,154 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     // Widget tree
-    const treeFields = document.querySelectorAll('[data-widget="tree"]');
-    treeFields.forEach(async (treeField) => {
-        const model = treeField.id.split('_')[0];
-        const field = treeField.id.split('_')[1];
-        if (LudineApp.context.trees[field]) {
-            treeData = LudineApp.context.trees[field];
+    async function initTreeField(treeFields) {
+        for (const treeField of treeFields) {
+            const model = treeField.id.split('_')[0];
+            const field = treeField.id.split('_')[1];
+            if (LudineApp.context.trees[field]) {
+                const treeData = LudineApp.context.trees[field];
 
-            const container = document.createElement('div');
-            container.id = 'table-container';
+                const container = document.createElement('div');
+                container.id = 'table-container';
 
-            const form = document.createElement('form');
-            container.appendChild(form);
+                const form = document.createElement('form');
+                container.appendChild(form);
 
-            const table = document.createElement('table');
-            table.classList.add('editable')
-            table.id = field
+                const table = document.createElement('table');
+                table.classList.add('editable')
+                table.id = field
 
-            const colgroup = document.createElement('colgroup');
-            for (let i = 0; i < treeData.fields.length; i++) {
-                const col = document.createElement('col');
-                col.style = `width: ${100 / treeData.fields.length}%;`;
-                colgroup.appendChild(col);
-            }
-            table.appendChild(colgroup);
+                // Get all fields
+                let AllFields = [];
+                const treeRelationalFields = [];
+                treeData.fields.forEach(field => {
+                    if (field.type === 'relational') {
+                        treeRelationalFields.push(field);
+                    } else {
+                        AllFields.push(field);
+                    }
+                })
+                for (const treeRelationalField of treeRelationalFields) {
+                    const response = await fetch(treeRelationalField.get_meta);
+                    const data = await response.json();
+                    data.fields.forEach(field => {
+                        field['model'] = data.model;
+                        field['save_path'] = data.save_path;
+                        AllFields.push(field);
+                    })
+                }
+                // Trier Allfields par séquence
+                function sortBySequence(a, b) {
+                    const aHasSeq = 'sequence' in a;
+                    const bHasSeq = 'sequence' in b;
 
-            const thead = document.createElement('thead');
-            table.appendChild(thead);
+                    if (aHasSeq && bHasSeq) {
+                        return a.sequence - b.sequence; // Tri croissant
+                    } else if (aHasSeq) {
+                        return -1; // a a une séquence, b non → a avant b
+                    } else if (bHasSeq) {
+                        return 1;  // b a une séquence, a non → b avant a
+                    } else {
+                        return 0;  // Aucun des deux n'a de séquence → pas de changement
+                    }
+                }
+                const tmpSortedFields = JSON.parse(JSON.stringify(treeData.fields)); // deep copy
+                tmpSortedFields.sort(sortBySequence)
+                const sortedFields = [];
+                tmpSortedFields.forEach(field => {
+                    if (field.type === 'relational') {
+                        const tmpRelationalFields = [];
+                        AllFields.forEach(sortedField => {
+                            if (sortedField.model === field.name) {
+                                tmpRelationalFields.push(sortedField);
+                            }
+                        })
+                        tmpRelationalFields.sort(sortBySequence)
+                        sortedFields.push(...tmpRelationalFields);
+                    } else {
+                        sortedFields.push(field);
+                    }
+                })
+                AllFields = sortedFields;
 
-            const tbody = document.createElement('tbody');
-            table.appendChild(tbody);
+                const colgroup = document.createElement('colgroup');
+                AllFields.forEach(field => {
+                    const col = document.createElement('col');
+                    col.style = `width: ${100 / AllFields.length}%;`;
+                    colgroup.appendChild(col);
+                });
+                table.appendChild(colgroup);
 
-            const theadTr = document.createElement('tr');
-            const tbodyTr = document.createElement('tr');
-            for (let i = 0; i < treeData.fields.length; i++) {
-                const th = document.createElement('th');
-                const td = document.createElement('td');
+                const thead = document.createElement('thead');
+                table.appendChild(thead);
 
-                const treeField = LudineApp.context.trees[field]
-                th.textContent = treeField.string ? treeField.string : treeField.name;
-                // td.textContent = treeField.value;
-                td.dataset.type = treeField.type;
-                td.dataset.name = treeField.name;
+                const tbody = document.createElement('tbody');
+                table.appendChild(tbody);
+
+                const theadTr = document.createElement('tr');
+                AllFields.forEach(field => {
+                    const th = document.createElement('th');
+                    th.textContent = field.string ? field.string : field.name;
+                    theadTr.appendChild(th);
+                });
+                thead.appendChild(theadTr);
 
                 try {
-                    const response = await fetch(treeField.get_path);
-                    const data = await response.json();
+                    let response = await fetch(treeData.get_path);
+                    response = await response.json();
+                    const data = response.data;
 
-                    
+                    data.forEach(record => {
+                        const tbodyTr = document.createElement('tr');
+                        tbodyTr.dataset.id = record.id;
+
+                        AllFields.forEach(field => {
+                            const td = document.createElement('td');
+                            if (field.model) {
+                                const relationalFields = record[field.model];
+                                td.textContent = relationalFields[field.name];
+                            } else {
+                                td.textContent = record[field.name];
+                            }
+                            td.dataset.type = field.type;
+                            td.dataset.name = field.name;
+                            tbodyTr.appendChild(td);
+                        })
+
+                        tbody.appendChild(tbodyTr);
+                    })
+
+                    const tbodyTr = document.createElement('tr');
+                    tbodyTr.dataset.id = 'new';
+
+                    AllFields.forEach(field => {
+                        const td = document.createElement('td');
+                        td.textContent = "Cliquer pour ajouter un nouvel enregistrement"
+                        td.dataset.type = field.type;
+                        td.dataset.name = field.name;
+                        if (AllFields.indexOf(field) !== 0) {
+                            td.style.display = 'none';
+                        } else {
+                            td.colSpan = AllFields.length;
+                        }
+                        tbodyTr.appendChild(td);
+                    })
+
+                    tbody.appendChild(tbodyTr);
                 } catch (error) {
-                    console.log(`Erreur lors du fetch ${treeField.get_path} :`, error);
+                    console.log(`Erreur lors du fetch ${treeData.get_path} :`, error);
                 }
+
+                form.appendChild(table);
+                container.appendChild(form);
+                treeField.appendChild(container);
+
+                treeField.parentElement.classList.add('tree')
             }
         }
-    })
+    }
+    const treeFields = document.querySelectorAll('[data-widget="tree"]');
+    await initTreeField(treeFields);
 
     // Field Text
     const textFields = document.querySelectorAll('textarea');
@@ -297,18 +396,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         textField.addEventListener('input', () => autoResize(textField));
     })
-
-    // Get context
-    // const metas = document.querySelectorAll('[data-context]');
-    // metas.forEach(meta => {
-    //     LudineApp.context = {
-    //         ...LudineApp.context,
-    //         ...JSON.parse(meta.dataset.context)
-    //     };
-    // })
-    const tmpRaw = document.getElementById('context');
-    LudineApp.context = JSON.parse(tmpRaw.textContent);
-    LudineApp.context.params = Object.fromEntries((new URLSearchParams(window.location.search)).entries());
 
     // Update page
     if (LudineApp.context) {
@@ -366,8 +453,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Click on table record
-    const tableContainer = document.querySelector('#table-container');
-    if (tableContainer) {
+    const tableContainers = document.querySelectorAll('#table-container');
+    tableContainers.forEach(tableContainer => {
         const table = tableContainer.querySelector('table');
         if (table) {
             // Cas où Nouveau viendrait d'être cliqué
@@ -376,10 +463,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (target) {
                     const tbody = table.querySelector('tbody');
                     if (LudineApp.context.params.editable === 'new') {
-                        const tr = tbody.querySelector('tr');
+                        const trs = tbody.querySelectorAll('tr');
+                        const tr = trs[trs.length - 1];
                         const clone = tr.cloneNode(true);
                         clone.dataset.id = LudineApp.context.params.editable;
                         clone.querySelectorAll('td').forEach(td => {
+                            // Nettoyer le widget tree
+                            if (td.style.display === 'none') {
+                                td.style.display = '';
+                                if (td.getAttribute('style')?.trim() === '') {
+                                    td.removeAttribute('style');
+                                }
+                            }
+                            if (td.colSpan) {
+                                td.removeAttribute('colSpan');
+                            }
+
                             td.textContent = '';
                             if (td.dataset.type) {
                                 const div = document.createElement('div');
@@ -467,7 +566,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-    }
+    })
     updateColorFields()
 
     relationalFields.forEach(field => {

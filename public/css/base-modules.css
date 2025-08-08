@@ -486,3 +486,11 @@ input[type=checkbox]:checked {
 .stars .star.selected {
     color: #97A4BC;
 }
+
+.tree {
+    display: flex;
+    flex-direction: column;
+}
+.tree [data-widget="tree"] {
+    width: 100%;
+}
