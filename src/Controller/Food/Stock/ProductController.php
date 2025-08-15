@@ -128,15 +128,29 @@ class ProductController extends AbstractController
         ]]);
     }
 
-    #[Route('/food/stock/products/get/{id}', 'food_stock_products_get')]
+    #[Route('/food/stock/products/get/{id}', 'food_stock_products_get', defaults: ['id' => null])]
     public function getData(
-        Product $product
+        ?int $id = null
     ): JsonResponse {
-        return new JsonResponse([
-            'id' => $product->getId(),
-            'name' => $product->getName(),
-            'description' => $product->getDescription(),
-        ], Response::HTTP_OK);
+        if ($id !== null) {
+            $product = $this->entityManager->getRepository(Product::class)->find($id);
+            return new JsonResponse([
+                'id' => $product->getId(),
+                'name' => $product->getName(),
+                'description' => $product->getDescription(),
+            ], Response::HTTP_OK);
+        }
+
+        $products = $this->entityManager->getRepository(Product::class)->findAll();
+        $data = [];
+        foreach ($products as $product) {
+            $data[] = [
+                'id' => $product->getId(),
+                'name' => $product->getName(),
+                'description' => $product->getDescription(),
+            ];
+        }
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
     #[Route('/food/stock/products/get_meta', 'food_stock_products_get_meta')]

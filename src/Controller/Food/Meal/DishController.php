@@ -71,7 +71,12 @@ class DishController extends AbstractController
                             'type' => 'relational',
                             'string' => 'Produit',
                             'get_meta' => '/food/stock/products/get_meta',
+                            'get_path' => '/food/stock/products/get',
                             'sequence' => 1,
+                            'display' => [
+                                'name',
+                                'description',
+                            ]
                         ],
                     ],
                     'model' => 'ingredient',

@@ -206,4 +206,65 @@ class StockedProductController extends AbstractController
             'location' => $stockedProduct->getLocation(),
         ], Response::HTTP_OK);
     }
+
+    #[Route('/food/stock/stocked-products/get_meta', 'food_stock_stocked_products_get_meta')]
+    public function getMeta(): JsonResponse
+    {
+        return new JsonResponse([
+            "fields" => [
+                [
+                    "name" => "product",
+                    "type" => "relational",
+                    "string" => "Produit",
+                    'get_meta' => '/food/stock/products/get_meta',
+                    'sequence' => 1
+                ],
+                [
+                    "name" => "arrivalDate",
+                    "type" => "date",
+                    "string" => "Date d'arrivée",
+                    'sequence' => 2
+                ],
+                [
+                    "name" => "expirationDate",
+                    "type" => "date",
+                    "string" => "Date de péremption",
+                    'sequence' => 2
+                ],
+                [
+                    "name" => "stackable",
+                    "type" => "boolean",
+                    "string" => "Stackable",
+                    'sequence' => 2
+                ],
+                [
+                    "name" => "cool",
+                    "type" => "boolean",
+                    "string" => "Frais",
+                    'sequence' => 2
+                ],
+                [
+                    "name" => "container",
+                    "type" => "relational",
+                    "string" => "Conteneur",
+                    'get_meta' => '/food/stock/containers/get_meta',
+                    'sequence' => 2
+                ],
+                [
+                    "name" => "floor",
+                    "type" => "integer",
+                    "string" => "Etage",
+                    'sequence' => 2
+                ],
+                [
+                    "name" => "location",
+                    "type" => "integer",
+                    "string" => "Emplacement",
+                    'sequence' => 2
+                ]
+            ],
+            "model" => "product",
+            "save_path" => '/food/stock/products/save'
+        ], Response::HTTP_OK);
+    }
 }

@@ -11,45 +11,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     let formModified = false;
 
-    // Widget relational
-    const relationalFields = document.querySelectorAll('[data-widget="relational"]');
-    relationalFields.forEach(relationalField => {
-        const instance = new Choices(relationalField, {
-            shouldSort: false,
-            searchEnabled: false,
-            itemSelectText: '',
-            removeItemButton: true,
-            callbackOnCreateTemplates: function (template) {
-                const defaultItemTemplate = Choices.defaults.templates.item;
-                return {
-                    item: (classNames, data) => {
-                        const element = defaultItemTemplate.call(this, this.config, data, true);
-
-                        const selectEl = this.passedElement.element;
-                        const matchingOption = selectEl.querySelector(`option[value="${data.value}"]`);
-                        const color = matchingOption?.getAttribute('data-color');
-
-                        if (color) {
-                            element.style.backgroundColor = color;
-                            element.style.color = '#242529';
-                        }
-
-                        return element;
-                    }
-                };
-            }
-        });
-        if (LudineApp.context) {
-            if (LudineApp.context.id === 'new') {
-                relationalField.selectedIndex = -1;
-            }
-        } else {
-            relationalField.selectedIndex = -1;
-        }
-
-        window.LudineApp.choicesInstances.set(relationalField, instance);
-    })
-
     // Widget date
     const dateFields = document.querySelectorAll('[data-widget="date"]');
     dateFields.forEach(dateField => {
@@ -260,7 +221,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 treeData.fields.forEach(field => {
                     if (field.type === 'relational') {
                         treeRelationalFields.push(field);
+                        field['display_mode'] = "write";
+                        AllFields.push(field);
                     } else {
+                        field['display_mode'] = "display,write";
                         AllFields.push(field);
                     }
                 })
@@ -268,9 +232,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const response = await fetch(treeRelationalField.get_meta);
                     const data = await response.json();
                     data.fields.forEach(field => {
-                        field['model'] = data.model;
-                        field['save_path'] = data.save_path;
-                        AllFields.push(field);
+                        if (treeRelationalField.display.includes(field.name)) {
+                            field['model'] = data.model;
+                            field['save_path'] = data.save_path;
+                            field['display_mode'] = "display";
+                            AllFields.push(field);
+                        }
                     })
                 }
                 // Trier Allfields par séquence
@@ -292,6 +259,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 tmpSortedFields.sort(sortBySequence)
                 const sortedFields = [];
                 tmpSortedFields.forEach(field => {
+                    sortedFields.push(field)
                     if (field.type === 'relational') {
                         const tmpRelationalFields = [];
                         AllFields.forEach(sortedField => {
@@ -301,8 +269,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         })
                         tmpRelationalFields.sort(sortBySequence)
                         sortedFields.push(...tmpRelationalFields);
-                    } else {
-                        sortedFields.push(field);
                     }
                 })
                 AllFields = sortedFields;
@@ -310,7 +276,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const colgroup = document.createElement('colgroup');
                 AllFields.forEach(field => {
                     const col = document.createElement('col');
-                    col.style = `width: ${100 / AllFields.length}%;`;
+                    col.style = `width: ${100 / AllFields.filter(item => item.display_mode.includes('display')).length}%;`;
                     colgroup.appendChild(col);
                 });
                 table.appendChild(colgroup);
@@ -322,7 +288,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 table.appendChild(tbody);
 
                 const theadTr = document.createElement('tr');
-                AllFields.forEach(field => {
+                AllFields.filter(item => item.display_mode.includes('display')).forEach(field => {
                     const th = document.createElement('th');
                     th.textContent = field.string ? field.string : field.name;
                     theadTr.appendChild(th);
@@ -338,7 +304,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         const tbodyTr = document.createElement('tr');
                         tbodyTr.dataset.id = record.id;
 
-                        AllFields.forEach(field => {
+                        AllFields.filter(item => item.display_mode.includes('display')).forEach(field => {
                             const td = document.createElement('td');
                             if (field.model) {
                                 const relationalFields = record[field.model];
@@ -357,15 +323,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const tbodyTr = document.createElement('tr');
                     tbodyTr.dataset.id = 'new';
 
-                    AllFields.forEach(field => {
+                    AllFields.filter(item => item.display_mode.includes('write')).forEach(field => {
                         const td = document.createElement('td');
                         td.textContent = "Cliquer pour ajouter un nouvel enregistrement"
                         td.dataset.type = field.type;
                         td.dataset.name = field.name;
+                        if (field.type === 'relational') {
+                            td.dataset.colspan = field.display.length;
+                            td.dataset.get_path = field.get_path;
+                        }
                         if (AllFields.indexOf(field) !== 0) {
                             td.style.display = 'none';
                         } else {
-                            td.colSpan = AllFields.length;
+                            td.colSpan = AllFields.filter(item => item.display_mode.includes('display')).length;
                         }
                         tbodyTr.appendChild(td);
                     })
@@ -454,7 +424,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Click on table record
     const tableContainers = document.querySelectorAll('#table-container');
-    tableContainers.forEach(tableContainer => {
+    for (const tableContainer of tableContainers) {
         const table = tableContainer.querySelector('table');
         if (table) {
             // Cas où Nouveau viendrait d'être cliqué
@@ -467,7 +437,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         const tr = trs[trs.length - 1];
                         const clone = tr.cloneNode(true);
                         clone.dataset.id = LudineApp.context.params.editable;
-                        clone.querySelectorAll('td').forEach(td => {
+                        for (const td of clone.querySelectorAll('td')) {
                             // Nettoyer le widget tree
                             if (td.style.display === 'none') {
                                 td.style.display = '';
@@ -479,14 +449,35 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 td.removeAttribute('colSpan');
                             }
 
+                            if (td.dataset.colspan) {
+                                td.colSpan = td.dataset.colspan;
+                            }
+
                             td.textContent = '';
                             if (td.dataset.type) {
                                 const div = document.createElement('div');
                                 div.classList.add('field');
-                                const input = document.createElement('input');
-                                input.id = `${LudineApp.context.model}_${td.dataset.name}`;
-                                input.name = td.dataset.name;
-                                input.type = td.dataset.type;
+                                const input = document.createElement(td.dataset.type === 'relational' ? 'select' : 'input');
+                                if (td.dataset.type === 'relational') {
+                                    input.dataset.widget = 'relational';
+                                    input.dataset.placeholder = ' ';
+                                    input.classList.add('field');
+
+                                    const records = await fetch(td.dataset.get_path).then(res => res.json());
+                                    records.forEach(record => {
+                                        const option = document.createElement('option');
+                                        option.value = record.id;
+                                        option.dataset.id = record.id;
+                                        option.dataset.url = td.dataset.get_path + '/' + record.id;
+                                        option.dataset.external_id = td.dataset.external_id;
+                                        option.textContent = record.name;
+                                        input.appendChild(option);
+                                    });
+                                } else {
+                                    input.id = `${LudineApp.context.model}_${td.dataset.name}`;
+                                    input.name = td.dataset.name;
+                                    input.type = td.dataset.type;
+                                }
                                 if (td.dataset.widget) {
                                     input.dataset.widget = td.dataset.widget;
                                     delete td.dataset.widget;
@@ -494,7 +485,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 div.appendChild(input);
                                 td.appendChild(div);
                             }
-                        })
+                        }
                         tbody.appendChild(clone);
 
                         if (tr.dataset.id && tr.dataset.id === 'new') {
@@ -566,8 +557,191 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
         }
-    })
+    }
     updateColorFields()
+
+    // Widget relational
+    const relationalFields = document.querySelectorAll('[data-widget="relational"]');
+    relationalFields.forEach(relationalField => {
+        const instance = new Choices(relationalField, {
+            shouldSort: false,
+            searchEnabled: false,
+            itemSelectText: '',
+            removeItemButton: true,
+            callbackOnCreateTemplates: function (template) {
+                const defaultItemTemplate = Choices.defaults.templates.item;
+                return {
+                    item: (classNames, data) => {
+                        const element = defaultItemTemplate.call(this, this.config, data, true);
+
+                        const selectEl = this.passedElement.element;
+                        const matchingOption = selectEl.querySelector(`option[value="${data.value}"]`);
+                        const color = matchingOption?.getAttribute('data-color');
+
+                        if (color) {
+                            element.style.backgroundColor = color;
+                            element.style.color = '#242529';
+                        }
+
+                        return element;
+                    }
+                };
+            }
+        });
+        if (LudineApp.context) {
+            if (LudineApp.context.id === 'new') {
+                relationalField.selectedIndex = -1;
+            }
+        } else {
+            relationalField.selectedIndex = -1;
+        }
+
+        window.LudineApp.choicesInstances.set(relationalField, instance);
+
+        // --- Portal Choices vers <body> en conservant le contexte de classes (.choices .is-open etc.) ---
+        (function portalizeChoicesDropdown() {
+            const wrapper = relationalField.closest('.choices'); // conteneur généré par Choices
+            let dropdownEl = null;
+            let host = null;
+
+            // Miroir des classes du wrapper (is-open, is-flipped, is-focused...) -> host
+            const mirrorClasses = () => {
+                if (!host) return;
+                // garde une classe propre pour cibler en CSS
+                host.className = 'choices choices-portal ' + wrapper.className
+                    .replace(/\bchoices\b/, '')      // on a déjà "choices"
+                    .replace(/\bchoices-portal\b/, '') // au cas où
+                    .trim();
+            };
+            const mo = new MutationObserver(mirrorClasses);
+            mo.observe(wrapper, { attributes: true, attributeFilter: ['class'] });
+
+            const reposition = () => {
+                if (!host || !dropdownEl) return;
+                const r = wrapper.getBoundingClientRect();
+
+                // position par défaut: sous l'input
+                let top = r.bottom;
+
+                // si le menu dépasse en bas, on “flip”
+                const menuH = dropdownEl.offsetHeight || 280;
+                const wouldOverflow = top + menuH > window.innerHeight;
+                wrapper.classList.toggle('is-flipped', wouldOverflow);
+                host.classList.toggle('is-flipped', wouldOverflow);
+
+                if (wouldOverflow) {
+                    top = r.top - menuH;
+                }
+
+                host.style.position = 'fixed';
+                host.style.left = r.left + 'px';
+                host.style.top  = top + 'px';
+                host.style.width = r.width + 'px';
+                host.style.zIndex = '9999';
+            };
+
+            const onShow = () => {
+                dropdownEl = wrapper.querySelector('.choices__list--dropdown');
+                if (!dropdownEl) return;
+
+                // créer le host une seule fois
+                if (!host) {
+                    host = document.createElement('div');
+                    host.className = 'choices choices-portal is-open';
+                    // copie la police pour cohérence visuelle
+                    const cs = getComputedStyle(wrapper);
+                    host.style.font = cs.font;
+                    document.body.appendChild(host);
+                } else {
+                    host.classList.add('is-open');
+                }
+
+                // déplacer le dropdown dans le host
+                host.appendChild(dropdownEl);
+
+                // limites raisonnables si très long
+                dropdownEl.style.maxHeight = '40vh';
+                dropdownEl.style.overflow = 'auto';
+
+                mirrorClasses();
+                reposition();
+
+                window.addEventListener('scroll', reposition, true);
+                window.addEventListener('resize', reposition);
+            };
+
+            const onHide = () => {
+                if (!dropdownEl || !host) return;
+
+                // restaurer le DOM
+                wrapper.appendChild(dropdownEl);
+                dropdownEl.style.maxHeight = '';
+                dropdownEl.style.overflow = '';
+
+                host.classList.remove('is-open');
+
+                window.removeEventListener('scroll', reposition, true);
+                window.removeEventListener('resize', reposition);
+            };
+
+            relationalField.addEventListener('showDropdown', onShow);
+            relationalField.addEventListener('hideDropdown', onHide);
+        })();
+
+        // const instance = new Choices(relationalField, {
+        //     shouldSort: false,
+        //     searchEnabled: false,
+        //     itemSelectText: '',
+        //     removeItemButton: true,
+        //     callbackOnCreateTemplates: function (template) { /* ... */ }
+        // });
+        //
+        // /* 👉 AJOUTE ICI (portal Choices vers <body>) */
+        // (function portalizeChoicesDropdown() {
+        //     const wrapper = relationalField.closest('.choices'); // conteneur rendu par Choices
+        //     let dropdownEl = null;
+        //
+        //     const reposition = () => {
+        //         if (!dropdownEl) return;
+        //         const r = wrapper.getBoundingClientRect();
+        //         dropdownEl.style.left = r.left + 'px';
+        //         dropdownEl.style.top  = r.bottom + 'px';  // sous l’input
+        //         dropdownEl.style.width = r.width + 'px';
+        //     };
+        //
+        //     const onShow = () => {
+        //         // Le dropdown existe maintenant sous wrapper
+        //         dropdownEl = wrapper.querySelector('.choices__list--dropdown');
+        //         if (!dropdownEl) return;
+        //
+        //         // Déplacer dans <body> et positionner
+        //         document.body.appendChild(dropdownEl);
+        //         dropdownEl.style.position = 'fixed';
+        //         dropdownEl.style.zIndex = '9999';
+        //         dropdownEl.style.maxHeight = '40vh';  // évite les menus trop grands
+        //         dropdownEl.style.overflow = 'auto';
+        //
+        //         reposition();
+        //         window.addEventListener('scroll', reposition, true);
+        //         window.addEventListener('resize', reposition);
+        //     };
+        //
+        //     const onHide = () => {
+        //         if (!dropdownEl) return;
+        //         // Replacer dans son wrapper d’origine et nettoyer les styles inline
+        //         wrapper.appendChild(dropdownEl);
+        //         dropdownEl.removeAttribute('style');
+        //         dropdownEl = null;
+        //
+        //         window.removeEventListener('scroll', reposition, true);
+        //         window.removeEventListener('resize', reposition);
+        //     };
+        //
+        //     // Écoute les events émis par Choices sur l’élément <select> d’origine
+        //     relationalField.addEventListener('showDropdown', onShow);
+        //     relationalField.addEventListener('hideDropdown', onHide);
+        // })();
+    })
 
     relationalFields.forEach(field => {
         field.addEventListener('change', (e) => {
