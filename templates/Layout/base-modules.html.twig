@@ -3,6 +3,10 @@
 {% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('modules/air-datepicker/air-datepicker.min.css') }}">
     <link rel="stylesheet" href="{{ asset('modules/choices/choices.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('modules/pickr/themes/classic/classic.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('modules/pickr/themes/monolith/monolith.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('modules/pickr/themes/nano/nano.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('modules/flatpickr/flatpickr.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/base-modules.css') }}">
     <link rel="stylesheet" href="{{ asset('css/Widget/sidebar.css') }}">
     {% block customstylesheets %}
@@ -12,6 +16,12 @@
 {% block javascripts %}
     <script src="{{ asset('modules/air-datepicker/air-datepicker.min.js') }}"></script>
     <script src="{{ asset('modules/choices/choices.min.js') }}"></script>
+    <script src="{{ asset('modules/pickr/pickr.js') }}"></script>
+    <script src="{{ asset('modules/flatpickr/flatpickr.js') }}"></script>
+    <script type="application/json" id="context">
+        {% block context %}
+        {% endblock %}
+    </script>
     <script src="{{ asset('js/base-modules.js') }}"></script>
     {% block customjavascripts %}
     {% endblock %}

@@ -5,6 +5,27 @@
     Ludine - Create container
 {% endblock %}
 
+{% block context %}
+    {{ {
+        "id": id,
+        "get_path": path('food_stock_containers_get', {'id': id}),
+        "save_path": path('food_stock_containers_save'),
+        "model": "container",
+        "fields": [
+            {"name": "name", "type": "char"},
+            {"name": "description", "type": "char"},
+            {"name": "ref", "type": "char"},
+            {"name": "cool", "type": "bool"},
+            {"name": "nbFloor", "type": "int"},
+            {"name": "floors", "type": "action", "action": "getFloors"}
+        ]
+    } | json_encode | raw }}
+{% endblock %}
+
+{% block customjavascripts %}
+    <script src="{{ asset('js/Food/Stock/containers-create.js') }}"></script>
+{% endblock %}
+
 {% block main %}
     {% include 'Widget/module-header.html.twig' with {
         header: {
@@ -12,11 +33,11 @@
             h2: {
                 'Repas': {
                     selected: false,
-                    url: '#'
+                    url: path('food_meal')
                 },
                 'Stock': {
                     selected: true,
-                    url: path('food_stock_containers')
+                    url: path('food_stock')
                 }
             },
             h3: {
@@ -37,19 +58,28 @@
     } %}
 
     <div id="content" class="form">
-        <meta data-context='{"id": {{ id == 'new' ? '"' : '' }}{{ id }}{{ id == 'new' ? '"' : '' }}, "url": "{{ path('food_stock_containers_get', {'id': id}) }}"}'>
-
         <div id="content-header">
             <div class="group">
                 {% include 'Widget/button.html.twig' with {
                     'btn': {
                         'name': 'Nouveau',
                         'url': path('food_stock_container_create'),
-                        'type': 'primary'
+                        'type': 'primary',
+                        'action_type': 'redirect'
                     }
                 } %}
 
-                <a href="" id="save"><img src="{{ asset('img/svg/save.svg') }}"></a>
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Supprimer',
+                        'url': path('food_stock_container_remove', {'id': id}),
+                        'type': 'secondary',
+                        'action_type': 'redirect',
+                        'id': 'remove'
+                    }
+                } %}
+
+                {% include 'Widget/button.html.twig' with {'btn': {'action_type': 'save'}} %}
             </div>
         </div>
 
@@ -108,8 +138,4 @@
         {{ form_end(form) }}
 
     </div>
-{% endblock %}
-
-{% block customjavascripts %}
-    <script src="{{ asset('js/Food/Stock/containers-create.js') }}"></script>
 {% endblock %}

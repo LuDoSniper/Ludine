@@ -1,0 +1,111 @@
+{% extends 'Layout/base-modules.html.twig' %}
+
+{% block title %}
+    Ludine | Repas
+{% endblock %}
+
+{% block context %}
+    {{ {
+        "save_path": path('food_meal_dishes_save'),
+        "model": "dish",
+        "fields": [
+            {"name": "name", "type": "char"},
+            {"name": "description", "type": "char"},
+            {"name": "instructions", "type": "text"},
+            {"name": "preparationTime", "type": "int"},
+            {"name": "cookingTime", "type": "int"},
+            {"name": "difficulty", "type": "int"},
+            {"name": "tags", "type": "relational"},
+            {"name": "ingredients", "type": "relational"},
+            {"name": "droprate", "type": "float"},
+        ]
+    } | json_encode | raw }}
+{% endblock %}
+
+{% block main %}
+    {% include 'Widget/module-header.html.twig' with {
+        header: {
+            h1: 'Nourriture',
+            h2: {
+                'Repas': {
+                    selected: true,
+                    url: path('food_meal')
+                },
+                'Stock': {
+                    selected: false,
+                    url: path('food_stock')
+                }
+            },
+            h3: {
+                'Tableau de bord': {
+                    selected: false,
+                    url: path('food_meal_dashboard')
+                },
+                'Plats': {
+                    selected: true,
+                    url: path('food_meal_dishes')
+                },
+                'Tags': {
+                    selected: false,
+                    url: path('food_meal_tags')
+                },
+                'Configuration': {
+                    selected: false,
+                    url: path('food_meal_config')
+                }
+            }
+        }
+    } %}
+
+    <div id="content" class="list">
+        <div id="content-header">
+            <div class="group">
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Nouveau',
+                        'url': path('food_meal_dishes_create'),
+                        'type': 'primary',
+                        'action_type': 'redirect'
+                    }
+                } %}
+
+                {% include 'Widget/button.html.twig' with {'btn': {'action_type': 'save'}} %}
+            </div>
+        </div>
+
+        <div id="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Tags</th>
+                        <th>Temps</th>
+                        <th>Difficulté</th>
+                        <th>Drop rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for dish in dishes %}
+                        <tr>
+                            <input type="hidden" name="url" value="{{ path('food_meal_dish_update', {id: dish.id}) }}">
+                            <td>{{ dish.name }}</td>
+                            <td>{{ dish.tags | map(tag => tag.name) | join(', ') }}</td>
+                            <td>{{ dish.preparationTime }}</td>
+                            <td>{{ dish.difficulty }}</td>
+                            <td>{{ dish.dropRate }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+

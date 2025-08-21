@@ -11,6 +11,6 @@ class StockController extends AbstractController
     #[Route('/food_stock', name: 'food_stock')]
     public function index(): Response
     {
-        return $this->redirectToRoute('food_stock_products');
+        return $this->redirectToRoute('food_stock_containers');
     }
 }

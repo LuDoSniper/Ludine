@@ -4,6 +4,7 @@ namespace App\Controller\Food\Stock;
 
 use App\Entity\Food\Stock\Container;
 use App\Form\Food\Stock\ContainerType;
+use App\Service\EntityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,13 +15,14 @@ use Symfony\Component\Routing\Attribute\Route;
 class ContainerController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly EntityService $entityService
     ){}
 
     #[Route('/food/stock/containers', 'food_stock_containers')]
     public function containers(): Response
     {
-        $containers = $this->entityManager->getRepository(Container::class)->findAll();
+        $containers = $this->entityService->getEntityRecords($this->getUser(), Container::class);
 
         return $this->render('Page/Food/Stock/containers.html.twig', [
             'containers' => $containers
@@ -33,6 +35,7 @@ class ContainerController extends AbstractController
     ): Response
     {
         $container = new Container();
+        $container->setOwner($this->getUser());
 
         $form = $this->createForm(ContainerType::class, $container);
         $form->handleRequest($request);
@@ -123,6 +126,7 @@ class ContainerController extends AbstractController
 
         if ($data['id'] === 'new') {
             $container = new Container();
+            $container->setOwner($this->getUser());
         } else {
             $container = $this->entityManager->getRepository(Container::class)->find((int) $data['id']);
         }

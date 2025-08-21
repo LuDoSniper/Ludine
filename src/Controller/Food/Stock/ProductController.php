@@ -3,7 +3,9 @@
 namespace App\Controller\Food\Stock;
 
 use App\Entity\Food\Stock\Product;
+use App\Entity\Settings\General\Share;
 use App\Form\Food\Stock\ProductType;
+use App\Service\EntityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,13 +16,14 @@ use Symfony\Component\Routing\Attribute\Route;
 class ProductController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly EntityService $entityService,
     ){}
 
     #[Route('/food/stock/products', 'food_stock_products')]
     public function products(): Response
     {
-        $products = $this->entityManager->getRepository(Product::class)->findAll();
+        $products = $this->entityService->getEntityRecords($this->getUser(), Product::class);
 
         return $this->render('Page/Food/Stock/products.html.twig', [
             'products' => $products
@@ -33,6 +36,7 @@ class ProductController extends AbstractController
     ): Response
     {
         $product = new Product();
+        $product->setOwner($this->getUser());
 
         $form = $this->createForm(ProductType::class, $product);
         $form->handleRequest($request);
@@ -45,6 +49,7 @@ class ProductController extends AbstractController
         }
 
         return $this->render('Page/Food/Stock/products-create.html.twig', [
+            'id' => 'new',
             'form' => $form->createView()
         ]);
     }
@@ -108,6 +113,7 @@ class ProductController extends AbstractController
 
         if ($data['id'] === 'new') {
             $product = new Product();
+            $product->setOwner($this->getUser());
         } else {
             $product = $this->entityManager->getRepository(Product::class)->find((int) $data['id']);
         }
@@ -127,14 +133,51 @@ class ProductController extends AbstractController
         ]]);
     }
 
-    #[Route('/food/stock/products/get/{id}', 'food_stock_products_get')]
+    #[Route('/food/stock/products/get/{id}', 'food_stock_products_get', defaults: ['id' => null])]
     public function getData(
-        Product $product
+        ?int $id = null
     ): JsonResponse {
+        if ($id !== null) {
+            $product = $this->entityManager->getRepository(Product::class)->find($id);
+            return new JsonResponse([
+                'id' => $product->getId(),
+                'name' => $product->getName(),
+                'description' => $product->getDescription(),
+            ], Response::HTTP_OK);
+        }
+
+        $products = $this->entityService->getEntityRecords($this->getUser(), Product::class);
+        $data = [];
+        foreach ($products as $product) {
+            $data[] = [
+                'id' => $product->getId(),
+                'name' => $product->getName(),
+                'description' => $product->getDescription(),
+            ];
+        }
+        return new JsonResponse($data, Response::HTTP_OK);
+    }
+
+    #[Route('/food/stock/products/get_meta', 'food_stock_products_get_meta')]
+    public function getMeta(): JsonResponse
+    {
         return new JsonResponse([
-            'id' => $product->getId(),
-            'name' => $product->getName(),
-            'description' => $product->getDescription(),
+            "fields" => [
+                [
+                    "name" => "name",
+                    "type" => "char",
+                    "string" => "Nom",
+                    'sequence' => 1
+                ],
+                [
+                    "name" => "description",
+                    "type" => "char",
+                    "string" => "Description",
+                    'sequence' => 2
+                ]
+            ],
+            "model" => "product",
+            "save_path" => '/food/stock/products/save'
         ], Response::HTTP_OK);
     }
 }

@@ -9,9 +9,14 @@
         {% endblock %}
 
         {% block javascripts %}
+            <script src="{{ asset('js/base.js') }}"></script>
         {% endblock %}
     </head>
     <body>
+        <div id="app-loader" role="status" aria-live="polite" aria-label="Chargement">
+            <div class="spinner" aria-hidden="true"></div>
+        </div>
+
         {% block body %}{% endblock %}
     </body>
 </html>

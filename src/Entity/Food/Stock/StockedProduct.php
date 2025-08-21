@@ -2,6 +2,7 @@
 
 namespace App\Entity\Food\Stock;
 
+use App\Entity\Authentication\User;
 use App\Repository\Food\Stock\StockedProductRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -39,6 +40,10 @@ class StockedProduct
 
     #[ORM\Column]
     private ?int $location = null;
+
+    #[ORM\ManyToOne(inversedBy: 'stockedProducts')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $owner = null;
 
     public function getId(): ?int
     {
@@ -137,6 +142,18 @@ class StockedProduct
     public function setLocation(int $location): static
     {
         $this->location = $location;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
 
         return $this;
     }

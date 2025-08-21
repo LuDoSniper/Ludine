@@ -1,0 +1,119 @@
+{% set sidebar_active = 'food' %}
+{% extends 'Layout/base-modules.html.twig' %}
+
+{% block title %}
+    Ludine - Tags
+{% endblock %}
+
+{% block context %}
+    {{ {
+        "save_path": path('food_meal_tags_save'),
+        "model": "tag",
+        "fields": [
+            {"name": "name", "type": "char"},
+            {"name": "description", "type": "char"},
+            {"name": "color", "type": "char"}
+        ]
+    } | json_encode | raw }}
+{% endblock %}
+
+{% block main %}
+    {% include 'Widget/module-header.html.twig' with {
+        header: {
+            h1: 'Nourriture',
+            h2: {
+                'Repas': {
+                    selected: true,
+                    url: path('food_meal')
+                },
+                'Stock': {
+                    selected: false,
+                    url: path('food_stock')
+                }
+            },
+            h3: {
+                'Tableau de bord': {
+                    selected: false,
+                    url: path('food_meal_dashboard')
+                },
+                'Plats': {
+                    selected: false,
+                    url: path('food_meal_dishes')
+                },
+                'Tags': {
+                    selected: true,
+                    url: path('food_meal_tags')
+                },
+                'Configuration': {
+                    selected: false,
+                    url: path('food_meal_config')
+                }
+            }
+        }
+    } %}
+
+    <div id="content" class="list">
+        <div id="content-header">
+            <div class="group">
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Nouveau',
+                        'url': path('food_meal_tags', {'target': 'tag', 'editable': 'new'}),
+                        'type': 'primary',
+                        'action_type': 'redirect'
+                    }
+                } %}
+
+                {% set editable = app.request ? app.request.query.get('editable') : null %}
+                {% if app.request and app.request.query.has('editable') and editable != 'new' %}
+                    {% include 'Widget/button.html.twig' with {
+                        'btn': {
+                            'name': 'Supprimer',
+                            'url': path('food_meal_tag_remove', {'id': editable}),
+                            'type': 'secondary',
+                            'action_type': 'redirect',
+                            'id': 'remove'
+                        }
+                    } %}
+                {% endif %}
+
+                {% include 'Widget/button.html.twig' with {'btn': {'action_type': 'save'}} %}
+            </div>
+        </div>
+
+        <div id="table-container">
+            <form>
+                <table class="editable" id="tag">
+                    <colgroup>
+                        <col style="width: 33.33%;">
+                        <col style="width: 33.33%;">
+                        <col style="width: 33.33%;">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Description</th>
+                            <th class="text-center">Couleur</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tag in tags %}
+                            <tr data-id="{{ tag.id }}">
+                                <input type="hidden" name="url" value="{{ path('food_stock_products_update', {id: tag.id}) }}">
+                                <td data-type="text" data-name="name">{{ tag.name }}</td>
+                                <td data-type="text" data-name="description">{{ tag.description }}</td>
+                                <td data-type="text" data-name="color" class="text-center" data-widget="color">{{ tag.color }}</td>
+                            </tr>
+                        {% else %}
+                            <tr data-id="new">
+                                <td data-type="text" data-name="name">Aucune donnée</td>
+                                <td data-type="text" data-name="description">Aucune donnée</td>
+                                <td data-type="text" data-name="color">Aucune donnée</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+{% endblock %}

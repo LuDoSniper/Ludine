@@ -43,61 +43,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return floors;
     }
+    LudineApp.actions["getFloors"] = getFloors;
 
-    saveBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-
-        const floors = getFloors();
-
-        fetch('/food/stock/containers/save', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                id: id,
-                name: form.container_name.value,
-                description: form.container_description.value,
-                ref: form.container_ref.value,
-                cool: form.container_cool.value,
-                nbFloor: form.container_nbFloor.value,
-                floors: floors,
-            })
-        })
-            .then(res => res.json())
-            .then(data => {
-                console.log('Succès : ', data);
-                if (data.missing_fields) {
-                    data.missing_fields.forEach(field => {
-                        if (field === 'name') {
-                            form.product_name.classList.add('invalid');
-                        } else if (field === 'description') {
-                            form.container_description.classList.add('invalid');
-                        } else if (field === 'ref') {
-                            form.container_ref.classList.add('invalid');
-                        } else if (field === 'cool') {
-                            form.container_cool.classList.add('invalid');
-                        } else if (field === 'nbFloor') {
-                            form.container_nbFloor.classList.add('invalid');
-                        } else if (field === 'floors') {
-                            form.container_nbFloor.classList.add('invalid');
-                        }
-                    })
-                }
-                if (data.product) {
-                    formModified = false;
-                    let invalids = document.querySelectorAll('.invalid');
-                    invalids.forEach(invalid => {
-                        invalid.classList.remove('invalid');
-                    })
-
-                    id = data.product.id
-                }
-            })
-            .catch(err => {
-                console.log('Erreur : ', err);
-            });
-    })
+    // saveBtn.addEventListener('click', (e) => {
+    //     e.preventDefault();
+    //
+    //     const floors = getFloors();
+    //
+    //     fetch('/food/stock/containers/save', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
+    //         body: JSON.stringify({
+    //             id: id,
+    //             name: form.container_name.value,
+    //             description: form.container_description.value,
+    //             ref: form.container_ref.value,
+    //             cool: form.container_cool.value,
+    //             nbFloor: form.container_nbFloor.value,
+    //             floors: floors,
+    //         })
+    //     })
+    //         .then(res => res.json())
+    //         .then(data => {
+    //             console.log('Succès : ', data);
+    //             if (data.missing_fields) {
+    //                 data.missing_fields.forEach(field => {
+    //                     if (field === 'name') {
+    //                         form.product_name.classList.add('invalid');
+    //                     } else if (field === 'description') {
+    //                         form.container_description.classList.add('invalid');
+    //                     } else if (field === 'ref') {
+    //                         form.container_ref.classList.add('invalid');
+    //                     } else if (field === 'cool') {
+    //                         form.container_cool.classList.add('invalid');
+    //                     } else if (field === 'nbFloor') {
+    //                         form.container_nbFloor.classList.add('invalid');
+    //                     } else if (field === 'floors') {
+    //                         form.container_nbFloor.classList.add('invalid');
+    //                     }
+    //                 })
+    //             }
+    //             if (data.product) {
+    //                 formModified = false;
+    //                 let invalids = document.querySelectorAll('.invalid');
+    //                 invalids.forEach(invalid => {
+    //                     invalid.classList.remove('invalid');
+    //                 })
+    //
+    //                 id = data.product.id
+    //             }
+    //         })
+    //         .catch(err => {
+    //             console.log('Erreur : ', err);
+    //         });
+    // })
 
     form.container_nbFloor.addEventListener('change', (e) => {
         let newNb = parseInt(form.container_nbFloor.value, 10);
@@ -159,13 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             nbCards = newNb;
-        }
-    })
-
-    window.addEventListener('beforeunload', (e) => {
-        if (formModified) {
-            e.preventDefault();
-            alert('Vous avez des modifications non enregistrées')
         }
     })
 });

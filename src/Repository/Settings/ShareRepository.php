@@ -1,40 +1,40 @@
 <?php
 
-namespace App\Repository;
+namespace App\Repository\Settings;
 
-use App\Entity\Container;
+use App\Entity\Settings\General\Share;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Container>
+ * @extends ServiceEntityRepository<Share>
  */
-class ContainerRepository extends ServiceEntityRepository
+class ShareRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Container::class);
+        parent::__construct($registry, Share::class);
     }
 
 //    /**
-//     * @return Container[] Returns an array of Container objects
+//     * @return Share[] Returns an array of Share objects
 //     */
 //    public function findByExampleField($value): array
 //    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
+//        return $this->createQueryBuilder('s')
+//            ->andWhere('s.exampleField = :val')
 //            ->setParameter('val', $value)
-//            ->orderBy('c.id', 'ASC')
+//            ->orderBy('s.id', 'ASC')
 //            ->setMaxResults(10)
 //            ->getQuery()
 //            ->getResult()
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?Container
+//    public function findOneBySomeField($value): ?Share
 //    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
+//        return $this->createQueryBuilder('s')
+//            ->andWhere('s.exampleField = :val')
 //            ->setParameter('val', $value)
 //            ->getQuery()
 //            ->getOneOrNullResult()

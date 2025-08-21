@@ -1,11 +1,19 @@
 body {
     display: flex;
+    align-items: stretch;
+    height: 100vh;
+    min-height: 0;
 }
 
 main {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    height: 100%;
-    max-height: 100vh;
+    height: 100vh;
+    min-height: 0;
+    /*max-height: 100vh;*/
+    overflow: hidden;
 }
 
 header {
@@ -59,6 +67,7 @@ h3.selected {
 
 form,
 .custom_form {
+    flex: 1 1 auto;
     display: flex;
     width: 100%;
     gap: var(--large);
@@ -70,6 +79,12 @@ form,
     gap: var(--large);
     max-width: 50%;
     width: 100%;
+}
+
+.group-inline {
+    display: flex;
+    flex-direction: row;
+    gap: var(--medium);
 }
 
 .field {
@@ -116,45 +131,65 @@ form,
 .field input:disabled {
     border: none;
 }
-
-#table-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+.field textarea {
+    resize: none;
     width: 100%;
-    height: 100%;
-    border: 1px solid #5B5B5B;
-    border-radius: var(--tiny);
-    overflow-y: scroll;
-    flex-shrink: 1;
-    max-height: 750px;
+    border: none;
+    border-bottom: 1px solid #5B5B5B;
+    background: transparent;
+    font-size: var(--medium);
+    outline: none;
+    color: white;
+    overflow: hidden;
+}
+.field textarea:focus-visible {
+    border-bottom: 1px solid #707070;
 }
 
-#table-container::-webkit-scrollbar {
+#table-container {
+    flex: 0 1 auto;     /* prend tout l’espace restant */
+    min-height: 0;      /* autorise la contraction */
+    overflow: auto;     /* scroll vertical ET horizontal si besoin */
+    width: 100%;
+    border: 1px solid #5B5B5B;
+    border-radius: var(--tiny);
+
+    /*display: flex;*/
+    /*flex-direction: column;*/
+    /*justify-content: center;*/
+    /*align-items: center;*/
+    /*width: 100%;*/
+    /*!*height: fit-content;*!*/
+    /*border: 1px solid #5B5B5B;*/
+    /*border-radius: var(--tiny);*/
+    /*!*overflow-y: scroll;*!*/
+}
+
+::-webkit-scrollbar {
     width: 8px; /* largeur de la scrollbar verticale */
     height: 8px; /* hauteur de la scrollbar horizontale */
 }
 
-#table-container::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
     background: transparent; /* fond de la piste */
 }
 
-#table-container::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
     background-color: #888; /* couleur de la barre */
     border-radius: 4px;
     border: 2px solid transparent; /* si tu veux un effet "padding" */
 }
 
-#table-container::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
     background-color: #aaa; /* au survol */
 }
 
 table {
     width: 100%;
+    /*height: fit-content;*/
     color: white;
     border-collapse: collapse;
-    max-height: 500px;
+    /*max-height: 500px;*/
     overflow-y: auto;
 }
 
@@ -176,10 +211,6 @@ table thead th {
     z-index: 1;
 }
 
-table tbody td {
-    border-top: 1px solid #5B5B5B;
-}
-
 table tbody tr:nth-child(odd) {
     background-color: #313138;
 }
@@ -193,6 +224,7 @@ table tbody tr:hover {
 }
 
 table tbody td {
+    border-top: 1px solid #5B5B5B;
     padding: var(--large) var(--medium);
     text-align: left;
 }
@@ -220,20 +252,36 @@ table tbody td.align-right {
 #content {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: var(--medium);
+    /*justify-content: flex-start;*/
+    flex: 1 1 auto;
+    /*align-items: center;*/
+    min-height: 0;
     width: 100%;
+    /*flex-grow: 1;*/
+    gap: var(--medium);
 }
 
 #content-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    /*display: flex;*/
+    /*justify-content: space-between;*/
+    /*align-items: center;*/
+    flex-shrink: 0;
     width: 100%;
 }
 
-.btn {
+#save.hidden {
+    display: none;
+}
+
+#save.visible {
+    display: initial;
+}
+
+.btn.hidden {
+    display: none;
+}
+
+.btn.visible {
     border: none;
     border-radius: var(--tiny);
     padding: 12px 20px;
@@ -243,6 +291,9 @@ table tbody td.align-right {
 
 .btn.btn-primary {
     background-color: #313138;
+}
+.btn.btn-secondary {
+    border: 2px solid #313138;
 }
 
 #content-header div.group {
@@ -272,16 +323,39 @@ select[data-widget="relational"] {
     right: 6px;
 }
 
+/*.choices__inner{*/
+/*    background-color: transparent;*/
+/*    border: none;*/
+/*    border-bottom: 1px solid #5B5B5B;*/
+/*    color: white;*/
+/*    width: 100%;*/
+/*    height: 100%;*/
+/*    font-size: var(--medium);*/
+/*    border-radius: 0;*/
+/*    padding: 0;*/
+/*    min-height: 0;*/
+/*}*/
+
+/* Laisser la hauteur s’adapter au contenu */
 .choices__inner{
     background-color: transparent;
     border: none;
     border-bottom: 1px solid #5B5B5B;
     color: white;
     width: 100%;
+    /* height: 100%;  <-- supprimer */
     font-size: var(--medium);
     border-radius: 0;
-    padding: 0;
-    min-height: 0;
+    /* padding: 0;     <-- supprimer */
+    /* min-height: 0;  <-- supprimer */
+
+    /* valeurs cohérentes pour afficher la sélection */
+    height: auto;
+    min-height: 36px;       /* ~ ligne de base pour voir le texte */
+    /*padding: 6px 0;         !* un peu d'air autour de l’item *!*/
+    padding-top: 0;
+    display: flex;
+    align-items: center;     /* vertical centering du texte sélectionné */
 }
 
 .choices__inner.invalid {
@@ -308,7 +382,7 @@ select[data-widget="relational"] {
 
 .choices__list,
 .choices__list--dropdown {
-    max-width: 175px;
+    /*max-width: 175px;*/
 }
 
 .choices__list--dropdown .choices__item--selectable.is-highlighted,
@@ -331,29 +405,183 @@ select[data-widget="relational"] {
     border-color: #707070;
 }
 
+.choices__button {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14' width='14' height='14'%3E%3Cpath fill='none' stroke='currentColor' stroke-width='2.5' stroke-linecap='round' d='M1,1 L13,13 M13,1 L1,13'/%3E%3C/svg%3E") !important;
+    color: var(--bg-color);
+    background-size: 1em 1em;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.choices[data-type="select-multiple"] input[type="search"] {
+    display: none;
+}
+
 .kanban {
     width: 100%;
     padding: var(--medium);
 }
 
-.kanban #kanban-container {
+#kanban-container {
     display: flex;
     flex-wrap: wrap;
     gap: var(--medium);
     width: 100%;
 }
 
-.kanban .card {
+.kanban .card,
+#kanban-container .card {
     border: 1px solid #5B5B5B;
     padding: var(--medium);
     width: 25%;
     cursor: pointer;
 }
-.kanban .card:hover {
-    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+.kanban .card:hover,
+#kanban-container .card:hover {
+    box-shadow: rgba(100, 100, 111, 0.2) 0 7px 29px 0;
     transform: translateY(-4px);
 }
 
-.text-muted {
+.text-muted,
+small {
     color: #909090 !important;
+}
+
+.text-center {
+    text-align: center;
+}
+.text-end {
+    text-align: right;
+}
+.text-start {
+    text-align: left;
+}
+
+#content.config form {
+    display: flex;
+    flex-direction: column;
+}
+
+#content.config div.section-content{
+    padding: 0 var(--large);
+    display: flex;
+    gap: var(--medium);
+}
+
+#content.config section {
+    width: 100%;
+}
+
+#content.config section .section-title {
+    display: inline-block;
+    width: 100%;
+    padding: var(--medium) var(--large);
+    background-color: #3F3F47;
+    color: white;
+    font-weight: bold;
+    margin-bottom: var(--medium);
+}
+
+.pickr .pcr-button {
+    width: 50px;
+    height: 16px;
+}
+
+.pickr .pcr-button,
+.pickr .pcr-button::before,
+.pickr .pcr-button::after {
+    border-radius: 12px;
+}
+
+.pcr-app .pcr-selection .pcr-picker {
+    transition: none;
+}
+
+input[type=checkbox] {
+    appearance: none;
+    width: 24px !important;
+    height: 24px;
+    border: 1px solid #5B5B5B;
+    border-radius: var(--tiny);
+    background-color: transparent;
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    cursor: pointer;
+    position: relative;
+}
+input[type=checkbox]:checked {
+    background-image: url("../img/svg/checkbox_check.svg");
+    background-color: #45454e;
+}
+/*input[type=checkbox]::after {*/
+/*    content: "✓";*/
+/*    color: white;*/
+/*    font-size: 16px;*/
+/*    position: absolute;*/
+/*    top: 50%;*/
+/*    left: 50%;*/
+/*    transform: translate(-50%, -55%);*/
+/*    pointer-events: none;*/
+/*}*/
+
+.stars {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: var(--small);
+}
+
+.stars .star {
+    color: #525354;
+    cursor: pointer;
+}
+.stars .star:hover:not(.selected),
+.stars .star:hover:not(.selected) ~ .star:not(.selected) {
+    color: #666e7c;
+}
+.stars .star.selected {
+    color: #97A4BC;
+}
+
+.tree {
+    flex: 0 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+.tree [data-widget="tree"] {
+    display: flex;
+    flex: 1 1 auto;
+    width: 100%;
+}
+
+/* Host porté dans <body> pour le dropdown Choices */
+.choices-portal { z-index: 9999; }
+
+/* On conserve le look défini pour le dropdown, même hors flux */
+.choices-portal .choices__list--dropdown {
+    background-color: transparent;
+    border: 1px solid #5B5B5B;
+}
+
+/* Quand Choices décide de "flip", on garde la bonne superposition */
+.choices-portal.is-flipped .choices__list--dropdown { /* rien à faire ici, la position est gérée en JS */ }
+
+/* état normal : le tableau scrolle */
+#table-container { overflow: auto; }
+
+/* quand un dropdown Choices est ouvert : on ne clippe plus */
+#table-container.dropdown-open { overflow: visible; }
+
+/* s'assurer que le menu passe au-dessus du thead sticky / autres couches */
+.choices__list--dropdown { z-index: 1000; }
+
+.tags .tag {
+    padding: 4px 12px;
+    border-radius: 20px;
+    color: var(--bg-color);
+    font-size: 14px;
+}
+
+.eye {
+    cursor: pointer;
 }
