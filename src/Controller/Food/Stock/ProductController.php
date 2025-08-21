@@ -3,7 +3,9 @@
 namespace App\Controller\Food\Stock;
 
 use App\Entity\Food\Stock\Product;
+use App\Entity\Settings\General\Share;
 use App\Form\Food\Stock\ProductType;
+use App\Service\EntityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,13 +16,14 @@ use Symfony\Component\Routing\Attribute\Route;
 class ProductController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly EntityService $entityService,
     ){}
 
     #[Route('/food/stock/products', 'food_stock_products')]
     public function products(): Response
     {
-        $products = $this->entityManager->getRepository(Product::class)->findAll();
+        $products = $this->entityService->getEntityRecords($this->getUser(), Product::class);
 
         return $this->render('Page/Food/Stock/products.html.twig', [
             'products' => $products
@@ -33,6 +36,7 @@ class ProductController extends AbstractController
     ): Response
     {
         $product = new Product();
+        $product->setOwner($this->getUser());
 
         $form = $this->createForm(ProductType::class, $product);
         $form->handleRequest($request);
@@ -109,6 +113,7 @@ class ProductController extends AbstractController
 
         if ($data['id'] === 'new') {
             $product = new Product();
+            $product->setOwner($this->getUser());
         } else {
             $product = $this->entityManager->getRepository(Product::class)->find((int) $data['id']);
         }
@@ -141,7 +146,7 @@ class ProductController extends AbstractController
             ], Response::HTTP_OK);
         }
 
-        $products = $this->entityManager->getRepository(Product::class)->findAll();
+        $products = $this->entityService->getEntityRecords($this->getUser(), Product::class);
         $data = [];
         foreach ($products as $product) {
             $data[] = [

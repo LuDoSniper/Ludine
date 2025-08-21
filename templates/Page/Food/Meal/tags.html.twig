@@ -34,7 +34,7 @@
             h3: {
                 'Tableau de bord': {
                     selected: false,
-                    url: path('food_stock_containers')
+                    url: path('food_meal_dashboard')
                 },
                 'Plats': {
                     selected: false,
@@ -63,6 +63,19 @@
                         'action_type': 'redirect'
                     }
                 } %}
+
+                {% set editable = app.request ? app.request.query.get('editable') : null %}
+                {% if app.request and app.request.query.has('editable') and editable != 'new' %}
+                    {% include 'Widget/button.html.twig' with {
+                        'btn': {
+                            'name': 'Supprimer',
+                            'url': path('food_meal_tag_remove', {'id': editable}),
+                            'type': 'secondary',
+                            'action_type': 'redirect',
+                            'id': 'remove'
+                        }
+                    } %}
+                {% endif %}
 
                 {% include 'Widget/button.html.twig' with {'btn': {'action_type': 'save'}} %}
             </div>

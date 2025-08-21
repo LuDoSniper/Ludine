@@ -2,19 +2,46 @@
 
 namespace App\Controller\Food\Meal;
 
+use App\Entity\Food\Meal\Dish;
 use App\Entity\Food\Meal\Ingredient;
+use App\Entity\Food\Stock\Product;
+use App\Service\EntityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\RouterInterface;
 
 class IngredientController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
+        private readonly EntityService $entityService,
     ){}
+
+    #[Route('/food/meal/ingredients/remove/{id}', 'food_meal_ingredient_remove')]
+    public function remove(
+        Ingredient $ingredient,
+        Request $request,
+        RouterInterface $router,
+    ): Response
+    {
+        $this->entityManager->remove($ingredient);
+        $this->entityManager->flush();
+
+        $redirect = (string) $request->query->get('redirect', 'food_meal_dishes');
+        $params = $request->query->all('redirect_params') ?? [];
+
+        // sécurité: s’assurer que la route existe (anti open-redirect/typo)
+        if (!$router->getRouteCollection()->get($redirect)) {
+            $redirect = 'food_meal_dishes';
+            $params = [];
+        }
+
+        return $this->redirectToRoute($redirect, $params);
+    }
 
     #[Route('/food/meal/ingredients/save', 'food_meal_ingredients_save')]
     public function save(
@@ -35,6 +62,19 @@ class IngredientController extends AbstractController
         }
         if (empty($data['product'])) {
             $missing_fields[] = 'product';
+        } else {
+            $product = $this->entityManager->getRepository(Product::class)->find($data['product']);
+            if (empty($product)) {
+                $missing_fields[] = 'product';
+            }
+        }
+        if (empty($data['dish_id'])) {
+            $missing_fields[] = 'dish_id';
+        } else {
+            $dish = $this->entityManager->getRepository(Dish::class)->find($data['dish_id']);
+            if (empty($dish)) {
+                $missing_fields[] = 'dish_id';
+            }
         }
 
         if (!empty($missing_fields)) {
@@ -43,19 +83,21 @@ class IngredientController extends AbstractController
 
         if ($data['id'] === 'new') {
             $ingredient = new Ingredient();
+            $ingredient->setOwner($this->getUser());
         } else {
             $ingredient = $this->entityManager->getRepository(Ingredient::class)->find((int) $data['id']);
         }
 
+        $ingredient->setDish($dish);
         $ingredient->setQuantity($data['quantity']);
-        $ingredient->setProduct($data['product']);
+        $ingredient->setProduct($this->entityManager->getRepository(Product::class)->find($data['product']));
 
         if ($data['id'] === 'new') {
             $this->entityManager->persist($ingredient);
         }
         $this->entityManager->flush();
 
-        return new JsonResponse(['container' => [
+        return new JsonResponse(['ingredient' => [
             'id' => $ingredient->getId(),
             'quantity' => $ingredient->getQuantity(),
             'product' => $ingredient->getProduct(),
@@ -65,7 +107,7 @@ class IngredientController extends AbstractController
     #[Route('/food/meal/ingredients/get', 'food_meal_ingredient_get')]
     public function get(): JSONResponse
     {
-        $ingredients = $this->entityManager->getRepository(Ingredient::class)->findAll();
+        $ingredients = $this->entityService->getEntityRecords($this->getUser(), Ingredient::class);
 
         $data = ["data" => []];
         foreach ($ingredients as $ingredient) {
@@ -80,5 +122,35 @@ class IngredientController extends AbstractController
             ];
         }
         return new JsonResponse($data, Response::HTTP_OK);
+    }
+
+    #[Route('/food/meal/ingredients/get_meta', 'food_meal_ingredients_get_meta')]
+    public function getMeta(): JsonResponse
+    {
+        return new JsonResponse([
+            "fields" => [
+                [
+                    "name" => "product",
+                    "type" => "relational",
+                    "string" => "Produit",
+                    'get_meta' => '/food/stock/products/get_meta',
+                    'sequence' => 1
+                ],
+                [
+                    "name" => "arrivalDate",
+                    "type" => "date",
+                    "string" => "Date d'arrivée",
+                    'sequence' => 2
+                ],
+                [
+                    "name" => "expirationDate",
+                    "type" => "date",
+                    "string" => "Date de péremption",
+                    'sequence' => 2
+                ],
+            ],
+            "model" => "ingredients",
+            "save_path" => '/food/meal/ingredients/save'
+        ], Response::HTTP_OK);
     }
 }

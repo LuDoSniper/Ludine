@@ -71,6 +71,16 @@
                     }
                 } %}
 
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Supprimer',
+                        'url': path('food_stock_stocked_product_remove', {'id': id}),
+                        'type': 'secondary',
+                        'action_type': 'redirect',
+                        'id': 'remove'
+                    }
+                } %}
+
                 {% include 'Widget/button.html.twig' with {'btn': {'action_type': 'save'}} %}
             </div>
         </div>

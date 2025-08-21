@@ -4,6 +4,7 @@ namespace App\Controller\Food\Meal;
 
 use App\Entity\Food\Meal\Config;
 use App\Form\Food\Meal\ConfigType;
+use App\Service\EntityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,7 +15,8 @@ use Symfony\Component\Routing\Attribute\Route;
 class ConfigController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly EntityService  $entityService,
     ){}
 
     #[Route('/food/meal/config', 'food_meal_config')]
@@ -22,11 +24,13 @@ class ConfigController extends AbstractController
         Request $request
     ): Response
     {
-        $configs = $this->entityManager->getRepository(Config::class)->findAll();
-        if (count($configs) >= 1) {
-            $config = $configs[0];
+        $config = $this->entityService->getEntityRecords($this->getUser(), Config::class);
+        // Ne devrait jamais arriver, mais vérification au cas où
+        if (count($config) >= 1) {
+            $config = $config[0];
         } else {
             $config = $this->setToDefault(new Config());
+            $config->setOwner($this->getUser());
         }
 
         $form = $this->createForm(ConfigType::class, $config);
@@ -82,6 +86,7 @@ class ConfigController extends AbstractController
 
         if ($data['id'] === 'new') {
             $config = $this->setToDefault(new Config());
+            $config->setOwner($this->getUser());
         } else {
             $config = $this->entityManager->getRepository(Config::class)->find((int) $data['id']);
         }
@@ -98,7 +103,7 @@ class ConfigController extends AbstractController
         }
         $this->entityManager->flush();
 
-        return new JsonResponse(['product' => [
+        return new JsonResponse(['config' => [
             'id' => $config->getId(),
             'selectionMode' => $config->getSelectionMode(),
             'selectLunch' => $config->isSelectLunch(),
@@ -112,6 +117,7 @@ class ConfigController extends AbstractController
     public function initializeDefault(): Config
     {
         $config = $this->setToDefault(new Config());
+        $config->setOwner($this->getUser());
 
         $this->entityManager->persist($config);
         $this->entityManager->flush();

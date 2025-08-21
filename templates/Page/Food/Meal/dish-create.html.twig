@@ -4,6 +4,10 @@
     Ludine | Create dish
 {% endblock %}
 
+{% block customstylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/Food/Meal/dish.css') }}">
+{% endblock %}
+
 {% block context %}
     {% set context_trees = '' %}
     {% if trees is defined %}
@@ -22,7 +26,7 @@
             {"name": "difficulty", "type": "int"},
             {"name": "tags", "type": "relational"},
             {"name": "ingredients", "type": "relational"},
-            {"name": "droprate", "type": "float"},
+            {"name": "dropRate", "type": "float"},
         ],
         "trees": trees
     } | json_encode | raw }}
@@ -45,7 +49,7 @@
             h3: {
                 'Tableau de bord': {
                     selected: false,
-                    url: path('food_stock_containers')
+                    url: path('food_meal_dashboard')
                 },
                 'Plats': {
                     selected: true,
@@ -72,6 +76,16 @@
                         'url': path('food_meal_dishes_create'),
                         'type': 'primary',
                         'action_type': 'redirect'
+                    }
+                } %}
+
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Supprimer',
+                        'url': path('food_meal_dish_remove', {'id': id}),
+                        'type': 'secondary',
+                        'action_type': 'redirect',
+                        'id': 'remove'
                     }
                 } %}
 
@@ -121,7 +135,28 @@
                 </div>
             </div>
             <div class="field">
-                <label for="dish_ingredients">Ingrédients</label>
+
+                <div style="display: flex; gap: var(--medium); align-items: center;">
+                    <label for="dish_ingredients">Ingrédients</label>
+
+                    {% set editable = app.request ? app.request.query.get('editable') : null %}
+                    {% set redirect_params = id != 'new' ? {'id': id} : {} %}
+                    {% if app.request and app.request.query.has('editable') and editable != 'new' %}
+                        {% include 'Widget/button.html.twig' with {
+                            'btn': {
+                                'name': 'Supprimer',
+                                'url': path('food_meal_ingredient_remove', {
+                                    'id': editable,
+                                    'redirect': app.request.attributes.get('_route'),
+                                    'redirect_params': redirect_params
+                                }),
+                                'type': 'secondary',
+                                'action_type': 'redirect',
+                                'id': 'remove'
+                            }
+                        } %}
+                    {% endif %}
+                </div>
                 <div id="dish_ingredients" data-widget="tree"></div>
             </div>
         </div>

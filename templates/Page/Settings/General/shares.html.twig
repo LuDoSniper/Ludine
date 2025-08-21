@@ -1,0 +1,79 @@
+{% set sidebar_active = 'settings' %}
+{% extends 'Layout/base-modules.html.twig' %}
+
+{% block title %}
+    Ludine - Shares
+{% endblock %}
+
+{% block context %}
+    {{ {
+        "save_path": path('settings_general_shares_save'),
+        "model": "share",
+        "fields": [
+            {"name": "name", "type": "char"},
+            {"name": "description", "type": "text"},
+            {"name": "entities", "type": "relational"},
+            {"name": "members", "type": "relational"},
+            {"name": "active", "type": "bool"},
+        ]
+    } | json_encode | raw }}
+{% endblock %}
+
+{% block main %}
+    {% include 'Widget/module-header.html.twig' with {
+        header: {
+            h1: 'Paramètres',
+            h2: {
+                'Profil': {
+                    selected: false,
+                    url: path('settings_profile')
+                },
+                'Général': {
+                    selected: true,
+                    url: path('settings_general')
+                }
+            },
+            h3: {
+                'Partages': {
+                    selected: true,
+                    url: path('settings_general_shares')
+                },
+            }
+        }
+    } %}
+    <div id="content" class="kanban">
+        <div id="content-header">
+            <div class="group">
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Nouveau',
+                        'url': path('settings_general_share_create'),
+                        'type': 'primary',
+                        'action_type': 'redirect'
+                    }
+                } %}
+
+                {% include 'Widget/button.html.twig' with {'btn': {'action_type': 'save'}} %}
+            </div>
+        </div>
+
+        <div id="kanban-container">
+            {% for share in shares %}
+                <div class="card" style="background-color: #3F3F47;">
+                    <input type="hidden" name="url" value="{{ path('settings_general_share_update', {id: share.id}) }}">
+                    <div class="group" style="max-width: 100% !important;">
+                        <div>
+                            <div class="field">
+                                <span class="h1">{{ share.name }}</span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <span>Actif : {{ share.active ? 'Oui' : 'Non' }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

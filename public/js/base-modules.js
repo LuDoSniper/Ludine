@@ -6,10 +6,25 @@ window.LudineApp.actions = {}
 document.addEventListener('DOMContentLoaded', async () => {
     // Get context
     const tmpRaw = document.getElementById('context');
-    LudineApp.context = JSON.parse(tmpRaw.textContent);
+    try {
+        LudineApp.context = JSON.parse(tmpRaw.textContent);
+    } catch (e) {
+        console.log("Can't initialize context. Skipping.")
+    }
     LudineApp.context.params = Object.fromEntries((new URLSearchParams(window.location.search)).entries());
 
     let formModified = false;
+    function setFormModified(state) {
+        formModified = state;
+        const save = document.getElementById('save');
+        if (formModified && save.classList.contains('hidden')) {
+            save.classList.remove('hidden');
+            save.classList.add('visible')
+        } else if (!formModified && save.classList.contains('visible')) {
+            save.classList.remove('visible');
+            save.classList.add('hidden')
+        }
+    }
 
     // Widget date
     const dateFields = document.querySelectorAll('[data-widget="date"]');
@@ -209,6 +224,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 container.id = 'table-container';
 
                 const form = document.createElement('form');
+                form.dataset.save_path = treeData.save_path;
+                form.dataset.fields = JSON.stringify(treeData.fields)
+                form.dataset.model = treeData.model
                 container.appendChild(form);
 
                 const table = document.createElement('table');
@@ -368,34 +386,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     })
 
     // Update page
-    if (LudineApp.context) {
-        if (LudineApp.context.id !== 'new') {
-            if (LudineApp.context.get_path) {
-                let object;
-                fetch(LudineApp.context.get_path)
-                    .then(res => res.json())
-                    .then(data => {
-                        // object = data;
-                        // const computedFields = document.querySelectorAll('[data-computed]');
-                        // computedFields.forEach(field => {
-                        //     const fieldTarget = field.dataset.computed.split('.')[1];
-                        //     const modelTarget = document.querySelectorAll('[data-external_id="' + field.dataset.computed.split('.')[0] + '"');
-                        //
-                        //     if (field.target) {
-                        //         modelTarget.forEach(model => {
-                        //             if (model.dataset.id === )
-                        //         })
-                        //     }
-                        // })
-
-                        document.querySelectorAll('[data-computed]').forEach(field => {
-                            const target = field.dataset.computed.split('.')[0];
-                            document.querySelectorAll(`[data-external_id="${target}"]`)[0].parentElement.dispatchEvent(new Event('change'));
-                        });
-                    })
-            }
-        }
-    }
+    // if (LudineApp.context) {
+    //     if (LudineApp.context.id !== 'new') {
+    //         if (LudineApp.context.get_path) {
+    //             let object;
+    //             fetch(LudineApp.context.get_path)
+    //                 .then(res => res.json())
+    //                 .then(data => {
+    //                     // object = data;
+    //                     // const computedFields = document.querySelectorAll('[data-computed]');
+    //                     // computedFields.forEach(field => {
+    //                     //     const fieldTarget = field.dataset.computed.split('.')[1];
+    //                     //     const modelTarget = document.querySelectorAll('[data-external_id="' + field.dataset.computed.split('.')[0] + '"');
+    //                     //
+    //                     //     if (field.target) {
+    //                     //         modelTarget.forEach(model => {
+    //                     //             if (model.dataset.id === )
+    //                     //         })
+    //                     //     }
+    //                     // })
+    //
+    //                     document.querySelectorAll('[data-computed]').forEach(field => {
+    //                         const target = field.dataset.computed.split('.')[0];
+    //                         document.querySelectorAll(`[data-external_id="${target}"]`)[0].parentElement.dispatchEvent(new Event('change'));
+    //                     });
+    //                 })
+    //         }
+    //     }
+    // }
 
     // Click on kanban card
     const kanban = document.querySelector('.kanban');
@@ -458,6 +476,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 const div = document.createElement('div');
                                 div.classList.add('field');
                                 const input = document.createElement(td.dataset.type === 'relational' ? 'select' : 'input');
+                                input.id = `${table.parentElement.tagName === 'FORM' && table.parentElement.dataset.model ? table.parentElement.dataset.model : LudineApp.context.model}_${td.dataset.name}`;
                                 if (td.dataset.type === 'relational') {
                                     input.dataset.widget = 'relational';
                                     input.dataset.placeholder = ' ';
@@ -474,7 +493,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                                         input.appendChild(option);
                                     });
                                 } else {
-                                    input.id = `${LudineApp.context.model}_${td.dataset.name}`;
                                     input.name = td.dataset.name;
                                     input.type = td.dataset.type;
                                 }
@@ -500,7 +518,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 const div = document.createElement('div');
                                 div.classList.add('field');
                                 const input = document.createElement('input');
-                                input.id = `${LudineApp.context.model}_${td.dataset.name}`;
+                                input.id = `${table.parentElement.tagName === 'FORM' && table.parentElement.dataset.model ? table.parentElement.dataset.model : LudineApp.context.model}_${td.dataset.name}`;
                                 input.name = td.dataset.name;
                                 input.type = td.dataset.type;
                                 input.value = value;
@@ -598,149 +616,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         window.LudineApp.choicesInstances.set(relationalField, instance);
 
-        // --- Portal Choices vers <body> en conservant le contexte de classes (.choices .is-open etc.) ---
-        (function portalizeChoicesDropdown() {
-            const wrapper = relationalField.closest('.choices'); // conteneur généré par Choices
-            let dropdownEl = null;
-            let host = null;
+        // Autoriser le dépassement visuel du dropdown pendant son ouverture
+        document.addEventListener('showDropdown', (ev) => {
+            const scroller = ev.target.closest('#table-container');
+            if (scroller) scroller.classList.add('dropdown-open');
+        }, true);
 
-            // Miroir des classes du wrapper (is-open, is-flipped, is-focused...) -> host
-            const mirrorClasses = () => {
-                if (!host) return;
-                // garde une classe propre pour cibler en CSS
-                host.className = 'choices choices-portal ' + wrapper.className
-                    .replace(/\bchoices\b/, '')      // on a déjà "choices"
-                    .replace(/\bchoices-portal\b/, '') // au cas où
-                    .trim();
-            };
-            const mo = new MutationObserver(mirrorClasses);
-            mo.observe(wrapper, { attributes: true, attributeFilter: ['class'] });
-
-            const reposition = () => {
-                if (!host || !dropdownEl) return;
-                const r = wrapper.getBoundingClientRect();
-
-                // position par défaut: sous l'input
-                let top = r.bottom;
-
-                // si le menu dépasse en bas, on “flip”
-                const menuH = dropdownEl.offsetHeight || 280;
-                const wouldOverflow = top + menuH > window.innerHeight;
-                wrapper.classList.toggle('is-flipped', wouldOverflow);
-                host.classList.toggle('is-flipped', wouldOverflow);
-
-                if (wouldOverflow) {
-                    top = r.top - menuH;
-                }
-
-                host.style.position = 'fixed';
-                host.style.left = r.left + 'px';
-                host.style.top  = top + 'px';
-                host.style.width = r.width + 'px';
-                host.style.zIndex = '9999';
-            };
-
-            const onShow = () => {
-                dropdownEl = wrapper.querySelector('.choices__list--dropdown');
-                if (!dropdownEl) return;
-
-                // créer le host une seule fois
-                if (!host) {
-                    host = document.createElement('div');
-                    host.className = 'choices choices-portal is-open';
-                    // copie la police pour cohérence visuelle
-                    const cs = getComputedStyle(wrapper);
-                    host.style.font = cs.font;
-                    document.body.appendChild(host);
-                } else {
-                    host.classList.add('is-open');
-                }
-
-                // déplacer le dropdown dans le host
-                host.appendChild(dropdownEl);
-
-                // limites raisonnables si très long
-                dropdownEl.style.maxHeight = '40vh';
-                dropdownEl.style.overflow = 'auto';
-
-                mirrorClasses();
-                reposition();
-
-                window.addEventListener('scroll', reposition, true);
-                window.addEventListener('resize', reposition);
-            };
-
-            const onHide = () => {
-                if (!dropdownEl || !host) return;
-
-                // restaurer le DOM
-                wrapper.appendChild(dropdownEl);
-                dropdownEl.style.maxHeight = '';
-                dropdownEl.style.overflow = '';
-
-                host.classList.remove('is-open');
-
-                window.removeEventListener('scroll', reposition, true);
-                window.removeEventListener('resize', reposition);
-            };
-
-            relationalField.addEventListener('showDropdown', onShow);
-            relationalField.addEventListener('hideDropdown', onHide);
-        })();
-
-        // const instance = new Choices(relationalField, {
-        //     shouldSort: false,
-        //     searchEnabled: false,
-        //     itemSelectText: '',
-        //     removeItemButton: true,
-        //     callbackOnCreateTemplates: function (template) { /* ... */ }
-        // });
-        //
-        // /* 👉 AJOUTE ICI (portal Choices vers <body>) */
-        // (function portalizeChoicesDropdown() {
-        //     const wrapper = relationalField.closest('.choices'); // conteneur rendu par Choices
-        //     let dropdownEl = null;
-        //
-        //     const reposition = () => {
-        //         if (!dropdownEl) return;
-        //         const r = wrapper.getBoundingClientRect();
-        //         dropdownEl.style.left = r.left + 'px';
-        //         dropdownEl.style.top  = r.bottom + 'px';  // sous l’input
-        //         dropdownEl.style.width = r.width + 'px';
-        //     };
-        //
-        //     const onShow = () => {
-        //         // Le dropdown existe maintenant sous wrapper
-        //         dropdownEl = wrapper.querySelector('.choices__list--dropdown');
-        //         if (!dropdownEl) return;
-        //
-        //         // Déplacer dans <body> et positionner
-        //         document.body.appendChild(dropdownEl);
-        //         dropdownEl.style.position = 'fixed';
-        //         dropdownEl.style.zIndex = '9999';
-        //         dropdownEl.style.maxHeight = '40vh';  // évite les menus trop grands
-        //         dropdownEl.style.overflow = 'auto';
-        //
-        //         reposition();
-        //         window.addEventListener('scroll', reposition, true);
-        //         window.addEventListener('resize', reposition);
-        //     };
-        //
-        //     const onHide = () => {
-        //         if (!dropdownEl) return;
-        //         // Replacer dans son wrapper d’origine et nettoyer les styles inline
-        //         wrapper.appendChild(dropdownEl);
-        //         dropdownEl.removeAttribute('style');
-        //         dropdownEl = null;
-        //
-        //         window.removeEventListener('scroll', reposition, true);
-        //         window.removeEventListener('resize', reposition);
-        //     };
-        //
-        //     // Écoute les events émis par Choices sur l’élément <select> d’origine
-        //     relationalField.addEventListener('showDropdown', onShow);
-        //     relationalField.addEventListener('hideDropdown', onHide);
-        // })();
+        document.addEventListener('hideDropdown', (ev) => {
+            const scroller = ev.target.closest('#table-container');
+            if (scroller) scroller.classList.remove('dropdown-open');
+        }, true);
     })
 
     relationalFields.forEach(field => {
@@ -802,34 +687,63 @@ document.addEventListener('DOMContentLoaded', async () => {
         })
     })
 
+    // Password's eye
+    const eyes = document.querySelectorAll('.eye');
+    eyes.forEach((eye) => {
+        eye.addEventListener('click', () => {
+            const target = document.getElementById(eye.dataset.target);
+            if (target.type === 'text') {
+                eye.src = eye.src.replace('open', 'closed');
+                target.type = 'password';
+            } else if (target.type === 'password') {
+                eye.src = eye.src.replace('closed', 'open');
+                target.type = 'text';
+            }
+        });
+    });
+
     // Save
-    let form = document.querySelector('form:not(form:has(table.editable))');
-    let editableForms = document.querySelectorAll('form:has(table.editable)');
+    const form = Array.from(document.querySelectorAll('form')).filter(f =>
+        !f.querySelector('table.editable') ||          // pas de table.editable dans ce form
+        f.querySelector('form table.editable')         // si table.editable, le table.editable doit être dans un sous-form
+    )[0];
+    let editableForms = Array.from(document.querySelectorAll('form')).filter(f =>
+        f.querySelector('table.editable') &&
+        !f.querySelector(':scope form table.editable'
+    ));
     let saveBtn = document.getElementById('save');
-    saveBtn.addEventListener('click', (e) => {
-        e.preventDefault();
+    if (saveBtn) {
+        saveBtn.addEventListener('click', (e) => {
+            e.preventDefault();
 
-        // Save en premier les editables pour ensuite save le modele qui en dépend
-        if (editableForms) {
-            editableForms.forEach(form => {
-                const save_path = form.dataset.save_path ? form.dataset.save_path : LudineApp.context.save_path;
-                const fields = form.dataset.fields ? form.dataset.fields : LudineApp.context.fields;
-                const model = form.dataset.model ? form.dataset.model : LudineApp.context.model;
-
-                const data = {'id': LudineApp.context.params.editable ? LudineApp.context.params.editable : LudineApp.context.id};
-                fields.forEach(field => {
+            if (form) {
+                const data = {'id': LudineApp.context.id ? LudineApp.context.id : ''};
+                LudineApp.context.fields.forEach((field) => {
                     if (field.type === 'action') {
                         data[field.name] = LudineApp.actions[field.action] ? LudineApp.actions[field.action]() : null;
+                    } else if (form[`${LudineApp.context.model}_${field.name}`] && form[`${LudineApp.context.model}_${field.name}`].tagName === 'SELECT' && form[`${LudineApp.context.model}_${field.name}`].multiple) {
+                        const select = form[`${LudineApp.context.model}_${field.name}`];
+                        let options = [];
+                        Array.from(select.selectedOptions).forEach((option) => {
+                            options.push(option.dataset.id ? option.dataset.id : option.value);
+                        })
+                        data[field.name] = options.join(',');
                     } else {
-                        const formatedFieldName = `${model}_${field.name}`;
-                        data[field.name] = form[formatedFieldName] ? form[formatedFieldName].value : null;
+                        const formattedFieldName = `${LudineApp.context.model}_${field.name}`;
+                        const tmp = form[formattedFieldName];
+                        if (form[formattedFieldName].tagName === 'INPUT' && form[formattedFieldName].type === 'checkbox') {
+                            data[field.name] = form[formattedFieldName] ? form[formattedFieldName].checked : false;
+                        } else {
+                            data[field.name] = form[formattedFieldName] ? form[formattedFieldName].value : null;
+                        }
                     }
-                })
+                });
 
-                fetch(save_path, {
+                console.log('save :', data)
+                fetch(LudineApp.context.save_path, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(data)
                 }).then(res => res.json())
@@ -839,79 +753,107 @@ document.addEventListener('DOMContentLoaded', async () => {
                             const formattedFieldName = `${LudineApp.context.model}_${field}`;
                             form[formattedFieldName].classList.add('invalid');
                         })
-                    } else {
-                        const target = document.getElementById(LudineApp.context.params.target);
-                        const tr = target.querySelector(`tr[data-id="${LudineApp.context.params.editable}"]`);
-                        tr.dataset.id = data[LudineApp.context.model].id;
-                        tr.querySelectorAll('td').forEach(field => {
-                            if (field.querySelectorAll('div.pickr').length > 0) {
-                                field.dataset.widget = 'color'
-                            }
-                            field.textContent = field.querySelector('input').value;
+                    }
+                    if (data[LudineApp.context.model]) {
+                        setFormModified(false);
+                        let invalids = document.querySelectorAll('.invalid');
+                        invalids.forEach(invalid => {
+                            invalid.classList.remove('invalid');
                         })
-                        updateColorFields()
-                        const url = new URL(window.location);
-                        url.search = '';
-                        window.history.replaceState({}, document.title, url.toString());
-                        delete LudineApp.context.params.target;
-                        delete LudineApp.context.params.editable;
+
+                        LudineApp.context.id = data[LudineApp.context.model].id;
                     }
                 })
                 .catch(err => console.log(err));
-            })
-        }
+            }
 
-        if (form) {
-            const data = {'id': LudineApp.context.id ? LudineApp.context.id : ''};
-            LudineApp.context.fields.forEach((field) => {
-                if (field.type === 'action') {
-                    data[field.name] = LudineApp.actions[field.action] ? LudineApp.actions[field.action]() : null;
-                } else {
-                    const formattedFieldName = `${LudineApp.context.model}_${field.name}`;
-                    data[field.name] = form[formattedFieldName] ? form[formattedFieldName].value : null;
-                }
-            });
+            // Save les editables
+            if (editableForms) {
+                editableForms.forEach(form => {
+                    const save_path = form.dataset.save_path ? form.dataset.save_path : LudineApp.context.save_path;
+                    const fields = form.dataset.fields ? JSON.parse(form.dataset.fields) : LudineApp.context.fields;
+                    const model = form.dataset.model ? form.dataset.model : LudineApp.context.model;
 
-            fetch(LudineApp.context.save_path, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            }).then(res => res.json())
-            .then(data => {
-                if (data.missing_fields) {
-                    data.missing_fields.forEach((field) => {
-                        const formattedFieldName = `${LudineApp.context.model}_${field}`;
-                        form[formattedFieldName].classList.add('invalid');
-                    })
-                }
-                if (data[LudineApp.context.model]) {
-                    formModified = false;
-                    let invalids = document.querySelectorAll('.invalid');
-                    invalids.forEach(invalid => {
-                        invalid.classList.remove('invalid');
+                    const data = {
+                        id: LudineApp.context.params.editable
+                            ? LudineApp.context.params.editable
+                            : LudineApp.context.id,
+                        [ `${LudineApp.context.model}_id` ]: LudineApp.context.id || null
+                    };
+                    fields.forEach(field => {
+                        if (field.type === 'action') {
+                            data[field.name] = LudineApp.actions[field.action] ? LudineApp.actions[field.action]() : null;
+                        } else {
+                            const formatedFieldName = `${model}_${field.name}`;
+                            data[field.name] = form[formatedFieldName] ? form[formatedFieldName].value : null;
+                        }
                     })
 
-                    LudineApp.context.id = data[LudineApp.context.model].id;
-                }
-            })
-            .catch(err => console.log(err));
-        }
-    })
+                    console.log('save :', data)
+                    fetch(save_path, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    }).then(res => res.json())
+                        .then(data => {
+                            if (data.missing_fields) {
+                                data.missing_fields.forEach((field) => {
+                                    const formattedFieldName = `${model}_${field}`;
+                                    form[formattedFieldName].classList.add('invalid');
+                                })
+                            } else {
+                                const target = document.getElementById(LudineApp.context.params.target);
+                                const tr = target.querySelector(`tr[data-id="${LudineApp.context.params.editable}"]`);
+                                tr.dataset.id = data[model].id;
+                                tr.querySelectorAll('td').forEach(field => {
+                                    if (field.querySelectorAll('div.pickr').length > 0) {
+                                        field.dataset.widget = 'color'
+                                    }
+                                    if (field.dataset.type === 'relational') {
+                                        let values = [];
+                                        Array.from(field.querySelector('select').selectedOptions).forEach((option) => {
+                                            values.push(option.textContent)
+                                        });
+                                        field.textContent = values.join(', ')
+                                    } else {
+                                        field.textContent = field.querySelector('input').value;
+                                    }
+                                })
+                                updateColorFields()
 
-    if (form) {
+                                let newUrl = new URL(window.location.href);
+                                let tmpUrl = newUrl.toString();
+                                if (tmpUrl.includes('create') && LudineApp.context.id !== 'new') {
+                                    tmpUrl.replace('create', `update/${LudineApp.context.id}`);
+                                    newUrl = new URL(tmpUrl);
+                                }
+                                newUrl.search = '';
+                                window.location.href = newUrl.toString();
+                            }
+                        })
+                        .catch(err => console.log(err));
+                })
+            }
+        })
+    }
+
+    // Remove button
+    const removeButton = document.getElementById('remove');
+    if (removeButton) {
+        removeButton.addEventListener('click', (e) => {
+            if (!confirm('Êtes vous sûr de vouloir supprimer cet enregistrement ? Cette action est irreversible !')) {
+                e.preventDefault();
+            }
+        });
+    }
+
+    document.querySelectorAll('form').forEach((form) => {
         form.addEventListener('input', (e) => {
-            formModified = true;
+            setFormModified(true);
         })
-    }
-    if (editableForms) {
-        editableForms.forEach(form => {
-            form.addEventListener('input', (e) => {
-                formModified = true;
-            })
-        })
-    }
+    });
 
     // window.addEventListener('beforeunload', (e) => {
     //     if (formModified) {
@@ -919,4 +861,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     //         alert('Vous avez des modifications non enregistrées')
     //     }
     // })
+
+    function hideLoader() {
+        const el = document.getElementById('app-loader');
+        if (!el) return;
+        el.classList.add('is-hidden');
+        // Retire du DOM après la transition (optionnel)
+        setTimeout(() => el.remove(), 300);
+    }
+    hideLoader();
 })

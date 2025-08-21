@@ -4,6 +4,7 @@ namespace App\Form\Food\Meal;
 
 use App\Entity\Food\Meal\Dish;
 use App\Entity\Food\Meal\Tag;
+use App\Repository\Food\Meal\TagRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -16,6 +17,9 @@ class DishType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $user = $options['user'];
+        $tags = $options['tags'];
+
         $builder
             ->add('name', TextType::class, [
                 'label' => 'Nom',
@@ -59,7 +63,21 @@ class DishType extends AbstractType
                         'data-external_id' => 'food_meal_tags',
                         'data-color' => $tag->getColor(),
                     ];
-                }
+                },
+                'choices' => $tags,
+//                'query_builder' => function (TagRepository $tr) use ($user) {
+//                    $qb = $tr->createQueryBuilder('t')
+//                        ->orderBy('t.name', 'ASC');
+//
+//                    if ($user) {
+//                        $qb->where('t.owner = :user')
+//                            ->setParameter('user', $user);
+//                    } else {
+//                        $qb->where('1 = 0');
+//                    }
+//
+//                    return $qb;
+//                }
             ])
             ->add('dropRate', IntegerType::class, [
                 'label' => 'Drop rate',
@@ -75,6 +93,8 @@ class DishType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Dish::class,
             'maxDifficulty' => 3,
+            'user' => null,
+            'tags' => [],
         ]);
     }
 }

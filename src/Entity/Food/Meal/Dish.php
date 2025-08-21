@@ -2,6 +2,7 @@
 
 namespace App\Entity\Food\Meal;
 
+use App\Entity\Authentication\User;
 use App\Repository\Food\Meal\DishRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -48,6 +49,10 @@ class Dish
 
     #[ORM\Column]
     private ?float $dropRate = null;
+
+    #[ORM\ManyToOne(inversedBy: 'dishes')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $owner = null;
 
     public function __construct()
     {
@@ -206,6 +211,18 @@ class Dish
     public function setDropRate(float $dropRate): static
     {
         $this->dropRate = $dropRate;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
 
         return $this;
     }

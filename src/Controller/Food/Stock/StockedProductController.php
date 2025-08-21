@@ -6,6 +6,7 @@ use App\Entity\Food\Stock\Product;
 use App\Entity\Food\Stock\StockedProduct;
 use App\Entity\Food\Stock\Container;
 use App\Form\Food\Stock\StockedProductType;
+use App\Service\EntityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,13 +17,14 @@ use Symfony\Component\Routing\Attribute\Route;
 class StockedProductController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly EntityService $entityService,
     ){}
 
     #[Route('/food/stock/stocked-products', name: 'food_stock_stocked_products')]
     public function stockedProducts(): Response
     {
-        $stockedProducts = $this->entityManager->getRepository(StockedProduct::class)->findAll();
+        $stockedProducts = $this->entityService->getEntityRecords($this->getUser(), StockedProduct::class);
 
         return $this->render('Page/Food/Stock/stocked-products.html.twig', [
             'stockedProducts' => $stockedProducts
@@ -35,8 +37,13 @@ class StockedProductController extends AbstractController
     ): Response
     {
         $stockedProduct = new StockedProduct();
+        $stockedProduct->setOwner($this->getUser());
 
-        $form = $this->createForm(StockedProductType::class, $stockedProduct);
+        $form = $this->createForm(StockedProductType::class, $stockedProduct, [
+            'user' => $this->getUser(),
+            'products' => $this->entityService->getEntityRecords($this->getUser(), Product::class),
+            'containers' => $this->entityService->getEntityRecords($this->getUser(), Container::class)
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -58,7 +65,11 @@ class StockedProductController extends AbstractController
         Request $request
     ): Response
     {
-        $form = $this->createForm(StockedProductType::class, $stockedProduct);
+        $form = $this->createForm(StockedProductType::class, $stockedProduct, [
+            'user' => $this->getUser(),
+            'products' => $this->entityService->getEntityRecords($this->getUser(), Product::class),
+            'containers' => $this->entityService->getEntityRecords($this->getUser(), Container::class)
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -135,6 +146,7 @@ class StockedProductController extends AbstractController
 
         if ($data['id'] === 'new') {
             $stocked_product = new StockedProduct();
+            $stocked_product->setOwner($this->getUser());
         } else {
             $stocked_product = $this->entityManager->getRepository(StockedProduct::class)->find((int) $data['id']);
         }

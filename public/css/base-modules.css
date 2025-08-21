@@ -165,22 +165,22 @@ form,
     /*!*overflow-y: scroll;*!*/
 }
 
-#table-container::-webkit-scrollbar {
+::-webkit-scrollbar {
     width: 8px; /* largeur de la scrollbar verticale */
     height: 8px; /* hauteur de la scrollbar horizontale */
 }
 
-#table-container::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
     background: transparent; /* fond de la piste */
 }
 
-#table-container::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
     background-color: #888; /* couleur de la barre */
     border-radius: 4px;
     border: 2px solid transparent; /* si tu veux un effet "padding" */
 }
 
-#table-container::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {
     background-color: #aaa; /* au survol */
 }
 
@@ -269,7 +269,19 @@ table tbody td.align-right {
     width: 100%;
 }
 
-.btn {
+#save.hidden {
+    display: none;
+}
+
+#save.visible {
+    display: initial;
+}
+
+.btn.hidden {
+    display: none;
+}
+
+.btn.visible {
     border: none;
     border-radius: var(--tiny);
     padding: 12px 20px;
@@ -311,17 +323,39 @@ select[data-widget="relational"] {
     right: 6px;
 }
 
+/*.choices__inner{*/
+/*    background-color: transparent;*/
+/*    border: none;*/
+/*    border-bottom: 1px solid #5B5B5B;*/
+/*    color: white;*/
+/*    width: 100%;*/
+/*    height: 100%;*/
+/*    font-size: var(--medium);*/
+/*    border-radius: 0;*/
+/*    padding: 0;*/
+/*    min-height: 0;*/
+/*}*/
+
+/* Laisser la hauteur s’adapter au contenu */
 .choices__inner{
     background-color: transparent;
     border: none;
     border-bottom: 1px solid #5B5B5B;
     color: white;
     width: 100%;
-    height: 100%;
+    /* height: 100%;  <-- supprimer */
     font-size: var(--medium);
     border-radius: 0;
-    padding: 0;
-    min-height: 0;
+    /* padding: 0;     <-- supprimer */
+    /* min-height: 0;  <-- supprimer */
+
+    /* valeurs cohérentes pour afficher la sélection */
+    height: auto;
+    min-height: 36px;       /* ~ ligne de base pour voir le texte */
+    /*padding: 6px 0;         !* un peu d'air autour de l’item *!*/
+    padding-top: 0;
+    display: flex;
+    align-items: center;     /* vertical centering du texte sélectionné */
 }
 
 .choices__inner.invalid {
@@ -388,25 +422,28 @@ select[data-widget="relational"] {
     padding: var(--medium);
 }
 
-.kanban #kanban-container {
+#kanban-container {
     display: flex;
     flex-wrap: wrap;
     gap: var(--medium);
     width: 100%;
 }
 
-.kanban .card {
+.kanban .card,
+#kanban-container .card {
     border: 1px solid #5B5B5B;
     padding: var(--medium);
     width: 25%;
     cursor: pointer;
 }
-.kanban .card:hover {
+.kanban .card:hover,
+#kanban-container .card:hover {
     box-shadow: rgba(100, 100, 111, 0.2) 0 7px 29px 0;
     transform: translateY(-4px);
 }
 
-.text-muted {
+.text-muted,
+small {
     color: #909090 !important;
 }
 
@@ -529,3 +566,22 @@ input[type=checkbox]:checked {
 /* Quand Choices décide de "flip", on garde la bonne superposition */
 .choices-portal.is-flipped .choices__list--dropdown { /* rien à faire ici, la position est gérée en JS */ }
 
+/* état normal : le tableau scrolle */
+#table-container { overflow: auto; }
+
+/* quand un dropdown Choices est ouvert : on ne clippe plus */
+#table-container.dropdown-open { overflow: visible; }
+
+/* s'assurer que le menu passe au-dessus du thead sticky / autres couches */
+.choices__list--dropdown { z-index: 1000; }
+
+.tags .tag {
+    padding: 4px 12px;
+    border-radius: 20px;
+    color: var(--bg-color);
+    font-size: 14px;
+}
+
+.eye {
+    cursor: pointer;
+}

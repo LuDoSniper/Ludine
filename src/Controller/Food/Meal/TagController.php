@@ -3,6 +3,7 @@
 namespace App\Controller\Food\Meal;
 
 use App\Entity\Food\Meal\Tag;
+use App\Service\EntityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,17 +14,29 @@ use Symfony\Component\Routing\Attribute\Route;
 class TagController extends AbstractController
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly EntityService $entityService
     ){}
 
     #[Route('/food/meal/tags', 'food_meal_tags')]
     public function tags(): Response
     {
-        $tags = $this->entityManager->getRepository(Tag::class)->findAll();
+        $tags = $this->entityService->getEntityRecords($this->getUser(), Tag::class);
 
         return $this->render('Page/Food/Meal/tags.html.twig', [
             'tags' => $tags
         ]);
+    }
+
+    #[Route('/food/meal/tag/remove/{id}', 'food_meal_tag_remove')]
+    public function remove(
+        Tag $tag
+    ): Response
+    {
+        $this->entityManager->remove($tag);
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('food_meal_tags');
     }
 
     #[Route('/food/meal/tags/save', 'food_meal_tags_save', methods: ['POST'])]
@@ -56,6 +69,7 @@ class TagController extends AbstractController
 
         if ($data['id'] === 'new') {
             $tag = new Tag();
+            $tag->setOwner($this->getUser());
         } else {
             $tag = $this->entityManager->getRepository(Tag::class)->find((int) $data['id']);
         }

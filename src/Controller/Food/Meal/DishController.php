@@ -4,7 +4,10 @@ namespace App\Controller\Food\Meal;
 
 use App\Entity\Food\Meal\Config;
 use App\Entity\Food\Meal\Dish;
+use App\Entity\Food\Meal\Tag;
 use App\Form\Food\Meal\DishType;
+use App\Service\EntityService;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,12 +19,13 @@ class DishController extends AbstractController
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
+        private readonly EntityService  $entityService,
     ){}
 
     #[Route('/food/meal/dishes', 'food_meal_dishes')]
     public function dishes(): Response
     {
-        $dishes = $this->entityManager->getRepository(Dish::class)->findAll();
+        $dishes = $this->entityService->getEntityRecords($this->getUser(), Dish::class);
 
         return $this->render('Page/Food/Meal/dishes.html.twig', [
             'dishes' => $dishes,
@@ -34,8 +38,9 @@ class DishController extends AbstractController
     ): Response
     {
         $dish = new Dish();
+        $dish->setOwner($this->getUser());
 
-        $config = $this->entityManager->getRepository(Config::class)->findAll();
+        $config = $this->entityService->getEntityRecords($this->getUser(), Config::class);
         if (count($config) >= 1) {
             $config = $config[0];
         } else {
@@ -43,7 +48,9 @@ class DishController extends AbstractController
         }
 
         $form = $this->createForm(DishType::class, $dish, [
-            'maxDifficulty' => $config->getMaxDifficulty()
+            'maxDifficulty' => $config->getMaxDifficulty(),
+            'user' => $this->getUser(),
+            'tags' => $this->entityService->getEntityRecords($this->getUser(), Tag::class)
         ]);
         $form->handleRequest($request);
 
@@ -87,21 +94,34 @@ class DishController extends AbstractController
         ]);
     }
 
+    #[Route('/food/meal/dish/remove/{id}', 'food_meal_dish_remove')]
+    public function remove(
+        Dish $dish,
+    ): Response
+    {
+        $this->entityManager->remove($dish);
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('food_meal_dishes');
+    }
+
     #[Route('/food/meal/dish/update/{id}', 'food_meal_dish_update')]
     public function update(
         Dish $dish,
         Request $request
     ): Response
     {
-        $config = $this->entityManager->getRepository(Config::class)->findAll();
+        $config = $this->entityService->getEntityRecords($this->getUser(), Config::class);
         if (count($config) >= 1) {
             $config = $config[0];
         } else {
             $config = (new ConfigController($this->entityManager))->initializeDefault();
         }
 
-        $form = $this->createForm(Dish::class, $dish, [
-            'maxDifficulty' => $config->getMaxDifficulty()
+        $form = $this->createForm(DishType::class, $dish, [
+            'maxDifficulty' => $config->getMaxDifficulty(),
+            'user' => $this->getUser(),
+            'tags' => $this->entityService->getEntityRecords($this->getUser(), Tag::class)
         ]);
         $form->handleRequest($request);
 
@@ -114,6 +134,33 @@ class DishController extends AbstractController
         return $this->render('Page/Food/Meal/dish-create.html.twig', [
             'id' => $dish->getId(),
             'form' => $form->createView(),
+            'trees' => [
+                'ingredients' => [
+                    'fields' => [
+                        [
+                            'name' => 'quantity',
+                            'type' => 'float',
+                            'string' => 'Quantité',
+                            'sequence' => 2,
+                        ],
+                        [
+                            'name' => 'product',
+                            'type' => 'relational',
+                            'string' => 'Produit',
+                            'get_meta' => '/food/stock/products/get_meta',
+                            'get_path' => '/food/stock/products/get',
+                            'sequence' => 1,
+                            'display' => [
+                                'name',
+                                'description',
+                            ]
+                        ],
+                    ],
+                    'model' => 'ingredient',
+                    'save_path' => '/food/meal/ingredients/save',
+                    'get_path' => '/food/meal/ingredients/get',
+                ]
+            ],
         ]);
     }
 
@@ -152,9 +199,6 @@ class DishController extends AbstractController
         if (empty($data['tags'])) {
             $missing_fields[] = 'tags';
         }
-        if (empty($data['ingredients'])) {
-            $missing_fields[] = 'ingredients';
-        }
         if (empty($data['dropRate'])) {
             $missing_fields[] = 'dropRate';
         }
@@ -165,6 +209,7 @@ class DishController extends AbstractController
 
         if ($data['id'] === 'new') {
             $dish = new Dish();
+            $dish->setOwner($this->getUser());
         } else {
             $dish = $this->entityManager->getRepository(Dish::class)->find((int) $data['id']);
         }
@@ -175,8 +220,17 @@ class DishController extends AbstractController
         $dish->setPreparationTime($data['preparationTime']);
         $dish->setCookingTime($data['cookingTime']);
         $dish->setDifficulty($data['difficulty']);
-        $dish->setTags($data['tags']);
-        $dish->setIngredients($data['ingredients']);
+        $tags = [];
+        foreach (explode(',', $data['tags']) as $tagId) {
+            $tag = $this->entityManager->getRepository(Tag::class)->find((int) $tagId);
+            if ($tag) {
+                $tags[] = $tag;
+            }
+        }
+        $dish->setTags(new ArrayCollection($tags));
+        if ($data['ingredients']) {
+            $dish->setIngredients($data['ingredients']);
+        }
         $dish->setDropRate($data['dropRate']);
 
         if ($data['id'] === 'new') {
@@ -184,7 +238,7 @@ class DishController extends AbstractController
         }
         $this->entityManager->flush();
 
-        return new JsonResponse(['container' => [
+        return new JsonResponse(['dish' => [
             'id' => $dish->getId(),
             'name' => $dish->getName(),
             'description' => $dish->getDescription(),

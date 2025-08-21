@@ -2,6 +2,7 @@
 
 namespace App\Entity\Food\Meal;
 
+use App\Entity\Authentication\User;
 use App\Repository\Food\Meal\TagRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -29,6 +30,10 @@ class Tag
      */
     #[ORM\ManyToMany(targetEntity: Dish::class, mappedBy: 'tags')]
     private Collection $dishes;
+
+    #[ORM\ManyToOne(inversedBy: 'tags')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $owner = null;
 
     public function __construct()
     {
@@ -99,6 +104,18 @@ class Tag
         if ($this->dishes->removeElement($dish)) {
             $dish->removeTag($this);
         }
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
 
         return $this;
     }

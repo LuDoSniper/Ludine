@@ -2,6 +2,7 @@
 
 namespace App\Entity\Food\Stock;
 
+use App\Entity\Authentication\User;
 use App\Entity\Food\Meal\Ingredient;
 use App\Repository\Food\Stock\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -34,6 +35,10 @@ class Product
      */
     #[ORM\OneToMany(targetEntity: Ingredient::class, mappedBy: 'product')]
     private Collection $ingredients;
+
+    #[ORM\ManyToOne(inversedBy: 'products')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $owner = null;
 
     public function __construct()
     {
@@ -126,6 +131,18 @@ class Product
                 $ingredient->setProduct(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
 
         return $this;
     }

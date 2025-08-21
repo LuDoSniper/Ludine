@@ -2,12 +2,13 @@
 
 namespace App\Entity\Food\Meal;
 
+use App\Entity\Authentication\User;
 use App\Entity\Food\Stock\Product;
 use App\Repository\Food\Meal\IngredientRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: IngredientRepository::class)]
-class Ingredient
+class  Ingredient
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -24,6 +25,10 @@ class Ingredient
     #[ORM\ManyToOne(inversedBy: 'ingredients')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Dish $dish = null;
+
+    #[ORM\ManyToOne(inversedBy: 'ingredients')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $owner = null;
 
     public function getId(): ?int
     {
@@ -62,6 +67,18 @@ class Ingredient
     public function setDish(?Dish $dish): static
     {
         $this->dish = $dish;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
 
         return $this;
     }

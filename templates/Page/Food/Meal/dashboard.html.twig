@@ -1,0 +1,102 @@
+{% set sidebar_active = 'food' %}
+{% extends 'Layout/base-modules.html.twig' %}
+
+{% block title %}
+    Ludine - Dashboard
+{% endblock %}
+
+{% block main %}
+    {% include 'Widget/module-header.html.twig' with {
+        header: {
+            h1: 'Nourriture',
+            h2: {
+                'Repas': {
+                    selected: true,
+                    url: path('food_meal')
+                },
+                'Stock': {
+                    selected: false,
+                    url: path('food_stock')
+                }
+            },
+            h3: {
+                'Tableau de bord': {
+                    selected: true,
+                    url: path('food_meal_dashboard')
+                },
+                'Plats': {
+                    selected: false,
+                    url: path('food_meal_dishes')
+                },
+                'Tags': {
+                    selected: false,
+                    url: path('food_meal_tags')
+                },
+                'Configuration': {
+                    selected: false,
+                    url: path('food_meal_config')
+                }
+            }
+        }
+    } %}
+
+    <div id="content" class="config kanban" style="padding: 0">
+        <section id="dashboard">
+            <span class="section-title text-center">Plats du jour</span>
+        </section>
+        {% if config.selectLunch %}
+            <section id="lunch">
+                <span class="section-title">Midi - {{ config.lunchTime | date('H:i') }}</span>
+                <div class="section-content">
+                    <div id="kanban-container">
+                        {% if dashboard.lunchDish %}
+                            {% include 'Widget/Food/Meal/dish-card.html.twig' with {
+                                'update_path': path('food_meal_dish_update', {'id': dashboard.lunchDish.id}),
+                                'name': dashboard.lunchDish.name,
+                                'preparation_time': dashboard.lunchDish.preparationTime,
+                                'tags': dashboard.lunchDish.tags
+                            } %}
+                        {% endif %}
+
+                        {% if dashboard.lunchDishDoable %}
+                            {% include 'Widget/Food/Meal/dish-card.html.twig' with {
+                                'update_path': path('food_meal_dish_update', {'id': dashboard.lunchDishDoable.id}),
+                                'name': dashboard.lunchDishDoable.name,
+                                'preparation_time': dashboard.lunchDishDoable.preparationTime,
+                                'tags': dashboard.lunchDishDoable.tags
+                            } %}
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+
+        {% if config.selectDiner %}
+            <section id="diner">
+                <span class="section-title">Soir - {{ config.dinerTime | date('H:i') }}</span>
+                <div class="section-content">
+                    <div id="kanban-container">
+                        {% if dashboard.dinerDish %}
+                            {% include 'Widget/Food/Meal/dish-card.html.twig' with {
+                                'update_path': path('food_meal_dish_update', {'id': dashboard.dinerDish.id}),
+                                'name': dashboard.dinerDish.name,
+                                'preparation_time': dashboard.dinerDish.preparationTime,
+                                'tags': dashboard.dinerDish.tags
+                            } %}
+                        {% endif %}
+
+                        {% if dashboard.dinerDishDoable %}
+                            {% include 'Widget/Food/Meal/dish-card.html.twig' with {
+                                'update_path': path('food_meal_dish_update', {'id': dashboard.dinerDishDoable.id}),
+                                'name': dashboard.dinerDishDoable.name,
+                                'preparation_time': dashboard.dinerDishDoable.preparationTime,
+                                'tags': dashboard.dinerDishDoable.tags
+                            } %}
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+        {% endif %}
+    </div>
+{% endblock %}
+

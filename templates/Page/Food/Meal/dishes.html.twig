@@ -39,7 +39,7 @@
             h3: {
                 'Tableau de bord': {
                     selected: false,
-                    url: path('food_stock_containers')
+                    url: path('food_meal_dashboard')
                 },
                 'Plats': {
                     selected: true,
@@ -89,7 +89,7 @@
                         <tr>
                             <input type="hidden" name="url" value="{{ path('food_meal_dish_update', {id: dish.id}) }}">
                             <td>{{ dish.name }}</td>
-                            <td>{{ dish.tags }}</td>
+                            <td>{{ dish.tags | map(tag => tag.name) | join(', ') }}</td>
                             <td>{{ dish.preparationTime }}</td>
                             <td>{{ dish.difficulty }}</td>
                             <td>{{ dish.dropRate }}</td>

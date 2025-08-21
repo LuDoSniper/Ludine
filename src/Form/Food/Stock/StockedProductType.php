@@ -5,6 +5,8 @@ namespace App\Form\Food\Stock;
 use App\Entity\Food\Stock\Container;
 use App\Entity\Food\Stock\Product;
 use App\Entity\Food\Stock\StockedProduct;
+use App\Repository\Food\Stock\ContainerRepository;
+use App\Repository\Food\Stock\ProductRepository;
 use DateTimeInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -18,6 +20,10 @@ class StockedProductType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $user = $options['user'];
+        $products = $options['products'];
+        $containers = $options['containers'];
+
         $builder
             ->add('arrivalDate', TextType::class, [
                 'label' => 'Date d\'arrivée',
@@ -58,7 +64,21 @@ class StockedProductType extends AbstractType
                         'data-url' => '/food/stock/products/get/' . $product->getId(),
                         'data-external_id' => 'food_stock_product',
                     ];
-                }
+                },
+                'choices' => $products,
+//                'query_builder' => function (ProductRepository $pr) use ($user) {
+//                    $qb = $pr->createQueryBuilder('p')
+//                        ->orderBy('p.name', 'ASC');
+//
+//                    if ($user) {
+//                        $qb->where('p.owner = :user')
+//                            ->setParameter('user', $user);
+//                    } else {
+//                        $qb->where('1 = 0');
+//                    }
+//
+//                    return $qb;
+//                }
             ])
             ->add('container', EntityType::class, [
                 'class' => Container::class,
@@ -75,7 +95,21 @@ class StockedProductType extends AbstractType
                         'data-url' => '/food/stock/containers/get/' . $container->getId(),
                         'data-external_id' => 'food_stock_container',
                     ];
-                }
+                },
+                'choices' => $containers,
+//                'query_builder' => function (ContainerRepository $cr) use ($user) {
+//                    $qb = $cr->createQueryBuilder('c')
+//                        ->orderBy('c.name', 'ASC');
+//
+//                    if ($user) {
+//                        $qb->where('c.owner = :user')
+//                            ->setParameter('user', $user);
+//                    } else {
+//                        $qb->where('1 = 0');
+//                    }
+//
+//                    return $qb;
+//                }
             ])
         ;
 
@@ -101,6 +135,9 @@ class StockedProductType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => StockedProduct::class,
+            'user' => null,
+            'products' => [],
+            'containers' => [],
         ]);
     }
 }

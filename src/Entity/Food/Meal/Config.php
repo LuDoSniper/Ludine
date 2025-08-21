@@ -2,6 +2,7 @@
 
 namespace App\Entity\Food\Meal;
 
+use App\Entity\Authentication\User;
 use App\Repository\Food\Meal\ConfigRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -31,6 +32,10 @@ class Config
 
     #[ORM\Column]
     private ?int $maxDifficulty = null;
+
+    #[ORM\OneToOne(inversedBy: 'config', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $owner = null;
 
     public function getId(): ?int
     {
@@ -105,6 +110,18 @@ class Config
     public function setMaxDifficulty(int $maxDifficulty): static
     {
         $this->maxDifficulty = $maxDifficulty;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(User $owner): static
+    {
+        $this->owner = $owner;
 
         return $this;
     }
