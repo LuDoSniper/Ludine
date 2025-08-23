@@ -1,0 +1,131 @@
+{% set sidebar_active = 'messenger' %}
+{% extends 'Layout/base-modules.html.twig' %}
+
+{% block title %}
+    Ludine - Messenger
+{% endblock %}
+
+{% block customstylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/Messenger/messenger.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/Messenger/messenger.js') }}"></script>
+{% endblock %}
+
+{% block main %}
+    {% include 'Widget/module-header.html.twig' with {
+        header: {
+            h1: 'Messagerie',
+            h2: {},
+            h3: {}
+        }
+    } %}
+
+    <div id="content" class="messenger">
+        <input type="hidden" id="chatId" name="chatId" value="{{ chat.id }}">
+        <input type="hidden" id="authorId" name="authorId" value="{{ user.id }}">
+        <input type="hidden" id="isMP" name="isMP" value="{{ isMP }}">
+
+        <div id="left-side">
+            {% include 'Widget/button.html.twig' with {
+                'btn': {
+                    'name': 'Nouvelle conversation',
+                    'url': path('messenger_chat_create'),
+                    'type': 'primary',
+                    'action_type': 'redirect',
+                    'id': 'new'
+                }
+            } %}
+
+            <div id="chat-container">
+                {% for tmp_chat in chats %}
+                    {% set class = tmp_chat.id == chat.id ? ' selected' : '' %}
+                    <a class="chat{{ class }}" href="{{ path('messenger_chat', {'id': tmp_chat.id}) }}">
+                        <div class="chat-group">
+                            <div class="user-avatar">
+                                {% set img = asset('img/svg/user.svg') %}
+                                {% if not tmp_chat.mP %}
+                                    {% set img = asset('img/svg/group.svg') %}
+                                {% endif %}
+                                <img src="{{ img }}">
+                            </div>
+
+                            <div class="infos">
+                                {% set chat_name = tmp_chat.name %}
+                                {% if not chat_name %}
+                                    {% if tmp_chat.mP %}
+                                        {% if tmp_chat.owner.id == user.id %}
+                                            {% set chat_name = tmp_chat.firstMemberName %}
+                                        {% else %}
+                                            {% set chat_name = tmp_chat.ownerName %}
+                                        {% endif %}
+                                    {% else %}
+                                        {% set chat_name = tmp_chat.firstMemberName %}
+                                    {% endif %}
+                                {% endif %}
+                                <span>{{ chat_name }}</span>
+                                <span>{{ tmp_chat.lastMessageContent }}</span>
+                            </div>
+                        </div>
+
+                        <div class="time">
+                            <span>{{ tmp_chat.lastMessageTime }}</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="messenger-container">
+            <div id="chat-header">
+                <div id="chat-infos">
+                    <div class="user-avatar">
+                        <img src="{{ asset('img/svg/user.svg') }}">
+                    </div>
+                    {% set chat_name = chat.name %}
+                    {% if not chat_name %}
+                        {% if chat.mP %}
+                            {% if chat.owner.id == user.id %}
+                                {% set chat_name = chat.firstMemberName %}
+                            {% else %}
+                                {% set chat_name = chat.ownerName %}
+                            {% endif %}
+                        {% else %}
+                            {% set chat_name = chat.firstMemberName %}
+                        {% endif %}
+                    {% endif %}
+                    <span class="name">{{ chat_name }}</span>
+                </div>
+
+                <div id="actions">
+                    <a href="{{ path('messenger_chat_idle') }}" id="back">
+                        <img src="{{ asset('img/svg/left.svg') }}">
+                    </a>
+                    <a href="{{ path('messenger_chat_update', {'id': chat.id}) }}" id="edit">
+                        <img src="{{ asset('img/svg/edit.svg') }}">
+                    </a>
+                    <a href="{{ path('messenger_chat_remove', {'id': chat.id}) }}" id="remove">
+                        <img src="{{ asset('img/svg/cancel.svg') }}">
+                    </a>
+                </div>
+            </div>
+
+            <div id="chat-body">
+                <div id="chat-messages">
+
+                </div>
+
+                <div id="chat-input">
+                    <form id="chat-form">
+                        <input type="text" id="chat_input_field" placeholder="Envoyer un message…" autocomplete="off">
+                        <button type="submit">
+                            <img src="{{ asset('img/svg/send.svg') }}">
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

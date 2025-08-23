@@ -10,6 +10,8 @@ use App\Entity\Food\Meal\Tag;
 use App\Entity\Food\Stock\Container;
 use App\Entity\Food\Stock\Product;
 use App\Entity\Food\Stock\StockedProduct;
+use App\Entity\Messenger\Chat;
+use App\Entity\Messenger\Message;
 use App\Entity\Settings\General\Share;
 use App\Repository\Authentication\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -107,6 +109,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(mappedBy: 'owner', cascade: ['persist', 'remove'])]
     private ?Dashboard $dashboard = null;
 
+    /**
+     * @var Collection<int, Chat>
+     */
+    #[ORM\OneToMany(targetEntity: Chat::class, mappedBy: 'owner', orphanRemoval: true)]
+    private Collection $chats;
+
+    /**
+     * @var Collection<int, Message>
+     */
+    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'author', orphanRemoval: true)]
+    private Collection $messages;
+
     public function __construct()
     {
         $this->ownedShares = new ArrayCollection();
@@ -117,6 +131,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->tags = new ArrayCollection();
         $this->dishes = new ArrayCollection();
         $this->ingredients = new ArrayCollection();
+        $this->chats = new ArrayCollection();
+        $this->messages = new ArrayCollection();
     }
 
     // Getter - Setter
@@ -508,6 +524,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         $this->dashboard = $dashboard;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Chat>
+     */
+    public function getChats(): Collection
+    {
+        return $this->chats;
+    }
+
+    public function addChat(Chat $chat): static
+    {
+        if (!$this->chats->contains($chat)) {
+            $this->chats->add($chat);
+            $chat->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChat(Chat $chat): static
+    {
+        if ($this->chats->removeElement($chat)) {
+            // set the owning side to null (unless already changed)
+            if ($chat->getOwner() === $this) {
+                $chat->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Message>
+     */
+    public function getMessages(): Collection
+    {
+        return $this->messages;
+    }
+
+    public function addMessage(Message $message): static
+    {
+        if (!$this->messages->contains($message)) {
+            $this->messages->add($message);
+            $message->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessage(Message $message): static
+    {
+        if ($this->messages->removeElement($message)) {
+            // set the owning side to null (unless already changed)
+            if ($message->getAuthor() === $this) {
+                $message->setAuthor(null);
+            }
+        }
 
         return $this;
     }

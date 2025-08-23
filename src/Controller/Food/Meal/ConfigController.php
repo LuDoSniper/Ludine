@@ -4,6 +4,7 @@ namespace App\Controller\Food\Meal;
 
 use App\Entity\Food\Meal\Config;
 use App\Form\Food\Meal\ConfigType;
+use App\Service\ConfigService;
 use App\Service\EntityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,6 +18,7 @@ class ConfigController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly EntityService  $entityService,
+        private readonly ConfigService $configService
     ){}
 
     #[Route('/food/meal/config', 'food_meal_config')]
@@ -29,7 +31,7 @@ class ConfigController extends AbstractController
         if (count($config) >= 1) {
             $config = $config[0];
         } else {
-            $config = $this->setToDefault(new Config());
+            $config = $this->configService->setToDefault(new Config());
             $config->setOwner($this->getUser());
         }
 
@@ -85,7 +87,7 @@ class ConfigController extends AbstractController
         }
 
         if ($data['id'] === 'new') {
-            $config = $this->setToDefault(new Config());
+            $config = $this->configService->setToDefault(new Config());
             $config->setOwner($this->getUser());
         } else {
             $config = $this->entityManager->getRepository(Config::class)->find((int) $data['id']);
@@ -112,32 +114,5 @@ class ConfigController extends AbstractController
             'dinerTime' => $config->getDinerTime(),
             'maxDifficulty' => $config->getMaxDifficulty(),
         ]]);
-    }
-
-    public function initializeDefault(): Config
-    {
-        $config = $this->setToDefault(new Config());
-        $config->setOwner($this->getUser());
-
-        $this->entityManager->persist($config);
-        $this->entityManager->flush();
-
-        return $config;
-    }
-
-    public function setToDefault(
-        Config $config
-    ): Config
-    {
-        $config
-            ->setSelectionMode(1)
-            ->setSelectLunch(true)
-            ->setSelectDiner(true)
-            ->setLunchTime(new \DateTime("12:00"))
-            ->setDinerTime(new \DateTime("19:00"))
-            ->setMaxDifficulty(5)
-        ;
-
-        return $config;
     }
 }

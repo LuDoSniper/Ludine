@@ -8,11 +8,56 @@
 
 aside {
     width: 220px;
-    height: 100vh;
+    height: calc(100vh - 60px);
+    /*height: 100vh;*/
     padding: 1rem;
     display: flex;
     flex-direction: column;
     border-right: 1px solid #2C2D33;
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+    z-index: 1000;
+    background-color: var(--bg-color);
+    min-height: 0;
+    overflow: auto;
+    flex: 0 1 auto;
+}
+aside.opened {
+    transform: translateX(0);
+}
+
+@media (min-width: 1200px) {
+    aside {
+        position: relative;
+        transform: initial;
+        height: 100%;
+    }
+}
+
+nav#sidebar {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 60px;
+    border-bottom: 1px solid #2C2D33;
+    padding: 1rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    z-index: 2000;
+    background-color: var(--bg-color);
+}
+
+nav#sidebar #hamburger {
+    cursor: pointer;
+}
+
+@media (min-width: 1200px) {
+    nav#sidebar {
+        display: none;
+    }
 }
 
 .logo {
@@ -34,9 +79,11 @@ aside {
 }
 
 aside nav {
-    height: 100%;
+    /*height: 100%;*/
+    flex: 1 1 auto;
     display: flex;
     flex-direction: column;
+    overflow-y: auto;
 }
 
 aside nav a {
@@ -66,9 +113,11 @@ aside nav a.active {
     align-items: center;
     gap: 0.8rem;
     border-radius: 8px;
-    margin-bottom: 0.4rem;
+    position: sticky;
+    bottom: 0;
+    background-color: var(--bg-color);
+    margin-bottom: 0;
 }
-
-.sidebar-spacer {
+.spacer {
     height: 100%;
 }

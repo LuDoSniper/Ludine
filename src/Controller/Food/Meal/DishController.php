@@ -6,6 +6,7 @@ use App\Entity\Food\Meal\Config;
 use App\Entity\Food\Meal\Dish;
 use App\Entity\Food\Meal\Tag;
 use App\Form\Food\Meal\DishType;
+use App\Service\ConfigService;
 use App\Service\EntityService;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,12 +21,13 @@ class DishController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly EntityService  $entityService,
+        private readonly ConfigService $configService
     ){}
 
     #[Route('/food/meal/dishes', 'food_meal_dishes')]
     public function dishes(): Response
     {
-        $dishes = $this->entityService->getEntityRecords($this->getUser(), Dish::class);
+        $dishes = $this->entityService->getEntityRecords($this->getUser(), Dish::class, 'name');
 
         return $this->render('Page/Food/Meal/dishes.html.twig', [
             'dishes' => $dishes,
@@ -44,13 +46,13 @@ class DishController extends AbstractController
         if (count($config) >= 1) {
             $config = $config[0];
         } else {
-            $config = (new ConfigController($this->entityManager))->initializeDefault();
+            $config = $this->configService->initializeDefault($this->getUser());
         }
 
         $form = $this->createForm(DishType::class, $dish, [
             'maxDifficulty' => $config->getMaxDifficulty(),
             'user' => $this->getUser(),
-            'tags' => $this->entityService->getEntityRecords($this->getUser(), Tag::class)
+            'tags' => $this->entityService->getEntityRecords($this->getUser(), Tag::class, 'name')
         ]);
         $form->handleRequest($request);
 
@@ -94,11 +96,15 @@ class DishController extends AbstractController
         ]);
     }
 
-    #[Route('/food/meal/dish/remove/{id}', 'food_meal_dish_remove')]
+    #[Route('/food/meal/dish/remove/{id}', 'food_meal_dish_remove', defaults: ['id' => null])]
     public function remove(
-        Dish $dish,
+        ?Dish $dish,
     ): Response
     {
+        if (!$dish) {
+            return $this->redirectToRoute('food_meal_dishes');
+        }
+
         $this->entityManager->remove($dish);
         $this->entityManager->flush();
 
@@ -115,13 +121,13 @@ class DishController extends AbstractController
         if (count($config) >= 1) {
             $config = $config[0];
         } else {
-            $config = (new ConfigController($this->entityManager))->initializeDefault();
+            $config = $this->configService->initializeDefault($this->getUser());
         }
 
         $form = $this->createForm(DishType::class, $dish, [
             'maxDifficulty' => $config->getMaxDifficulty(),
             'user' => $this->getUser(),
-            'tags' => $this->entityService->getEntityRecords($this->getUser(), Tag::class)
+            'tags' => $this->entityService->getEntityRecords($this->getUser(), Tag::class, 'name')
         ]);
         $form->handleRequest($request);
 

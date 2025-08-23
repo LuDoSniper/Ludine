@@ -5,6 +5,7 @@ namespace App\Controller\Food\Meal;
 use App\Entity\Food\Meal\Config;
 use App\Entity\Food\Meal\Dashboard;
 use App\Entity\Food\Meal\Dish;
+use App\Service\ConfigService;
 use App\Service\EntityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,6 +17,7 @@ class DashboardController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly EntityService  $entityService,
+        private readonly ConfigService $configService
     ){}
 
     #[Route('/food/meal/dashboard', name: 'food_meal_dashboard')]
@@ -28,7 +30,10 @@ class DashboardController extends AbstractController
 
         $config = $this->entityService->getEntityRecords($this->getUser(), Config::class);
         if ($config == null) {
-            $config = (new ConfigController($this->entityManager))->initializeDefault();
+            $config = $this->configService->initializeDefault($this->getUser());
+        }
+        if (count($config) >= 1) {
+            $config = $config[0];
         }
 
         $tz    = new \DateTimeZone('Europe/Paris');
@@ -51,13 +56,17 @@ class DashboardController extends AbstractController
             $dishes = $this->entityService->getEntityRecords($this->getUser(), Dish::class);
             $selected = $this->pickDishesWeighted($dishes, $n * $factor);
 
-            $dashboard->setLunchDish($selected[0]);
-            $dashboard->setLunchDishDoable($selected[1]);
-            $dashboard->setDinerDish($selected[2]);
-            $dashboard->setDinerDishDoable($selected[3]);
+            if (count($selected) >= 1) {
+                $dashboard->setLunchDish($selected[0]);
+                $dashboard->setLunchDishDoable($selected[1]);
+                $dashboard->setDinerDish($selected[2]);
+                $dashboard->setDinerDishDoable($selected[3]);
 
-            $this->entityManager->persist($dashboard);
-            $this->entityManager->flush();
+                $this->entityManager->persist($dashboard);
+                $this->entityManager->flush();
+            } else {
+                $dashboard = false;
+            }
         }
 
         return $this->render('Page/Food/Meal/dashboard.html.twig', [

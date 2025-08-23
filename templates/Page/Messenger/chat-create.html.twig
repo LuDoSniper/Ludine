@@ -1,0 +1,89 @@
+{% set sidebar_active = 'messenger' %}
+{% extends 'Layout/base-modules.html.twig' %}
+
+{% block title %}
+    Ludine - Messenger
+{% endblock %}
+
+{% block customstylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/Messenger/messenger.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/Messenger/create.css') }}">
+{% endblock %}
+
+{% block main %}
+    {% include 'Widget/module-header.html.twig' with {
+        header: {
+            h1: 'Messagerie',
+            h2: {},
+            h3: {}
+        }
+    } %}
+
+    <div id="content" class="messenger">
+        <div id="left-side">
+            {% include 'Widget/button.html.twig' with {
+                'btn': {
+                    'name': 'Nouvelle conversation',
+                    'url': path('messenger_chat_create'),
+                    'type': 'primary',
+                    'action_type': 'redirect',
+                    'id': 'new'
+                }
+            } %}
+
+            <div id="chat-container">
+                {% for chat in chats %}
+                    <a class="chat" href="{{ path('messenger_chat', {'id': chat.id}) }}">
+                        <div class="chat-group">
+                            <div class="user-avatar">
+                                {% set img = asset('img/svg/user.svg') %}
+                                {% if not chat.mP %}
+                                    {% set img = asset('img/svg/group.svg') %}
+                                {% endif %}
+                                <img src="{{ img }}">
+                            </div>
+
+                            <div class="infos">
+                                <span>{{ chat.name }}</span>
+                                <span>{{ chat.lastMessageContent }}</span>
+                            </div>
+                        </div>
+
+                        <div class="time">
+                            <span>{{ chat.lastMessageTime }}</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="messenger-container">
+            {{ form_start(form) }}
+            <h1>Nouvelle conversation</h1>
+
+            <div class="group" style="max-width: 100% !important;">
+                <div class="field">
+                    {{ form_label(form.name) }}
+                    {{ form_widget(form.name) }}
+                </div>
+
+                <small>Si laissé vide, le nom de la conversation aura le nom du premier membre spécifié.<br>
+                En cas de message privé, le nom ne sera qu'un alias, le destinataire lui vera votre nom.</small>
+
+                <div class="field">
+                    {{ form_label(form.members) }}
+                    {{ form_widget(form.members, {
+                        attr: {
+                            class: (form.name.vars.attr.class | default('') ~ invalidMembers ? ' invaclid' : '') | trim
+                        }
+                    }) }}
+                </div>
+            </div>
+
+            <button class="btn btn-primary visible">Enregistrer</button>
+            <a href="{{ path('messenger_chat_idle') }}" id="back" class="btn btn-secondary visible">Retour</a>
+            {{ form_end(form) }}
+        </div>
+
+    </div>
+{% endblock %}

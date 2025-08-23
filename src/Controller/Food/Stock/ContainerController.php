@@ -22,7 +22,7 @@ class ContainerController extends AbstractController
     #[Route('/food/stock/containers', 'food_stock_containers')]
     public function containers(): Response
     {
-        $containers = $this->entityService->getEntityRecords($this->getUser(), Container::class);
+        $containers = $this->entityService->getEntityRecords($this->getUser(), Container::class, 'name');
 
         return $this->render('Page/Food/Stock/containers.html.twig', [
             'containers' => $containers
@@ -76,11 +76,15 @@ class ContainerController extends AbstractController
         ]);
     }
 
-    #[Route('/food/stock/container/remove/{id}', 'food_stock_container_remove')]
+    #[Route('/food/stock/container/remove/{id}', 'food_stock_container_remove', defaults: ['id' => null])]
     public function remove(
-        Container $container
+        ?Container $container
     ): Response
     {
+        if (!$container) {
+            return $this->redirectToRoute('food_stock_containers');
+        }
+
         $this->entityManager->remove($container);
         $this->entityManager->flush();
 
