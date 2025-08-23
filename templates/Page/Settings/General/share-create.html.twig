@@ -66,6 +66,15 @@
                     }
                 } %}
 
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Envoyer validation',
+                        'url': path('settings_general_share_send_validation', {'id': id}),
+                        'type': 'secondary',
+                        'action_type': 'redirect'
+                    }
+                } %}
+
                 {% include 'Widget/button.html.twig' with {'btn': {'action_type': 'save'}} %}
             </div>
         </div>

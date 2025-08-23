@@ -3,6 +3,8 @@
 namespace App\Controller\Settings\General;
 
 use App\Entity\Authentication\User;
+use App\Entity\Messenger\Chat;
+use App\Entity\Messenger\Message;
 use App\Entity\Settings\General\Share;
 use App\Form\Settings\General\ShareType;
 use App\Service\EntityService;
@@ -45,6 +47,8 @@ class ShareController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->sendValidationMethod($share);
+
             $this->entityManager->persist($share);
             $this->entityManager->flush();
 
@@ -81,11 +85,15 @@ class ShareController extends AbstractController
         ]);
     }
 
-    #[Route('/settings/general/share/remove/{id}', 'settings_general_share_remove')]
+    #[Route('/settings/general/share/remove/{id}', 'settings_general_share_remove', defaults: ['id' => null])]
     public function remove(
-        Share $share
+        ?Share $share
     ): Response
     {
+        if (!$share) {
+            return $this->redirectToRoute('settings_general_shares');
+        }
+
         $this->entityManager->remove($share);
         $this->entityManager->flush();
 
@@ -141,6 +149,8 @@ class ShareController extends AbstractController
         }
         $share->setActive($data['active']);
 
+        $this->sendValidationMethod($share);
+
         if ($data['id'] === 'new') {
             $this->entityManager->persist($share);
         }
@@ -154,5 +164,97 @@ class ShareController extends AbstractController
             'members' => $share->getMembers(),
             'active' => $share->isActive(),
         ]]);
+    }
+
+    #[Route('/settings/general/share/send-validation/{id}', 'settings_general_share_send_validation')]
+    public function sendValidation(
+        Share $share,
+    ): Response
+    {
+        $this->sendValidationMethod($share);
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('settings_general_share_update', ['id' => $share->getId()]);
+    }
+
+
+    #[Route('/settings/general/share/confirm/{shareId}/{messageId}/{confirm}', 'settings_general_share_confirm')]
+    public function confirm(
+        int $shareId,
+        int $messageId,
+        string $confirm
+    ): Response
+    {
+        $share = $this->entityManager->getRepository(Share::class)->find($shareId);
+        $message = $this->entityManager->getRepository(Message::class)->find($messageId);
+
+        if (!$share || !$message) {
+            throw $this->createNotFoundException();
+        }
+
+        $message->setActive(false);
+        $validMembers = $share->getValidMembers() ?? [];
+        $validMembers[$this->getUser()->getId()] = ($confirm === 'confirm');
+        $share->setValidMembers($validMembers);
+
+        $valid = true;
+        foreach ($share->getMembers() as $member) {
+            $uid = $member->getId();
+            if (!array_key_exists($uid, $validMembers) || $validMembers[$uid] !== true) {
+                $valid = false;
+                break;
+            }
+        }
+        $share->setValid($valid);
+
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('messenger_chat', ['id' => $message->getChat()->getId()]);
+    }
+
+    /**
+     * @param Share $share
+     * @return void
+     */
+    public function sendValidationMethod(Share $share): void
+    {
+        foreach ($share->getMembers() as $member) {
+            $qb = $this->entityManager->getRepository(Chat::class)->createQueryBuilder('c');
+            $qb
+                ->leftJoin('c.members', 'm')
+                ->addSelect('COUNT(m) AS HIDDEN membersCount')
+                ->groupBy('c.id')
+                ->having('COUNT(m) = 1')
+                ->andWhere('c.owner NOT MEMBER OF c.members')
+                ->andWhere('c.owner = :u OR :u MEMBER OF c.members')
+                ->setParameter('u', $member)
+                ->orderBy('c.id', 'DESC');
+            $chat = $qb->getQuery()->getOneOrNullResult();
+
+            if (!$chat) {
+                $chat = new Chat();
+                $chat->setOwner($this->getUser());
+                $chat->addMember($member);
+                $chat->setCreatedAt(new \DateTimeImmutable());
+
+                $this->entityManager->persist($chat);
+            }
+
+            $message = new Message();
+            $message->setChat($chat);
+            $message->setCreatedAt(new \DateTimeImmutable());
+            $message->setActive(true);
+            $message->setAuthor($this->getUser());
+            $message->setContent('');
+
+            $this->entityManager->persist($message);
+            $this->entityManager->flush();
+
+            $confirm_path = '/settings/general/share/confirm/' . $share->getId() . '/' . $message->getId() . '/confirm';
+            $cancel_path = '/settings/general/share/confirm/' . $share->getId() . '/' . $message->getId() . '/cancel';
+            $message->setContent("[layout][!confirm][confirm_path:'" . $confirm_path . "',cancel_path:'" . $cancel_path . "',confirm:'Accepter',cancel:'Refuser']:Message automatique envoyé pour demande de validation de partage");
+
+            $this->entityManager->flush();
+        }
     }
 }

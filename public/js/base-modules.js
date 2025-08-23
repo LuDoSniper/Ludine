@@ -4,6 +4,16 @@ window.LudineApp.choicesInstances = new Map();
 window.LudineApp.actions = {}
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // Sidebar responsive
+    document.getElementById('hamburger').addEventListener('click', () => {
+        const sidebar = document.querySelector('aside');
+        if (sidebar.classList.contains('opened')) {
+            sidebar.classList.remove('opened');
+        } else {
+            sidebar.classList.add('opened');
+        }
+    });
+
     // Get context
     const tmpRaw = document.getElementById('context');
     try {

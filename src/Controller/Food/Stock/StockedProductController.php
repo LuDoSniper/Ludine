@@ -84,11 +84,15 @@ class StockedProductController extends AbstractController
         ]);
     }
 
-    #[Route('/food/stock/stocked-product/remove/{id}', name: 'food_stock_stocked_product_remove')]
+    #[Route('/food/stock/stocked-product/remove/{id}', name: 'food_stock_stocked_product_remove', defaults: ['id' => null])]
     public function remove(
-        StockedProduct $stockedProduct
+        ?StockedProduct $stockedProduct
     ): Response
     {
+        if (!$stockedProduct) {
+            return $this->redirectToRoute('food_stock_stocked_products');
+        }
+
         $this->entityManager->remove($stockedProduct);
         $this->entityManager->flush();
 

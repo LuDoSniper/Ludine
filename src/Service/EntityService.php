@@ -12,6 +12,8 @@ use App\Entity\Food\Stock\Container;
 use App\Entity\Food\Stock\Product;
 use App\Entity\Food\Stock\StockedProduct;
 use App\Entity\Settings\General\Share;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityManagerInterface;
 
 class EntityService
@@ -150,21 +152,24 @@ class EntityService
     /**
      * @param class-string $class
      */
-    public function getEntityRecords(User $owner, string $class): array
+    public function getEntityRecords(User $owner, string $class, string $orderBy = 'id'): array
     {
         $entities = $this->entityManager->getRepository($class)->findBy(['owner' => $owner]);
         $shares = $this->entityManager->getRepository(Share::class)
             ->createQueryBuilder('s')
-            ->where(':user MEMBER OF s.members')
+            ->where(':user MEMBER OF s.members OR s.owner = :user')
             ->andWhere('s.active = :active')
+            ->andWhere('s.valid = :valid')
             ->setParameter('user', $owner)
             ->setParameter('active', true)
+            ->setParameter('valid', true)
             ->getQuery()
             ->getResult()
         ;
 
         $sharedEntities = [];
         foreach ($shares as $share) {
+            $sharedEntities = array_merge($sharedEntities, $this->entityManager->getRepository($class)->findBy(['owner' => $share->getOwner()]));
             foreach ($share->getEntities() as $entity) {
                 if ($this->getEntityName($this->getEntityById($entity)) === $this->getClassName($class)) {
                     $sharedEntities = array_merge($sharedEntities, $this->entityManager->getRepository($class)->findBy(['owner' => array_map(fn($m) => $m->getId(), $share->getMembers()->toArray())]));
@@ -172,6 +177,7 @@ class EntityService
             }
         }
 
-        return $this->array_unique(array_merge($entities, $sharedEntities));
+        $entities = new ArrayCollection($this->array_unique(array_merge($entities, $sharedEntities)));
+        return $entities->matching(Criteria::create()->orderBy([$orderBy => Criteria::ASC]))->toArray();
     }
 }

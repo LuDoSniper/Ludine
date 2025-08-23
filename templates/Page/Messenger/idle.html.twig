@@ -1,0 +1,80 @@
+{% set sidebar_active = 'messenger' %}
+{% extends 'Layout/base-modules.html.twig' %}
+
+{% block title %}
+    Ludine - Messenger
+{% endblock %}
+
+{% block customstylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/Messenger/messenger.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/Messenger/create.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/Messenger/idle.css') }}">
+{% endblock %}
+
+{% block main %}
+    {% include 'Widget/module-header.html.twig' with {
+        header: {
+            h1: 'Messagerie',
+            h2: {},
+            h3: {}
+        }
+    } %}
+
+    <div id="content" class="messenger">
+        <div id="left-side">
+            {% include 'Widget/button.html.twig' with {
+                'btn': {
+                    'name': 'Nouvelle conversation',
+                    'url': path('messenger_chat_create'),
+                    'type': 'primary',
+                    'action_type': 'redirect',
+                    'id': 'new'
+                }
+            } %}
+
+            <div id="chat-container">
+                {% for chat in chats %}
+                    <a class="chat" href="{{ path('messenger_chat', {'id': chat.id}) }}">
+                        <div class="chat-group">
+                            <div class="user-avatar">
+                                {% set img = asset('img/svg/user.svg') %}
+                                {% if not chat.mP %}
+                                    {% set img = asset('img/svg/group.svg') %}
+                                {% endif %}
+                                <img src="{{ img }}">
+                            </div>
+
+                            <div class="infos">
+                                {% set chat_name = chat.name %}
+                                {% if not chat_name %}
+                                    {% if chat.mP %}
+                                        {% if chat.owner.id == user.id %}
+                                            {% set chat_name = chat.firstMemberName %}
+                                        {% else %}
+                                            {% set chat_name = chat.ownerName %}
+                                        {% endif %}
+                                    {% else %}
+                                        {% set chat_name = chat.firstMemberName %}
+                                    {% endif %}
+                                {% endif %}
+                                <span>{{ chat_name }}</span>
+                                <span>{{ chat.lastMessageContent }}</span>
+                            </div>
+                        </div>
+
+                        <div class="time">
+                            <span>{{ chat.lastMessageTime }}</span>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="messenger-container">
+            <div id="idle-message-container">
+                <span id="idle-message">Cliquez sur un chat pour en voir son contenu.</span>
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

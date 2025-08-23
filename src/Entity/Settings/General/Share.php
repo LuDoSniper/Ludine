@@ -3,7 +3,7 @@
 namespace App\Entity\Settings\General;
 
 use App\Entity\Authentication\User;
-use App\Repository\Settings\ShareRepository;
+use App\Repository\Settings\General\ShareRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -38,6 +38,12 @@ class Share
 
     #[ORM\Column(type: Types::ARRAY)]
     private array $entities = [];
+
+    #[ORM\Column]
+    private ?bool $valid = false;
+
+    #[ORM\Column(type: Types::ARRAY)]
+    private array $validMembers = [];
 
     public function __construct()
     {
@@ -129,6 +135,30 @@ class Share
     public function setEntities(array $entities): static
     {
         $this->entities = $entities;
+
+        return $this;
+    }
+
+    public function isValid(): ?bool
+    {
+        return $this->valid;
+    }
+
+    public function setValid(bool $valid): static
+    {
+        $this->valid = $valid;
+
+        return $this;
+    }
+
+    public function getValidMembers(): array
+    {
+        return $this->validMembers;
+    }
+
+    public function setValidMembers(array $validMembers): static
+    {
+        $this->validMembers = $validMembers;
 
         return $this;
     }

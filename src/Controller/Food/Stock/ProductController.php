@@ -3,7 +3,6 @@
 namespace App\Controller\Food\Stock;
 
 use App\Entity\Food\Stock\Product;
-use App\Entity\Settings\General\Share;
 use App\Form\Food\Stock\ProductType;
 use App\Service\EntityService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,7 +22,7 @@ class ProductController extends AbstractController
     #[Route('/food/stock/products', 'food_stock_products')]
     public function products(): Response
     {
-        $products = $this->entityService->getEntityRecords($this->getUser(), Product::class);
+        $products = $this->entityService->getEntityRecords($this->getUser(), Product::class, 'name');
 
         return $this->render('Page/Food/Stock/products.html.twig', [
             'products' => $products
@@ -75,11 +74,15 @@ class ProductController extends AbstractController
         ]);
     }
 
-    #[Route('/food/stock/products/remove/{id}', 'food_stock_products_remove')]
+    #[Route('/food/stock/products/remove/{id}', 'food_stock_products_remove', defaults: ['id' => null])]
     public function remove(
-        Product $product
+        ?Product $product
     ): Response
     {
+        if (!$product) {
+            return $this->redirectToRoute('food_stock_products');
+        }
+
         $this->entityManager->remove($product);
         $this->entityManager->flush();
 
@@ -146,7 +149,7 @@ class ProductController extends AbstractController
             ], Response::HTTP_OK);
         }
 
-        $products = $this->entityService->getEntityRecords($this->getUser(), Product::class);
+        $products = $this->entityService->getEntityRecords($this->getUser(), Product::class, 'name');
         $data = [];
         foreach ($products as $product) {
             $data[] = [

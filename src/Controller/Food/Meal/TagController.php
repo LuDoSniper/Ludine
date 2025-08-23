@@ -21,7 +21,7 @@ class TagController extends AbstractController
     #[Route('/food/meal/tags', 'food_meal_tags')]
     public function tags(): Response
     {
-        $tags = $this->entityService->getEntityRecords($this->getUser(), Tag::class);
+        $tags = $this->entityService->getEntityRecords($this->getUser(), Tag::class, 'name');
 
         return $this->render('Page/Food/Meal/tags.html.twig', [
             'tags' => $tags

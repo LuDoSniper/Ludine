@@ -29,9 +29,14 @@
 
 {% block body %}
     {% set sidebar_active = sidebar_active|default('') %}
-    {% include 'Widget/sidebar.html.twig'  with {'active': sidebar_active}%}
-    <main>
-        {% block main %}
-        {% endblock %}
-    </main>
+    <nav id="sidebar">
+        <img id="hamburger" src="{{ asset('img/svg/hamburger.svg') }}">
+    </nav>
+    <div id="main">
+        {% include 'Widget/sidebar.html.twig'  with {'active': sidebar_active}%}
+        <main>
+            {% block main %}
+            {% endblock %}
+        </main>
+    </div>
 {% endblock %}
