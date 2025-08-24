@@ -1,0 +1,17 @@
+{% extends 'Layout/base.html.twig' %}
+
+{% block title %}
+    Vérifier votre email
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/Authentication/wait.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div id="overlay"></div>
+    <h1>Veuillez vérifier votre email</h1>
+    <div class="button-container">
+        <a href="{{ path('app_resend') }}" class="button">Renvoyer</a>
+    </div>
+{% endblock %}

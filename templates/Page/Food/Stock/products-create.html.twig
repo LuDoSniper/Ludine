@@ -1,0 +1,96 @@
+{% set sidebar_active = 'food' %}
+{% extends 'Layout/base-modules.html.twig' %}
+
+{% block title %}
+    Ludine - Create product
+{% endblock %}
+
+{% block customstylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/Food/Stock/products-create.css') }}">
+{% endblock %}
+
+{% block context %}
+    {{ {
+        "id": id,
+        "save_path": path('food_stock_product_save'),
+        "get_path": path('food_stock_product_get', {'id': id}),
+        "model": "product",
+        "fields": [
+            {"name": "name", "type": "char"},
+            {"name": "description", "type": "char"}
+        ]
+    } | json_encode | raw }}
+{% endblock %}
+
+{% block main %}
+    {% include 'Widget/module-header.html.twig' with {
+        header: {
+            h1: 'Nourriture',
+            h2: {
+                'Repas': {
+                    selected: false,
+                    url: path('food_meal')
+                },
+                'Stock': {
+                    selected: true,
+                    url: path('food_stock')
+                }
+            },
+            h3: {
+                'Conteneurs': {
+                    selected: false,
+                    url: path('food_stock_container')
+                },
+                'Produits': {
+                    selected: true,
+                    url: path('food_stock_product')
+                },
+                'Produits stockés': {
+                    selected: false,
+                    url: path('food_stock_stocked_product')
+                }
+            }
+        }
+    } %}
+
+    <div id="content" class="form">
+        <div id="content-header">
+            <div class="group">
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Nouveau',
+                        'url': path('food_stock_product_create'),
+                        'type': 'primary',
+                        'action_type': 'redirect'
+                    }
+                } %}
+
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Supprimer',
+                        'url': path('food_stock_product_remove', {'id': id}),
+                        'type': 'secondary',
+                        'action_type': 'redirect',
+                        'id': 'remove'
+                    }
+                } %}
+
+                {% include 'Widget/button.html.twig' with {'btn': {'action_type': 'save'}} %}
+            </div>
+        </div>
+
+        {{ form_start(form) }}
+            <input type="hidden" name="id" value="new">
+            <div class="group">
+                <div class="field">
+                    {{ form_label(form.name) }}
+                    {{ form_widget(form.name) }}
+                </div>
+                <div class="field">
+                    {{ form_label(form.description) }}
+                    {{ form_widget(form.description) }}
+                </div>
+            </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}

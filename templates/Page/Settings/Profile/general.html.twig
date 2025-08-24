@@ -1,0 +1,88 @@
+{% set sidebar_active = 'settings' %}
+{% extends 'Layout/base-modules.html.twig' %}
+
+{% block title %}
+    Ludine - Profile
+{% endblock %}
+
+{% block context %}
+    {{ {
+        "save_path": path('settings_profile_general_save'),
+        "model": "general",
+        "fields": [
+            {"name": "email", "type": "char"},
+            {"name": "username", "type": "char"},
+            {"name": "displayName", "type": "char"},
+        ]
+    } | json_encode | raw }}
+{% endblock %}
+
+{% block main %}
+    {% include 'Widget/module-header.html.twig' with {
+        header: {
+            h1: 'Paramètres',
+            h2: {
+                'Profil': {
+                    selected: true,
+                    url: path('settings_profile')
+                },
+                'Général': {
+                    selected: false,
+                    url: path('settings_general')
+                }
+            },
+            h3: {
+                'Informations générales': {
+                    selected: true,
+                    url: path('settings_profile_general')
+                },
+                'Sécurité': {
+                    selected: false,
+                    url: path('settings_profile_security')
+                },
+            }
+        }
+    } %}
+
+    <div id="content" class="config">
+        <div id="content-header">
+            <div class="group">
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Enregistrer',
+                        'type': 'primary',
+                        'action_type': 'save'
+                    }
+                } %}
+            </div>
+        </div>
+
+        {{ form_start(form) }}
+        <section id="general">
+            <span class="section-title">Informations générales</span>
+            <div class="section-content">
+                <div class="body">
+                    <div class="group">
+                        <div class="field">
+                            {{ form_label(form.email) }}
+                            {{ form_widget(form.email) }}
+                        </div>
+                        <div class="field">
+                            {{ form_label(form.username) }}
+                            {{ form_widget(form.username) }}
+                        </div>
+                    </div>
+                    <div class="group">
+                        <div class="field">
+                            {{ form_label(form.displayName) }}
+                            {{ form_widget(form.displayName) }}
+                        </div>
+                        <small>Si "Nom d'affichage" est laissé vide, "Nom d'affichage" prendra la valeur de "Nom d'utilisateur"</small>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
+

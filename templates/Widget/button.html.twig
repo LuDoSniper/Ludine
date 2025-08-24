@@ -1,0 +1,29 @@
+{% set isSave = (btn.action_type|default(null) == 'save') %}
+{% if isSave %}
+    {% set baseVisible = false %}
+{% else %}
+    {% set baseVisible = true %}
+{% endif %}
+
+{% set classes = [] %}
+{% set classes = classes|merge([(btn.visible is defined ? btn.visible : baseVisible) ? 'visible' : 'hidden']) %}
+
+{% if btn.type is defined and btn.type in ['primary','secondary'] %}
+    {% set classes = classes|merge(['btn', 'btn-' ~ btn.type]) %}
+{% endif %}
+
+<a
+    href="{{ btn.url|default('') }}"
+    {% if isSave %}
+        id="save"
+    {% elseif btn.id is defined %}
+        id="{{ btn.id }}"
+    {% endif %}
+    class="{{ classes|join(' ') }}"
+>
+    {% if isSave and (btn.type is not defined or btn.type not in ['primary','secondary']) %}
+        <img src="{{ asset('img/svg/save.svg') }}" alt="Save">
+    {% elseif btn.name is defined %}
+        {{ btn.name }}
+    {% endif %}
+</a>

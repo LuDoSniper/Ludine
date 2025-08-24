@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <link rel="icon" href="{{ asset('img/icon.svg') }}">
+        <link rel="stylesheet" href="{{ asset('css/base.css') }}">
+        {% block stylesheets %}
+        {% endblock %}
+
+        {% block javascripts %}
+            <script src="{{ asset('js/base.js') }}"></script>
+        {% endblock %}
+    </head>
+    <body>
+        <div id="app-loader" role="status" aria-live="polite" aria-label="Chargement">
+            <div class="spinner" aria-hidden="true"></div>
+        </div>
+
+        {% block body %}{% endblock %}
+    </body>
+</html>

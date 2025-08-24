@@ -1,0 +1,36 @@
+{% extends 'Layout/base.html.twig' %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/Authentication/authentication.css') }}">
+
+    {% block additionalStylesheets %}{% endblock %}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/Authentication/authentication.js') }}"></script>
+    <script src="{{ asset('js/base.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    <div id="overlay"></div>
+    <div id="left">
+        <div></div>
+        <div></div>
+    </div>
+    <div id="center">
+        <div id="login-container">
+            <div id="logo-container">
+                <div id="logo">
+                    <img src="{{ asset('img/icon.svg') }}">
+                </div>
+                <span>Ludine</span>
+            </div>
+            {% block form %}
+            {% endblock %}
+        </div>
+    </div>
+    <div id="right">
+        <div></div>
+        <div></div>
+    </div>
+{% endblock %}

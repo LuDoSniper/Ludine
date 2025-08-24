@@ -1,0 +1,142 @@
+{% set sidebar_active = 'food' %}
+{% extends 'Layout/base-modules.html.twig' %}
+
+{% block title %}
+    Ludine - Create stocked products
+{% endblock %}
+
+{% block context %}
+    {{ {
+        "id": id,
+        "get_path": path('food_stock_stocked_product_get', {'id': id}),
+        "save_path": path('food_stock_stocked_product_save'),
+        "model": "stocked_product",
+        "fields": [
+            {"name": "product", "type": "relational"},
+            {"name": "arrivalDate", "type": "date"},
+            {"name": "expirationDate", "type": "date"},
+            {"name": "stackable", "type": "bool"},
+            {"name": "cool", "type": "bool"},
+            {"name": "container", "type": "relational"},
+            {"name": "floor", "type": "selection"},
+            {"name": "location", "type": "int"},
+        ]
+    } | json_encode | raw }}
+{% endblock %}
+
+{% block customjavascripts %}
+    <script src="{{ asset('js/Food/Stock/stocked-products-create.js') }}"></script>
+{% endblock %}
+
+{% block main %}
+    {% include 'Widget/module-header.html.twig' with {
+        header: {
+            h1: 'Nourriture',
+            h2: {
+                'Repas': {
+                    selected: false,
+                    url: path('food_meal')
+                },
+                'Stock': {
+                    selected: true,
+                    url: path('food_stock')
+                }
+            },
+            h3: {
+                'Conteneurs': {
+                    selected: false,
+                    url: path('food_stock_container')
+                },
+                'Produits': {
+                    selected: false,
+                    url: path('food_stock_product')
+                },
+                'Produits stockés': {
+                    selected: true,
+                    url: path('food_stock_stocked_product')
+                }
+            }
+        }
+    } %}
+
+    <div id="content" class="form">
+        <div id="content-header">
+            <div class="group">
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Nouveau',
+                        'url': path('food_stock_stocked_product_create'),
+                        'type': 'primary',
+                        'action_type': 'redirect'
+                    }
+                } %}
+
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Supprimer',
+                        'url': path('food_stock_stocked_product_remove', {'id': id}),
+                        'type': 'secondary',
+                        'action_type': 'redirect',
+                        'id': 'remove'
+                    }
+                } %}
+
+                {% include 'Widget/button.html.twig' with {'btn': {'action_type': 'save'}} %}
+            </div>
+        </div>
+
+        {{ form_start(form) }}
+            <input type="hidden" name="id" value="{{ id }}">
+            <div style="display: flex; flex-direction: column; width: 100%; gap: var(--large)">
+                <div>
+                    <div class="field">
+                        <label class="h1" for="name">Nom</label>
+                        <input type="text" id="name" name="name" class="h1 text-muted" data-computed="food_stock_product.name" disabled>
+                    </div>
+                </div>
+                <div class="custom_form">
+                    <div class="group">
+                        <div class="field">
+                            <label for="description">Description</label>
+                            <input type="text" id="description" name="description" class="text-muted" data-computed="food_stock_product.description" disabled>
+                        </div>
+                        <div class="field">
+                            {{ form_label(form.product) }}
+                            {{ form_widget(form.product) }}
+                        </div>
+                        <div class="field">
+                            {{ form_label(form.arrivalDate) }}
+                            {{ form_widget(form.arrivalDate) }}
+                        </div>
+                        <div class="field">
+                            {{ form_label(form.expirationDate) }}
+                            {{ form_widget(form.expirationDate) }}
+                        </div>
+                        <div class="field">
+                            {{ form_label(form.stackable) }}
+                            {{ form_widget(form.stackable) }}
+                        </div>
+                        <div class="field">
+                            {{ form_label(form.cool) }}
+                            {{ form_widget(form.cool) }}
+                        </div>
+                    </div>
+                    <div class="group">
+                        <div class="field">
+                            {{ form_label(form.container) }}
+                            {{ form_widget(form.container) }}
+                        </div>
+                        <div class="field">
+                            {{ form_label(form.floor) }}
+                            <select id="stocked_product_floor" data-computed="food_stock_container.floors" data-widget="relational" disabled></select>
+                        </div>
+                        <div class="field">
+                            {{ form_label(form.location) }}
+                            <input type="number" id="stocked_product_location" name="location" min="1" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {{ form_end(form, {'render_rest': false}) }}
+    </div>
+{% endblock %}

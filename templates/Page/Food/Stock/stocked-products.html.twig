@@ -1,0 +1,129 @@
+{% set sidebar_active = 'food' %}
+{% extends 'Layout/base-modules.html.twig' %}
+
+{% block title %}
+    Ludine - Stocked products
+{% endblock %}
+
+{% block customstylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/Food/Stock/products.css') }}">
+{% endblock %}
+
+{% block context %}
+    {{ {
+        "save_path": path('food_stock_stocked_product_save'),
+        "model": "stocked_product",
+        "fields": [
+            {"name": "name", "type": "char"},
+            {"name": "description", "type": "char"},
+            {"name": "arrivalDate", "type": "date"},
+            {"name": "expirationDate", "type": "date"},
+            {"name": "stackable", "type": "bool"},
+            {"name": "cool", "type": "bool"},
+            {"name": "container", "type": "relational"},
+            {"name": "floor", "type": "selection"},
+            {"name": "location", "type": "int"},
+        ]
+    } | json_encode | raw }}
+{% endblock %}
+
+{% block main %}
+    {% include 'Widget/module-header.html.twig' with {
+        header: {
+            h1: 'Nourriture',
+            h2: {
+                'Repas': {
+                    selected: false,
+                    url: path('food_meal')
+                },
+                'Stock': {
+                    selected: true,
+                    url: path('food_stock')
+                }
+            },
+            h3: {
+                'Conteneurs': {
+                    selected: false,
+                    url: path('food_stock_container')
+                },
+                'Produits': {
+                    selected: false,
+                    url: path('food_stock_product')
+                },
+                'Produits stockés': {
+                    selected: true,
+                    url: path('food_stock_stocked_product')
+                }
+            }
+        }
+    } %}
+
+    <div id="content" class="list">
+        <div id="content-header">
+            <div class="group">
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Nouveau',
+                        'url': path('food_stock_stocked_product_create'),
+                        'type': 'primary',
+                        'action_type': 'redirect'
+                    }
+                } %}
+
+                {% include 'Widget/button.html.twig' with {'btn': {'action_type': 'save'}} %}
+            </div>
+        </div>
+
+        <div id="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Description</th>
+                        <th>Date d'arrivée</th>
+                        <th>Date de péremption</th>
+                        <th>Stackable</th>
+                        <th>Frais</th>
+                        <th>Conteneur</th>
+                        <th>Etage</th>
+                        <th>Emplacement</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stockedProduct in stockedProducts %}
+                        <tr>
+                            <input type="hidden" name="url" value="{{ path('food_stock_stocked_product_update', {id: stockedProduct.id}) }}">
+                            <td>{{ stockedProduct.product.name }}</td>
+                            <td>{{ stockedProduct.product.description }}</td>
+                            <td>{{ stockedProduct.arrivalDate | date }}</td>
+                            <td>{{ stockedProduct.expirationDate | date }}</td>
+                            <td><input type="checkbox" {{ stockedProduct.stackable ? 'checked' : '' }} disabled></td>
+                            <td><input type="checkbox" {{ stockedProduct.cool ? 'checked' : '' }} disabled></td>
+                            <td>{{ stockedProduct.container.name }}</td>
+                            <td>
+                                {% for floor in stockedProduct.container.floors %}
+                                    {% if floor.id == stockedProduct.floor %}
+                                        {{ floor.description }}
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>{{ stockedProduct.location }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% set sidebar_active = 'food' %}
+{% extends 'Layout/base-modules.html.twig' %}
+
+{% block title %}
+    Ludine - Products
+{% endblock %}
+
+{% block customstylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/Food/Stock/products.css') }}">
+{% endblock %}
+
+{% block context %}
+    {{ {
+        "save_path": path('food_stock_product_save'),
+        "model": "product",
+        "fields": [
+            {"name": "name", "type": "char"},
+            {"name": "description", "type": "char"}
+        ]
+    } | json_encode | raw }}
+{% endblock %}
+
+{% block main %}
+    {% include 'Widget/module-header.html.twig' with {
+        header: {
+            h1: 'Nourriture',
+            h2: {
+                'Repas': {
+                    selected: false,
+                    url: path('food_meal')
+                },
+                'Stock': {
+                    selected: true,
+                    url: path('food_stock')
+                }
+            },
+            h3: {
+                'Conteneurs': {
+                    selected: false,
+                    url: path('food_stock_container')
+                },
+                'Produits': {
+                    selected: true,
+                    url: path('food_stock_product')
+                },
+                'Produits stockés': {
+                    selected: false,
+                    url: path('food_stock_stocked_product')
+                }
+            }
+        }
+    } %}
+
+    <div id="content" class="list">
+        <div id="content-header">
+            <div class="group">
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Nouveau',
+                        'url': path('food_stock_product_create'),
+                        'type': 'primary',
+                        'action_type': 'redirect'
+                    }
+                } %}
+
+                {% include 'Widget/button.html.twig' with {'btn': {'action_type': 'save'}} %}
+            </div>
+        </div>
+
+        <div id="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                        <tr>
+                            <input type="hidden" name="url" value="{{ path('food_stock_product_update', {id: product.id}) }}">
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.description }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td>Aucune donnée</td>
+                            <td>Aucune donnée</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

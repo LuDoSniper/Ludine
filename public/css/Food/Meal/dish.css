@@ -1,0 +1,15 @@
+form[name='dish'] {
+    overflow-y: scroll;
+}
+
+.custom {
+    display: flex;
+    gap: var(--medium);
+    flex-wrap: wrap;
+}
+
+@media (min-width: 1200px) {
+    .custom {
+        flex-wrap: nowrap;
+    }
+}

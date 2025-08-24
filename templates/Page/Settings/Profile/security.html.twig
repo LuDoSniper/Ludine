@@ -1,0 +1,88 @@
+{% set sidebar_active = 'settings' %}
+{% extends 'Layout/base-modules.html.twig' %}
+
+{% block title %}
+    Ludine - Profile
+{% endblock %}
+
+{% block context %}
+    {{ {
+        "save_path": path('settings_profile_security_save'),
+        "model": "security",
+        "fields": [
+            {"name": "actualPassword", "type": "char"},
+            {"name": "newPassword_first", "type": "char"},
+            {"name": "newPassword_second", "type": "char"},
+        ]
+    } | json_encode | raw }}
+{% endblock %}
+
+{% block main %}
+    {% include 'Widget/module-header.html.twig' with {
+        header: {
+            h1: 'Paramètres',
+            h2: {
+                'Profil': {
+                    selected: true,
+                    url: path('settings_profile')
+                },
+                'Général': {
+                    selected: false,
+                    url: path('settings_general')
+                }
+            },
+            h3: {
+                'Informations générales': {
+                    selected: false,
+                    url: path('settings_profile_general')
+                },
+                'Sécurité': {
+                    selected: true,
+                    url: ''
+                },
+            }
+        }
+    } %}
+
+    <div id="content" class="config">
+        <div id="content-header">
+            <div class="group">
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Enregistrer',
+                        'type': 'primary',
+                        'action_type': 'save'
+                    }
+                } %}
+            </div>
+        </div>
+
+        {{ form_start(form) }}
+        <section id="general">
+            <span class="section-title">Sécurité</span>
+            <div class="section-content">
+                <div class="body">
+                    <div class="group">
+                        <div class="field">
+                            {{ form_label(form.actualPassword) }}
+                            {{ form_widget(form.actualPassword) }}
+                            <img src="{{ asset('img/svg/eye-closed.svg') }}" class="eye" data-target="security_actualPassword">
+                        </div>
+                        <div class="field">
+                            {{ form_label(form.newPassword.first) }}
+                            {{ form_widget(form.newPassword.first) }}
+                            <img src="{{ asset('img/svg/eye-closed.svg') }}" class="eye" data-target="security_newPassword_first">
+                        </div>
+                        <div class="field">
+                            {{ form_label(form.newPassword.second) }}
+                            {{ form_widget(form.newPassword.second) }}
+                            <img src="{{ asset('img/svg/eye-closed.svg') }}" class="eye" data-target="security_newPassword_second">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
+

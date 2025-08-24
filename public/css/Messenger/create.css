@@ -1,0 +1,16 @@
+#messenger-container h1 {
+    color: white;
+    margin: 0;
+}
+
+#messenger-container form {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    flex: 1 1 auto;
+}
+
+button {
+    cursor: pointer;
+}

@@ -1,0 +1,14 @@
+#left-side {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    flex: 1 1 auto;
+    min-height: 0;
+    max-width: 350px;
+    gap: 10px;
+}
+
+#messenger-container {
+    display: none;
+}

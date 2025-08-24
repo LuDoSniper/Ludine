@@ -1,0 +1,27 @@
+{% extends 'Layout/Authentication/authentication.html.twig' %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block form %}
+    {{ form_start(form) }}
+    {{ form_widget(form._username) }}
+    {{ form_widget(form._email) }}
+    <div>
+        {{ form_widget(form.password.first) }}
+        <img src="{{ asset('img/svg/eye-closed.svg') }}" class="eye">
+    </div>
+    <div>
+        {{ form_widget(form.password.second) }}
+        <img src="{{ asset('img/svg/eye-closed.svg') }}" class="eye">
+    </div>
+    <button class="button">S'inscrire</button>
+    <a class="button" href="{{ path('app_login_google') }}">
+        <img src="{{ asset('img/svg/google.svg') }}">
+        S'inscrire avec Google
+    </a>
+    <a href="{{ path('app_login') }}">Déjà un compte ?</a>
+    {{ form_end(form) }}
+{% endblock %}
+

@@ -1,0 +1,91 @@
+{% set sidebar_active = 'food' %}
+{% extends 'Layout/base-modules.html.twig' %}
+
+{% block title %}
+    Ludine - Containers
+{% endblock %}
+
+{% block context %}
+    {{ {
+        "save_path": path('food_stock_container_save'),
+        "model": "container",
+        "fields": [
+            {"name": "name", "type": "char"},
+            {"name": "description", "type": "char"},
+            {"name": "ref", "type": "char"},
+            {"name": "cool", "type": "bool"},
+            {"name": "nbFloor", "type": "int"},
+        ]
+    } | json_encode | raw }}
+{% endblock %}
+
+{% block main %}
+    {% include 'Widget/module-header.html.twig' with {
+        header: {
+            h1: 'Nourriture',
+            h2: {
+                'Repas': {
+                    selected: false,
+                    url: path('food_meal')
+                },
+                'Stock': {
+                    selected: true,
+                    url: path('food_stock')
+                }
+            },
+            h3: {
+                'Conteneurs': {
+                    selected: true,
+                    url: path('food_stock_container')
+                },
+                'Produits': {
+                    selected: false,
+                    url: path('food_stock_product')
+                },
+                'Produits stockés': {
+                    selected: false,
+                    url: path('food_stock_stocked_product')
+                }
+            }
+        }
+    } %}
+    <div id="content" class="kanban">
+        <div id="content-header">
+            <div class="group">
+                {% include 'Widget/button.html.twig' with {
+                    'btn': {
+                        'name': 'Nouveau',
+                        'url': path('food_stock_container_create'),
+                        'type': 'primary',
+                        'action_type': 'redirect'
+                    }
+                } %}
+
+                {% include 'Widget/button.html.twig' with {'btn': {'action_type': 'save'}} %}
+            </div>
+        </div>
+
+        <div id="kanban-container">
+            {% for container in containers %}
+                <div class="card" style="background-color: #3F3F47;">
+                    <input type="hidden" name="url" value="{{ path('food_stock_container_update', {id: container.id}) }}">
+                    <div class="group" style="max-width: 100% !important;">
+                        <div>
+                            <div class="field">
+                                <span class="h1">{{ container.name }}</span>
+                                <span class="h1 text-muted">[{{ container.ref }}]</span>
+                            </div>
+                            <div class="field">
+                                <span class="text-muted">{{ container.description }}</span>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <span>Frais : {{ container.cool ? 'Oui' : 'Non' }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

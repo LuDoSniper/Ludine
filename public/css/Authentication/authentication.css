@@ -1,0 +1,221 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#overlay {
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    z-index: 2;
+    background: radial-gradient(ellipse 150% 100% at center -5%, rgba(255, 255, 255, 0.05) 0%, transparent 25%),
+                radial-gradient(ellipse 150% 100% at center 105%, rgba(255, 255, 255, 0.1) 0%, transparent 25%);
+}
+
+#left, #right {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+}
+
+#left, #right {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#left {
+    padding-right: 12px;
+}
+
+#right {
+    padding-left: 12px;
+}
+
+#left div, #right div {
+    width: 100%;
+    height: 100%;
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent;
+}
+
+#left div:first-child {
+    background: linear-gradient(var(--bg-color), var(--bg-color)) padding-box,
+    linear-gradient(calc(-45deg + 15deg), #393B41, rgba(102, 102, 102, 0) 35% 35%) border-box;
+    border-radius: 0 0 64px 0;
+}
+
+#left div:last-child {
+    background: linear-gradient(var(--bg-color), var(--bg-color)) padding-box,
+    linear-gradient(calc(-90deg - 45deg - 15deg), #393B41, rgba(102, 102, 102, 0) 35% 35%) border-box;
+    border-radius: 0 64px 0 0;
+}
+
+#right div:first-child {
+    background: linear-gradient(var(--bg-color), var(--bg-color)) padding-box,
+    linear-gradient(calc(45deg - 15deg), #393B41, rgba(102, 102, 102, 0) 35% 35%) border-box;
+    border-radius: 0 0 0 64px;
+}
+
+#right div:last-child {
+    background: linear-gradient(var(--bg-color), var(--bg-color)) padding-box,
+    linear-gradient(calc(90deg + 45deg + 15deg), #393B41, rgba(102, 102, 102, 0) 35% 35%) border-box;
+    border-radius: 64px 0 0 0;
+}
+
+#center {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1000px;
+    min-width: 350px;
+}
+
+#login-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    border-radius: 32px;
+    padding: 16px;
+    box-shadow: 0 4px 32px 0 rgba(123, 123, 123, 0.25),
+                inset 0 0 32px 20px rgba(123, 123, 123, 0.1);
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent;
+    background: linear-gradient(#393B41, #393B41) padding-box,
+    linear-gradient(calc(-90deg - 45deg - 15deg), #CACACA, #646464 35% 35%) border-box;
+    gap: 32px;
+}
+
+#logo-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 32px;
+    font-weight: 500;
+    gap: 10px;
+    user-select: none;
+}
+
+#logo {
+    border-radius: 64px;
+    box-shadow: inset 0 0 16px 0 rgba(255, 255, 255, 0.25);
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#logo img {
+    width: 50px;
+}
+
+form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+    gap: 12px;
+}
+
+form > div:not(.google-email) {
+    position: relative;
+    width: 100%;
+}
+
+.google-email {
+    background-color: #2B2C31;
+    border-radius: 16px;
+    padding: 2px 10px;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    font-size: 14px;
+    color: white;
+}
+
+.eye {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+form input:not([type='checkbox']) {
+    width: 100%;
+    background-color: #484A51;
+    padding: 16px;
+    color: #cccfd6;
+    font-size: 14px;
+    border-radius: 16px;
+    border: none;
+}
+
+form input:not([type='checkbox'])::placeholder {
+    color: #9094A0;
+}
+
+form input:not([type='checkbox']):focus {
+    outline: none;
+}
+
+.remember-div {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    color: #9094A0;
+    gap: 4px;
+}
+
+.remember-div input {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border: solid 1px #9094A0;
+    background-color: #d1d3d5;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.remember-div input:checked {
+    border-color: #5c5f67;
+    background-color: #5c5f67;
+}
+
+.remember-div label {
+    user-select: none;
+    cursor: pointer;
+}
+
+a {
+    color: #9094A0;
+    font-size: 14px;
+}
+
+a:visited {
+    color: #9094A0;
+}
+
+.text-end {
+    width: 100%;
+    text-align: right;
+}
+
+.button {
+    width: 100%;
+}
