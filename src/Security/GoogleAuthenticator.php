@@ -3,6 +3,8 @@
 namespace App\Security;
 
 use App\Entity\Authentication\User;
+use App\Repository\Authentication\UserRepository;
+use App\Security\Exception\GoogleRegisterRequiredException;
 use Doctrine\ORM\EntityManagerInterface;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use KnpU\OAuth2ClientBundle\Client\OAuth2ClientInterface;
@@ -26,7 +28,8 @@ class GoogleAuthenticator extends OAuth2Authenticator implements UserProviderInt
         private readonly ClientRegistry $clientRegistry,
         private readonly RouterInterface $router,
         private readonly UserProviderInterface $userProvider,
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly UserRepository $userRepository,
     ){}
 
     public function supports(Request $request): ?bool
@@ -52,21 +55,29 @@ class GoogleAuthenticator extends OAuth2Authenticator implements UserProviderInt
 
     public function onAuthenticationSuccess(Request $request, $token, string $firewallName): RedirectResponse
     {
-        /** @var OAuthUser $oauthUser */
-        $oauthUser = $token->getUser();
-        // Ici user peut valoir null car loadUserByIdentifierFromBDD renvoi User ou null
-        $user = $this->loadUserByIdentifierFromBDD($oauthUser->getUserIdentifier());
-
-        // Regarder si l'utilisateur n'existe pas dans la bdd auquel cas, redirection vers /register/google
-        if (!$user) {
-            return new RedirectResponse($this->router->generate('app_register_google'));
-        }
+//        /** @var OAuthUser $oauthUser */
+//        $oauthUser = $token->getUser();
+//        // Ici user peut valoir null car loadUserByIdentifierFromBDD renvoi User ou null
+//        $user = $this->loadUserByIdentifierFromBDD($oauthUser->getUserIdentifier());
+//
+//        // Regarder si l'utilisateur n'existe pas dans la bdd auquel cas, redirection vers /register/google
+//        if (!$user) {
+//            return new RedirectResponse($this->router->generate('app_register_google'));
+//        }
+        $request->getSession()->remove('google_pending_email');
 
         return new RedirectResponse($this->router->generate('app_home'));
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): RedirectResponse
     {
+        if ($exception instanceof GoogleRegisterRequiredException) {
+            return new RedirectResponse($this->router->generate('app_register_google'));
+        }
+
+        // Pour toute autre erreur, on s'assure d'effacer la clé résiduelle
+        $request->getSession()->remove('google_pending_email');
+
         return new RedirectResponse($this->router->generate('app_login'));
     }
 
@@ -77,22 +88,37 @@ class GoogleAuthenticator extends OAuth2Authenticator implements UserProviderInt
 
     public function authenticate(Request $request): Passport
     {
+        $request->getSession()->remove('google_pending_email');
+
         // Récupérer le token d'accès Google
         $credentials = $this->fetchAccessToken($this->getGoogleClient());
         // Récupérer les informations utilisateur depuis Google
         $googleUser = $this->getGoogleClient()->fetchUserFromToken($credentials);
 
-        $email = $googleUser->getEmail();
-
-        if (!$email) {
+        $rawEmail = $googleUser->getEmail();
+        if (!$rawEmail) {
             throw new AuthenticationException('Email introuvable ou invalide.');
         }
 
-        // Créer un Passport Self-Validating
-        $badge = new UserBadge($email, function ($email) {
-            return $this->userProvider->loadUserByIdentifier($email);
-        });
-        return new SelfValidatingPassport($badge);
+        $email = mb_strtolower(trim($rawEmail));
+
+        $user = $this->userRepository->createQueryBuilder('u')
+            ->where('LOWER(u.email) = :e OR LOWER(u.username) = :e')
+            ->setParameter('e', $email)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if ($user) {
+            // auth OK : surtout ne rien mettre en session ici
+            return new SelfValidatingPassport(
+                new UserBadge($email, fn () => $user)
+            );
+        }
+
+        // Inscription requise : marquer explicitement le cas
+        $request->getSession()->set('google_pending_email', $email);
+        throw new GoogleRegisterRequiredException(); // crée une petite exception dédiée
     }
 
     public function refreshUser(UserInterface $user): UserInterface
