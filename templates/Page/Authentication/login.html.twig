@@ -33,5 +33,6 @@
         Se connecter avec Google
     </a>
     <a href="{{ path('app_register') }}">Pas encore de compte ?</a>
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
     {{ form_end(form) }}
 {% endblock %}
