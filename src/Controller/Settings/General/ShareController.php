@@ -211,32 +211,33 @@ class ShareController extends AbstractController
 
         return $this->redirectToRoute('messenger_chat', ['id' => $message->getChat()->getId()]);
     }
-
-    /**
-     * @param Share $share
-     * @return void
-     */
+    
     public function sendValidationMethod(Share $share): void
     {
+        $me = $this->getUser();
+
         foreach ($share->getMembers() as $member) {
+            if ($member->getId() === $me->getId()) {
+                continue; // on ne se DM pas soi-même
+            }
+
             $qb = $this->entityManager->getRepository(Chat::class)->createQueryBuilder('c');
-            $qb
-                ->leftJoin('c.members', 'm')
-                ->addSelect('COUNT(m) AS HIDDEN membersCount')
-                ->groupBy('c.id')
-                ->having('COUNT(m) = 1')
+            $qb->leftJoin('c.members', 'm')
+                ->where('SIZE(c.members) = 1')
+                ->andWhere('(c.owner = :me AND m = :u) OR (c.owner = :u AND m = :me)')
                 ->andWhere('c.owner NOT MEMBER OF c.members')
-                ->andWhere('c.owner = :u OR :u MEMBER OF c.members')
+                ->setParameter('me', $me)
                 ->setParameter('u', $member)
-                ->orderBy('c.id', 'DESC');
+                ->orderBy('c.id', 'DESC')
+                ->setMaxResults(1);
+
             $chat = $qb->getQuery()->getOneOrNullResult();
 
             if (!$chat) {
                 $chat = new Chat();
-                $chat->setOwner($this->getUser());
+                $chat->setOwner($me);
                 $chat->addMember($member);
                 $chat->setCreatedAt(new \DateTimeImmutable());
-
                 $this->entityManager->persist($chat);
             }
 
@@ -244,16 +245,14 @@ class ShareController extends AbstractController
             $message->setChat($chat);
             $message->setCreatedAt(new \DateTimeImmutable());
             $message->setActive(true);
-            $message->setAuthor($this->getUser());
+            $message->setAuthor($me);
             $message->setContent('');
-
             $this->entityManager->persist($message);
             $this->entityManager->flush();
 
-            $confirm_path = '/settings/general/share/confirm/' . $share->getId() . '/' . $message->getId() . '/confirm';
-            $cancel_path = '/settings/general/share/confirm/' . $share->getId() . '/' . $message->getId() . '/cancel';
-            $message->setContent("[layout][!confirm][confirm_path:'" . $confirm_path . "',cancel_path:'" . $cancel_path . "',confirm:'Accepter',cancel:'Refuser']:Message automatique envoyé pour demande de validation de partage");
-
+            $confirm_path = '/settings/general/share/confirm/'.$share->getId().'/'.$message->getId().'/confirm';
+            $cancel_path  = '/settings/general/share/confirm/'.$share->getId().'/'.$message->getId().'/cancel';
+            $message->setContent("[layout][!confirm][confirm_path:'".$confirm_path."',cancel_path:'".$cancel_path."',confirm:'Accepter',cancel:'Refuser']:Message automatique envoyé pour demande de validation de partage");
             $this->entityManager->flush();
         }
     }

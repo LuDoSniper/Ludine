@@ -61,21 +61,23 @@
         <section id="general">
             <span class="section-title">Sécurité</span>
             <div class="section-content">
-                <div class="group">
-                    <div class="field">
-                        {{ form_label(form.actualPassword) }}
-                        {{ form_widget(form.actualPassword) }}
-                        <img src="{{ asset('img/svg/eye-closed.svg') }}" class="eye" data-target="security_actualPassword">
-                    </div>
-                    <div class="field">
-                        {{ form_label(form.newPassword.first) }}
-                        {{ form_widget(form.newPassword.first) }}
-                        <img src="{{ asset('img/svg/eye-closed.svg') }}" class="eye" data-target="security_newPassword_first">
-                    </div>
-                    <div class="field">
-                        {{ form_label(form.newPassword.second) }}
-                        {{ form_widget(form.newPassword.second) }}
-                        <img src="{{ asset('img/svg/eye-closed.svg') }}" class="eye" data-target="security_newPassword_second">
+                <div class="body">
+                    <div class="group">
+                        <div class="field">
+                            {{ form_label(form.actualPassword) }}
+                            {{ form_widget(form.actualPassword) }}
+                            <img src="{{ asset('img/svg/eye-closed.svg') }}" class="eye" data-target="security_actualPassword">
+                        </div>
+                        <div class="field">
+                            {{ form_label(form.newPassword.first) }}
+                            {{ form_widget(form.newPassword.first) }}
+                            <img src="{{ asset('img/svg/eye-closed.svg') }}" class="eye" data-target="security_newPassword_first">
+                        </div>
+                        <div class="field">
+                            {{ form_label(form.newPassword.second) }}
+                            {{ form_widget(form.newPassword.second) }}
+                            <img src="{{ asset('img/svg/eye-closed.svg') }}" class="eye" data-target="security_newPassword_second">
+                        </div>
                     </div>
                 </div>
             </div>

@@ -61,22 +61,24 @@
         <section id="general">
             <span class="section-title">Informations générales</span>
             <div class="section-content">
-                <div class="group">
-                    <div class="field">
-                        {{ form_label(form.email) }}
-                        {{ form_widget(form.email) }}
+                <div class="body">
+                    <div class="group">
+                        <div class="field">
+                            {{ form_label(form.email) }}
+                            {{ form_widget(form.email) }}
+                        </div>
+                        <div class="field">
+                            {{ form_label(form.username) }}
+                            {{ form_widget(form.username) }}
+                        </div>
                     </div>
-                    <div class="field">
-                        {{ form_label(form.username) }}
-                        {{ form_widget(form.username) }}
+                    <div class="group">
+                        <div class="field">
+                            {{ form_label(form.displayName) }}
+                            {{ form_widget(form.displayName) }}
+                        </div>
+                        <small>Si "Nom d'affichage" est laissé vide, "Nom d'affichage" prendra la valeur de "Nom d'utilisateur"</small>
                     </div>
-                </div>
-                <div class="group">
-                    <div class="field">
-                        {{ form_label(form.displayName) }}
-                        {{ form_widget(form.displayName) }}
-                    </div>
-                    <small>Si "Nom d'affichage" est laissé vide, "Nom d'affichage" prendra la valeur de "Nom d'utilisateur"</small>
                 </div>
             </div>
         </section>
