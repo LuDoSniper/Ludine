@@ -11,6 +11,6 @@ class GeneralController extends AbstractController
     #[Route('/settings/general', name: 'settings_general')]
     public function index(): Response
     {
-        return $this->redirectToRoute('settings_general_shares');
+        return $this->redirectToRoute('settings_general_share');
     }
 }

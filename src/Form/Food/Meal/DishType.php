@@ -59,7 +59,7 @@ class DishType extends AbstractType
                 'choice_attr' => function (Tag $tag) {
                     return [
                         'data-id' => $tag->getId(),
-                        'data-url' => '/food/meal/tags/get/' . $tag->getId(),
+                        'data-url' => '/food/meal/tag/get/' . $tag->getId(),
                         'data-external_id' => 'food_meal_tags',
                         'data-color' => $tag->getColor(),
                     ];

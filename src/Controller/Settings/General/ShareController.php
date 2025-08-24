@@ -22,7 +22,7 @@ class ShareController extends AbstractController
         private readonly EntityService $entityService,
     ){}
 
-    #[Route('/settings/general/shares', 'settings_general_shares')]
+    #[Route('/settings/general/share', 'settings_general_share')]
     public function shares(): Response
     {
         $shares = $this->entityManager->getRepository(Share::class)->findBy(['owner' => $this->getUser()]);
@@ -52,7 +52,7 @@ class ShareController extends AbstractController
             $this->entityManager->persist($share);
             $this->entityManager->flush();
 
-            return $this->redirectToRoute('settings_general_shares');
+            return $this->redirectToRoute('settings_general_share');
         }
 
         return $this->render('Page/Settings/General/share-create.html.twig', [
@@ -76,7 +76,7 @@ class ShareController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->flush();
 
-            return $this->redirectToRoute('settings_general_shares');
+            return $this->redirectToRoute('settings_general_share');
         }
 
         return $this->render('Page/Settings/General/share-create.html.twig', [
@@ -91,16 +91,16 @@ class ShareController extends AbstractController
     ): Response
     {
         if (!$share) {
-            return $this->redirectToRoute('settings_general_shares');
+            return $this->redirectToRoute('settings_general_share');
         }
 
         $this->entityManager->remove($share);
         $this->entityManager->flush();
 
-        return $this->redirectToRoute('settings_general_shares');
+        return $this->redirectToRoute('settings_general_share');
     }
 
-    #[Route('/settings/general/shares/save', 'settings_general_shares_save', methods: ['POST'])]
+    #[Route('/settings/general/share/save', 'settings_general_share_save', methods: ['POST'])]
     public function save(
         Request $request
     ): JSONResponse

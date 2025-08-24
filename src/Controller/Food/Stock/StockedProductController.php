@@ -21,7 +21,7 @@ class StockedProductController extends AbstractController
         private readonly EntityService $entityService,
     ){}
 
-    #[Route('/food/stock/stocked-products', name: 'food_stock_stocked_products')]
+    #[Route('/food/stock/stocked-product', name: 'food_stock_stocked_product')]
     public function stockedProducts(): Response
     {
         $stockedProducts = $this->entityService->getEntityRecords($this->getUser(), StockedProduct::class);
@@ -50,7 +50,7 @@ class StockedProductController extends AbstractController
             $this->entityManager->persist($stockedProduct);
             $this->entityManager->flush();
 
-            return $this->redirectToRoute('food_stock_stocked_products');
+            return $this->redirectToRoute('food_stock_stocked_product');
         }
 
         return $this->render('Page/Food/Stock/stocked-products-create.html.twig', [
@@ -75,7 +75,7 @@ class StockedProductController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->flush();
 
-            return $this->redirectToRoute('food_stock_stocked_products');
+            return $this->redirectToRoute('food_stock_stocked_product');
         }
 
         return $this->render('Page/Food/Stock/stocked-products-create.html.twig', [
@@ -90,16 +90,16 @@ class StockedProductController extends AbstractController
     ): Response
     {
         if (!$stockedProduct) {
-            return $this->redirectToRoute('food_stock_stocked_products');
+            return $this->redirectToRoute('food_stock_stocked_product');
         }
 
         $this->entityManager->remove($stockedProduct);
         $this->entityManager->flush();
 
-        return $this->redirectToRoute('food_stock_stocked_products');
+        return $this->redirectToRoute('food_stock_stocked_product');
     }
 
-    #[Route('/food/stock/stocked-products/save', 'food_stock_stocked_products_save', methods: ['POST'])]
+    #[Route('/food/stock/stocked-product/save', 'food_stock_stocked_product_save', methods: ['POST'])]
     public function save(
         Request $request
     ): JSONResponse
@@ -223,7 +223,7 @@ class StockedProductController extends AbstractController
         ], Response::HTTP_OK);
     }
 
-    #[Route('/food/stock/stocked-products/get_meta', 'food_stock_stocked_products_get_meta')]
+    #[Route('/food/stock/stocked-product/get_meta', 'food_stock_stocked_product_get_meta')]
     public function getMeta(): JsonResponse
     {
         return new JsonResponse([
@@ -263,7 +263,7 @@ class StockedProductController extends AbstractController
                     "name" => "container",
                     "type" => "relational",
                     "string" => "Conteneur",
-                    'get_meta' => '/food/stock/containers/get_meta',
+                    'get_meta' => '/food/stock/container/get_meta',
                     'sequence' => 2
                 ],
                 [

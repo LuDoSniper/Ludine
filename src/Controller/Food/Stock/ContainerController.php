@@ -19,7 +19,7 @@ class ContainerController extends AbstractController
         private readonly EntityService $entityService
     ){}
 
-    #[Route('/food/stock/containers', 'food_stock_containers')]
+    #[Route('/food/stock/container', 'food_stock_container')]
     public function containers(): Response
     {
         $containers = $this->entityService->getEntityRecords($this->getUser(), Container::class, 'name');
@@ -44,7 +44,7 @@ class ContainerController extends AbstractController
             $this->entityManager->persist($container);
             $this->entityManager->flush();
 
-            return $this->redirectToRoute('food_stock_containers');
+            return $this->redirectToRoute('food_stock_container');
         }
 
         return $this->render('Page/Food/Stock/container-create.html.twig', [
@@ -65,7 +65,7 @@ class ContainerController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->flush();
 
-            return $this->redirectToRoute('food_stock_containers');
+            return $this->redirectToRoute('food_stock_container');
         }
 
         return $this->render('Page/Food/Stock/container-create.html.twig', [
@@ -82,16 +82,16 @@ class ContainerController extends AbstractController
     ): Response
     {
         if (!$container) {
-            return $this->redirectToRoute('food_stock_containers');
+            return $this->redirectToRoute('food_stock_container');
         }
 
         $this->entityManager->remove($container);
         $this->entityManager->flush();
 
-        return $this->redirectToRoute('food_stock_containers');
+        return $this->redirectToRoute('food_stock_container');
     }
 
-    #[Route('/food/stock/containers/save', 'food_stock_containers_save', methods: ['POST'])]
+    #[Route('/food/stock/container/save', 'food_stock_container_save', methods: ['POST'])]
     public function save(
         Request $request
     ): JSONResponse
@@ -158,7 +158,7 @@ class ContainerController extends AbstractController
         ]]);
     }
 
-    #[Route('/food/stock/containers/get/{id}', 'food_stock_containers_get')]
+    #[Route('/food/stock/container/get/{id}', 'food_stock_container_get')]
     public function getData(
         Container $container
     ): JsonResponse {
@@ -173,7 +173,7 @@ class ContainerController extends AbstractController
         ], Response::HTTP_OK);
     }
 
-    #[Route('/food/stock/containers/floors/get/{id}/{floorID}', 'food_stock_containers_floors_get')]
+    #[Route('/food/stock/container/floors/get/{id}/{floorID}', 'food_stock_container_floors_get')]
     public function getFloorData(
         Container $container,
         int $floorID

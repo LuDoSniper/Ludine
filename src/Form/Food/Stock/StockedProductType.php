@@ -61,7 +61,7 @@ class StockedProductType extends AbstractType
                 'choice_attr' => function(Product $product) {
                     return [
                         'data-id' => $product->getId(),
-                        'data-url' => '/food/stock/products/get/' . $product->getId(),
+                        'data-url' => '/food/stock/product/get/' . $product->getId(),
                         'data-external_id' => 'food_stock_product',
                     ];
                 },
@@ -92,7 +92,7 @@ class StockedProductType extends AbstractType
                 'choice_attr' => function(Container $container) {
                     return [
                         'data-id' => $container->getId(),
-                        'data-url' => '/food/stock/containers/get/' . $container->getId(),
+                        'data-url' => '/food/stock/container/get/' . $container->getId(),
                         'data-external_id' => 'food_stock_container',
                     ];
                 },

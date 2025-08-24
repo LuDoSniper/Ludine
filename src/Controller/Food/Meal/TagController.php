@@ -18,7 +18,7 @@ class TagController extends AbstractController
         private readonly EntityService $entityService
     ){}
 
-    #[Route('/food/meal/tags', 'food_meal_tags')]
+    #[Route('/food/meal/tag', 'food_meal_tag')]
     public function tags(): Response
     {
         $tags = $this->entityService->getEntityRecords($this->getUser(), Tag::class, 'name');
@@ -36,10 +36,10 @@ class TagController extends AbstractController
         $this->entityManager->remove($tag);
         $this->entityManager->flush();
 
-        return $this->redirectToRoute('food_meal_tags');
+        return $this->redirectToRoute('food_meal_tag');
     }
 
-    #[Route('/food/meal/tags/save', 'food_meal_tags_save', methods: ['POST'])]
+    #[Route('/food/meal/tag/save', 'food_meal_tag_save', methods: ['POST'])]
     public function save(
         Request $request
     ): JsonResponse
