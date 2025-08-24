@@ -117,7 +117,7 @@ class ShareController extends AbstractController
         if (empty($data['name'])) {
             $missing_fields[] = 'name';
         }
-        if (empty($data['entities'])) {
+        if (!isset($data['entities']) || $data['entities'] === "") {
             $missing_fields[] = 'entities';
         }
         if (empty($data['members'])) {

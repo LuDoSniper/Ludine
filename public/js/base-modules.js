@@ -791,13 +791,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                         })
 
                         LudineApp.context.id = data[LudineApp.context.model].id;
+
+                        if (editableForms.length === 0) {
+                            let newUrl = new URL(window.location.href);
+                            let tmpUrl = newUrl.toString();
+                            if (tmpUrl.includes('create') && LudineApp.context.id !== 'new') {
+                                tmpUrl = tmpUrl.replace('create', `update/${LudineApp.context.id}`);
+                                newUrl = new URL(tmpUrl);
+                            }
+                            newUrl.search = '';
+                            window.location.href = newUrl.toString();
+                        }
                     }
                 })
                 .catch(err => console.log(err));
             }
 
             // Save les editables
-            if (editableForms) {
+            if (editableForms.length !== 0) {
                 editableForms.forEach(form => {
                     const save_path = form.dataset.save_path ? form.dataset.save_path : LudineApp.context.save_path;
                     const fields = form.dataset.fields ? JSON.parse(form.dataset.fields) : LudineApp.context.fields;
@@ -855,7 +866,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 let newUrl = new URL(window.location.href);
                                 let tmpUrl = newUrl.toString();
                                 if (tmpUrl.includes('create') && LudineApp.context.id !== 'new') {
-                                    tmpUrl.replace('create', `update/${LudineApp.context.id}`);
+                                    tmpUrl = tmpUrl.replace('create', `update/${LudineApp.context.id}`);
                                     newUrl = new URL(tmpUrl);
                                 }
                                 newUrl.search = '';
