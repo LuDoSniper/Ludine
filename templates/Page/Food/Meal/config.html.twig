@@ -127,13 +127,15 @@
             <section id="dish">
                 <span class="section-title">Repas</span>
                 <div class="section-content">
-                    <div class="group">
-                        <div class="field">
-                            {{ form_label(form.maxDifficulty) }}
-                            {{ form_widget(form.maxDifficulty) }}
+                    <div class="body">
+                        <div class="group">
+                            <div class="field">
+                                {{ form_label(form.maxDifficulty) }}
+                                {{ form_widget(form.maxDifficulty) }}
+                            </div>
                         </div>
+                        <div class="group"></div>
                     </div>
-                    <div class="group"></div>
                 </div>
             </section>
         {{ form_end(form) }}
