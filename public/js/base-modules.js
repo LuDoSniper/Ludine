@@ -740,7 +740,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     ));
     let saveBtn = document.getElementById('save');
     if (saveBtn) {
-        saveBtn.addEventListener('click', (e) => {
+        saveBtn.addEventListener('click', async (e) => {
             e.preventDefault();
 
             if (form) {
@@ -769,28 +769,30 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
 
                 console.log('save :', data)
-                fetch(LudineApp.context.save_path, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                }).then(res => res.json())
-                .then(data => {
-                    if (data.missing_fields) {
-                        data.missing_fields.forEach((field) => {
+                try {
+                    const r = await fetch(LudineApp.context.save_path, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    const responseData = await r.json()
+
+                    if (responseData.missing_fields) {
+                        responseData.missing_fields.forEach((field) => {
                             const formattedFieldName = `${LudineApp.context.model}_${field}`;
                             form[formattedFieldName].classList.add('invalid');
                         })
                     }
-                    if (data[LudineApp.context.model]) {
+                    if (responseData[LudineApp.context.model]) {
                         setFormModified(false);
                         let invalids = document.querySelectorAll('.invalid');
                         invalids.forEach(invalid => {
                             invalid.classList.remove('invalid');
                         })
 
-                        LudineApp.context.id = data[LudineApp.context.model].id;
+                        LudineApp.context.id = responseData[LudineApp.context.model].id;
 
                         if (editableForms.length === 0) {
                             let newUrl = new URL(window.location.href);
@@ -803,13 +805,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                             window.location.href = newUrl.toString();
                         }
                     }
-                })
-                .catch(err => console.log(err));
+                } catch (e) {
+                    console.log('Erreur save', e);
+                }
             }
 
             // Save les editables
             if (editableForms.length !== 0) {
-                editableForms.forEach(form => {
+                for (const form of editableForms) {
                     const save_path = form.dataset.save_path ? form.dataset.save_path : LudineApp.context.save_path;
                     const fields = form.dataset.fields ? JSON.parse(form.dataset.fields) : LudineApp.context.fields;
                     const model = form.dataset.model ? form.dataset.model : LudineApp.context.model;
@@ -830,51 +833,49 @@ document.addEventListener('DOMContentLoaded', async () => {
                     })
 
                     console.log('save :', data)
-                    fetch(save_path, {
+                    const r = await fetch(save_path, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify(data)
-                    }).then(res => res.json())
-                        .then(data => {
-                            if (data.missing_fields) {
-                                data.missing_fields.forEach((field) => {
-                                    const formattedFieldName = `${model}_${field}`;
-                                    form[formattedFieldName].classList.add('invalid');
-                                })
+                    })
+                    const resonseData = await r.json()
+                    if (resonseData.missing_fields) {
+                        resonseData.missing_fields.forEach((field) => {
+                            const formattedFieldName = `${model}_${field}`;
+                            form[formattedFieldName].classList.add('invalid');
+                        })
+                    } else {
+                        const target = document.getElementById(LudineApp.context.params.target);
+                        const tr = target.querySelector(`tr[data-id="${LudineApp.context.params.editable}"]`);
+                        tr.dataset.id = resonseData[model].id;
+                        tr.querySelectorAll('td').forEach(field => {
+                            if (field.querySelectorAll('div.pickr').length > 0) {
+                                field.dataset.widget = 'color'
+                            }
+                            if (field.dataset.type === 'relational') {
+                                let values = [];
+                                Array.from(field.querySelector('select').selectedOptions).forEach((option) => {
+                                    values.push(option.textContent)
+                                });
+                                field.textContent = values.join(', ')
                             } else {
-                                const target = document.getElementById(LudineApp.context.params.target);
-                                const tr = target.querySelector(`tr[data-id="${LudineApp.context.params.editable}"]`);
-                                tr.dataset.id = data[model].id;
-                                tr.querySelectorAll('td').forEach(field => {
-                                    if (field.querySelectorAll('div.pickr').length > 0) {
-                                        field.dataset.widget = 'color'
-                                    }
-                                    if (field.dataset.type === 'relational') {
-                                        let values = [];
-                                        Array.from(field.querySelector('select').selectedOptions).forEach((option) => {
-                                            values.push(option.textContent)
-                                        });
-                                        field.textContent = values.join(', ')
-                                    } else {
-                                        field.textContent = field.querySelector('input').value;
-                                    }
-                                })
-                                updateColorFields()
-
-                                let newUrl = new URL(window.location.href);
-                                let tmpUrl = newUrl.toString();
-                                if (tmpUrl.includes('create') && LudineApp.context.id !== 'new') {
-                                    tmpUrl = tmpUrl.replace('create', `update/${LudineApp.context.id}`);
-                                    newUrl = new URL(tmpUrl);
-                                }
-                                newUrl.search = '';
-                                window.location.href = newUrl.toString();
+                                field.textContent = field.querySelector('input').value;
                             }
                         })
-                        .catch(err => console.log(err));
-                })
+                        updateColorFields()
+
+                        let newUrl = new URL(window.location.href);
+                        let tmpUrl = newUrl.toString();
+                        if (tmpUrl.includes('create') && LudineApp.context.id !== 'new') {
+                            tmpUrl = tmpUrl.replace('create', `update/${LudineApp.context.id}`);
+                            newUrl = new URL(tmpUrl);
+                        }
+                        newUrl.search = '';
+                        window.location.href = newUrl.toString();
+                    }
+                }
             }
         })
     }

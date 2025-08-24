@@ -15,7 +15,7 @@
     {% endif %}
     {{ {
         "id": id,
-        "save_path": path('food_meal_dishes_save'),
+        "save_path": path('food_meal_dish_save'),
         "model": "dish",
         "fields": [
             {"name": "name", "type": "char"},
@@ -53,11 +53,11 @@
                 },
                 'Plats': {
                     selected: true,
-                    url: path('food_meal_dishes')
+                    url: path('food_meal_dish')
                 },
                 'Tags': {
                     selected: false,
-                    url: path('food_meal_tags')
+                    url: path('food_meal_tag')
                 },
                 'Configuration': {
                     selected: false,
@@ -73,7 +73,7 @@
                 {% include 'Widget/button.html.twig' with {
                     'btn': {
                         'name': 'Nouveau',
-                        'url': path('food_meal_dishes_create'),
+                        'url': path('food_meal_dish_create'),
                         'type': 'primary',
                         'action_type': 'redirect'
                     }

@@ -7,7 +7,7 @@
 
 {% block context %}
     {{ {
-        "save_path": path('food_stock_containers_save'),
+        "save_path": path('food_stock_container_save'),
         "model": "container",
         "fields": [
             {"name": "name", "type": "char"},
@@ -36,15 +36,15 @@
             h3: {
                 'Conteneurs': {
                     selected: true,
-                    url: path('food_stock_containers')
+                    url: path('food_stock_container')
                 },
                 'Produits': {
                     selected: false,
-                    url: path('food_stock_products')
+                    url: path('food_stock_product')
                 },
                 'Produits stockés': {
                     selected: false,
-                    url: path('food_stock_stocked_products')
+                    url: path('food_stock_stocked_product')
                 }
             }
         }

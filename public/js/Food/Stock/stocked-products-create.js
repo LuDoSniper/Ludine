@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (floor.selectedOptions.length > 0) {
             const floor_context = JSON.parse(floor.selectedOptions[0].dataset.customProperties);
 
-            console.log('/food/stock/containers/floors/get/' + container.dataset.id + '/' + floor_context.id);
-            fetch('/food/stock/containers/floors/get/' + container.dataset.id + '/' + floor_context.id, {})
+            console.log('/food/stock/container/floors/get/' + container.dataset.id + '/' + floor_context.id);
+            fetch('/food/stock/container/floors/get/' + container.dataset.id + '/' + floor_context.id, {})
                 .then(res => res.json())
                 .then(data => {
                     location.max = data.locations.toString();

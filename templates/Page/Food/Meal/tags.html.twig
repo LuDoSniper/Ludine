@@ -7,7 +7,7 @@
 
 {% block context %}
     {{ {
-        "save_path": path('food_meal_tags_save'),
+        "save_path": path('food_meal_tag_save'),
         "model": "tag",
         "fields": [
             {"name": "name", "type": "char"},
@@ -38,11 +38,11 @@
                 },
                 'Plats': {
                     selected: false,
-                    url: path('food_meal_dishes')
+                    url: path('food_meal_dish')
                 },
                 'Tags': {
                     selected: true,
-                    url: path('food_meal_tags')
+                    url: path('food_meal_tag')
                 },
                 'Configuration': {
                     selected: false,
@@ -58,7 +58,7 @@
                 {% include 'Widget/button.html.twig' with {
                     'btn': {
                         'name': 'Nouveau',
-                        'url': path('food_meal_tags', {'target': 'tag', 'editable': 'new'}),
+                        'url': path('food_meal_tag', {'target': 'tag', 'editable': 'new'}),
                         'type': 'primary',
                         'action_type': 'redirect'
                     }
@@ -99,7 +99,7 @@
                     <tbody>
                         {% for tag in tags %}
                             <tr data-id="{{ tag.id }}">
-                                <input type="hidden" name="url" value="{{ path('food_stock_products_update', {id: tag.id}) }}">
+                                <input type="hidden" name="url" value="{{ path('food_stock_product_update', {id: tag.id}) }}">
                                 <td data-type="text" data-name="name">{{ tag.name }}</td>
                                 <td data-type="text" data-name="description">{{ tag.description }}</td>
                                 <td data-type="text" data-name="color" class="text-center" data-widget="color">{{ tag.color }}</td>

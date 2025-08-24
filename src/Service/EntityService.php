@@ -67,17 +67,17 @@ class EntityService
             ],
             'dish' => [
                 'class' => Dish::class,
-                'save_path' => '/food/meal/dishes/save',
-                'get_path' => '/food/meal/dishes/get',
-                'get_meta_path' => '/food/meal/dishes/get_meta',
+                'save_path' => '/food/meal/dish/save',
+                'get_path' => '/food/meal/dish/get',
+                'get_meta_path' => '/food/meal/dish/get_meta',
                 'module' => 'food',
                 'internal_id' => 5
             ],
             'ingredient' => [
                 'class' => Ingredient::class,
-                'save_path' => '/food/meal/ingredients/save',
-                'get_path' => '/food/meal/ingredients/get',
-                'get_meta_path' => '/food/meal/ingredients/get_meta',
+                'save_path' => '/food/meal/ingredient/save',
+                'get_path' => '/food/meal/ingredient/get',
+                'get_meta_path' => '/food/meal/ingredient/get_meta',
                 'module' => 'food',
                 'internal_id' => 6
             ],
@@ -107,9 +107,9 @@ class EntityService
             ],
             'share' => [
                 'class' => Share::class,
-                'save_path' => '/settings/general/shares/save',
-                'get_path' => '/settings/general/shares/get',
-                'get_meta_path' => '/settings/general/shares/get_meta',
+                'save_path' => '/settings/general/share/save',
+                'get_path' => '/settings/general/share/get',
+                'get_meta_path' => '/settings/general/share/get_meta',
                 'module' => 'settings',
                 'internal_id' => 10
             ]

@@ -11,6 +11,6 @@ class MealController extends AbstractController
     #[Route('/food/meal', 'food_meal')]
     public function index(): Response
     {
-        return $this->redirectToRoute('food_meal_tags');
+        return $this->redirectToRoute('food_meal_tag');
     }
 }

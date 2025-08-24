@@ -24,8 +24,8 @@ class DishController extends AbstractController
         private readonly ConfigService $configService
     ){}
 
-    #[Route('/food/meal/dishes', 'food_meal_dishes')]
-    public function dishes(): Response
+    #[Route('/food/meal/dish', 'food_meal_dish')]
+    public function dish(): Response
     {
         $dishes = $this->entityService->getEntityRecords($this->getUser(), Dish::class, 'name');
 
@@ -34,7 +34,7 @@ class DishController extends AbstractController
         ]);
     }
 
-    #[Route('/food/meal/dishes/create', 'food_meal_dishes_create')]
+    #[Route('/food/meal/dish/create', 'food_meal_dish_create')]
     public function create(
         Request $request
     ): Response
@@ -81,7 +81,7 @@ class DishController extends AbstractController
             $this->entityManager->persist($dish);
             $this->entityManager->flush();
 
-            return $this->redirectToRoute('food_meal_dishes');
+            return $this->redirectToRoute('food_meal_dish');
         }
 
         return $this->render('Page/Food/Meal/dish-create.html.twig', [
@@ -100,8 +100,8 @@ class DishController extends AbstractController
                             'name' => 'product',
                             'type' => 'relational',
                             'string' => 'Produit',
-                            'get_meta' => '/food/stock/products/get_meta',
-                            'get_path' => '/food/stock/products/get',
+                            'get_meta' => '/food/stock/product/get_meta',
+                            'get_path' => '/food/stock/product/get',
                             'sequence' => 1,
                             'display' => [
                                 'name',
@@ -110,8 +110,8 @@ class DishController extends AbstractController
                         ],
                     ],
                     'model' => 'ingredient',
-                    'save_path' => '/food/meal/ingredients/save',
-                    'get_path' => '/food/meal/ingredients/get',
+                    'save_path' => '/food/meal/ingredient/save',
+                    'get_path' => '/food/meal/ingredient/get',
                 ]
             ],
         ]);
@@ -123,13 +123,13 @@ class DishController extends AbstractController
     ): Response
     {
         if (!$dish) {
-            return $this->redirectToRoute('food_meal_dishes');
+            return $this->redirectToRoute('food_meal_dish');
         }
 
         $this->entityManager->remove($dish);
         $this->entityManager->flush();
 
-        return $this->redirectToRoute('food_meal_dishes');
+        return $this->redirectToRoute('food_meal_dish');
     }
 
     #[Route('/food/meal/dish/update/{id}', 'food_meal_dish_update')]
@@ -177,7 +177,7 @@ class DishController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->flush();
 
-            return $this->redirectToRoute('food_meal_dishes');
+            return $this->redirectToRoute('food_meal_dish');
         }
 
         return $this->render('Page/Food/Meal/dish-create.html.twig', [
@@ -196,8 +196,8 @@ class DishController extends AbstractController
                             'name' => 'product',
                             'type' => 'relational',
                             'string' => 'Produit',
-                            'get_meta' => '/food/stock/products/get_meta',
-                            'get_path' => '/food/stock/products/get',
+                            'get_meta' => '/food/stock/product/get_meta',
+                            'get_path' => '/food/stock/product/get',
                             'sequence' => 1,
                             'display' => [
                                 'name',
@@ -206,14 +206,14 @@ class DishController extends AbstractController
                         ],
                     ],
                     'model' => 'ingredient',
-                    'save_path' => '/food/meal/ingredients/save',
-                    'get_path' => '/food/meal/ingredients/get',
+                    'save_path' => '/food/meal/ingredient/save',
+                    'get_path' => '/food/meal/ingredient/get',
                 ]
             ],
         ]);
     }
 
-    #[Route('/food/meal/dishes/save', 'food_meal_dishes_save', methods: ['POST'])]
+    #[Route('/food/meal/dish/save', 'food_meal_dish_save', methods: ['POST'])]
     public function save(
         Request $request
     ): JSONResponse

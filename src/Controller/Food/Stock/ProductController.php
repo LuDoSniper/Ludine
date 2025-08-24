@@ -19,7 +19,7 @@ class ProductController extends AbstractController
         private readonly EntityService $entityService,
     ){}
 
-    #[Route('/food/stock/products', 'food_stock_products')]
+    #[Route('/food/stock/product', 'food_stock_product')]
     public function products(): Response
     {
         $products = $this->entityService->getEntityRecords($this->getUser(), Product::class, 'name');
@@ -29,7 +29,7 @@ class ProductController extends AbstractController
         ]);
     }
 
-    #[Route('/food/stock/products/create', 'food_stock_products_create')]
+    #[Route('/food/stock/product/create', 'food_stock_product_create')]
     public function create(
         Request $request
     ): Response
@@ -44,7 +44,7 @@ class ProductController extends AbstractController
             $this->entityManager->persist($product);
             $this->entityManager->flush();
 
-            return $this->redirectToRoute('food_stock_products');
+            return $this->redirectToRoute('food_stock_product');
         }
 
         return $this->render('Page/Food/Stock/products-create.html.twig', [
@@ -53,7 +53,7 @@ class ProductController extends AbstractController
         ]);
     }
 
-    #[Route('/food/stock/products/update/{id}', 'food_stock_products_update')]
+    #[Route('/food/stock/product/update/{id}', 'food_stock_product_update')]
     public function update(
         Product $product,
         Request $request
@@ -65,7 +65,7 @@ class ProductController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->flush();
 
-            return $this->redirectToRoute('food_stock_products');
+            return $this->redirectToRoute('food_stock_product');
         }
 
         return $this->render('Page/Food/Stock/products-create.html.twig', [
@@ -74,22 +74,22 @@ class ProductController extends AbstractController
         ]);
     }
 
-    #[Route('/food/stock/products/remove/{id}', 'food_stock_products_remove', defaults: ['id' => null])]
+    #[Route('/food/stock/product/remove/{id}', 'food_stock_product_remove', defaults: ['id' => null])]
     public function remove(
         ?Product $product
     ): Response
     {
         if (!$product) {
-            return $this->redirectToRoute('food_stock_products');
+            return $this->redirectToRoute('food_stock_product');
         }
 
         $this->entityManager->remove($product);
         $this->entityManager->flush();
 
-        return $this->redirectToRoute('food_stock_products');
+        return $this->redirectToRoute('food_stock_product');
     }
 
-    #[Route('/food/stock/products/save', 'food_stock_products_save', methods: ['POST'])]
+    #[Route('/food/stock/product/save', 'food_stock_product_save', methods: ['POST'])]
     public function save(
         Request $request
     ): JSONResponse
@@ -136,7 +136,7 @@ class ProductController extends AbstractController
         ]]);
     }
 
-    #[Route('/food/stock/products/get/{id}', 'food_stock_products_get', defaults: ['id' => null])]
+    #[Route('/food/stock/product/get/{id}', 'food_stock_product_get', defaults: ['id' => null])]
     public function getData(
         ?int $id = null
     ): JsonResponse {
@@ -161,7 +161,7 @@ class ProductController extends AbstractController
         return new JsonResponse($data, Response::HTTP_OK);
     }
 
-    #[Route('/food/stock/products/get_meta', 'food_stock_products_get_meta')]
+    #[Route('/food/stock/product/get_meta', 'food_stock_product_get_meta')]
     public function getMeta(): JsonResponse
     {
         return new JsonResponse([
@@ -180,7 +180,7 @@ class ProductController extends AbstractController
                 ]
             ],
             "model" => "product",
-            "save_path" => '/food/stock/products/save'
+            "save_path" => '/food/stock/product/save'
         ], Response::HTTP_OK);
     }
 }

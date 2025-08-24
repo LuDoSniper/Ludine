@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     saveBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        fetch('/food/stock/products/save', {
+        fetch('/food/stock/product/save', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

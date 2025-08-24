@@ -21,7 +21,7 @@ class IngredientController extends AbstractController
         private readonly EntityService $entityService,
     ){}
 
-    #[Route('/food/meal/ingredients/remove/{id}', 'food_meal_ingredient_remove')]
+    #[Route('/food/meal/ingredient/remove/{id}', 'food_meal_ingredient_remove')]
     public function remove(
         Ingredient $ingredient,
         Request $request,
@@ -31,19 +31,19 @@ class IngredientController extends AbstractController
         $this->entityManager->remove($ingredient);
         $this->entityManager->flush();
 
-        $redirect = (string) $request->query->get('redirect', 'food_meal_dishes');
+        $redirect = (string) $request->query->get('redirect', 'food_meal_dish');
         $params = $request->query->all('redirect_params') ?? [];
 
         // sécurité: s’assurer que la route existe (anti open-redirect/typo)
         if (!$router->getRouteCollection()->get($redirect)) {
-            $redirect = 'food_meal_dishes';
+            $redirect = 'food_meal_dish';
             $params = [];
         }
 
         return $this->redirectToRoute($redirect, $params);
     }
 
-    #[Route('/food/meal/ingredients/save', 'food_meal_ingredients_save')]
+    #[Route('/food/meal/ingredient/save', 'food_meal_ingredient_save')]
     public function save(
         Request $request
     ): JSONResponse
@@ -104,7 +104,7 @@ class IngredientController extends AbstractController
         ]]);
     }
 
-    #[Route('/food/meal/ingredients/get/{id}', 'food_meal_ingredient_get', defaults: ['id' => null])]
+    #[Route('/food/meal/ingredient/get/{id}', 'food_meal_ingredient_get', defaults: ['id' => null])]
     public function get(
         string | int | null $id,
     ): JSONResponse
@@ -132,7 +132,7 @@ class IngredientController extends AbstractController
         return new JsonResponse($data, Response::HTTP_OK);
     }
 
-    #[Route('/food/meal/ingredients/get_meta', 'food_meal_ingredients_get_meta')]
+    #[Route('/food/meal/ingredient/get_meta', 'food_meal_ingredient_get_meta')]
     public function getMeta(): JsonResponse
     {
         return new JsonResponse([
@@ -141,7 +141,7 @@ class IngredientController extends AbstractController
                     "name" => "product",
                     "type" => "relational",
                     "string" => "Produit",
-                    'get_meta' => '/food/stock/products/get_meta',
+                    'get_meta' => '/food/stock/product/get_meta',
                     'sequence' => 1
                 ],
                 [
@@ -158,7 +158,7 @@ class IngredientController extends AbstractController
                 ],
             ],
             "model" => "ingredients",
-            "save_path" => '/food/meal/ingredients/save'
+            "save_path" => '/food/meal/ingredient/save'
         ], Response::HTTP_OK);
     }
 }
