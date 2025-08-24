@@ -66,14 +66,16 @@
                     }
                 } %}
 
-                {% include 'Widget/button.html.twig' with {
-                    'btn': {
-                        'name': 'Envoyer validation',
-                        'url': path('settings_general_share_send_validation', {'id': id}),
-                        'type': 'secondary',
-                        'action_type': 'redirect'
-                    }
-                } %}
+                {% if id != 'new' %}
+                    {% include 'Widget/button.html.twig' with {
+                        'btn': {
+                            'name': 'Envoyer validation',
+                            'url': path('settings_general_share_send_validation', {'id': id}),
+                            'type': 'secondary',
+                            'action_type': 'redirect'
+                        }
+                    } %}
+                {% endif %}
 
                 {% include 'Widget/button.html.twig' with {'btn': {'action_type': 'save'}} %}
             </div>
