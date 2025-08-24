@@ -84,18 +84,17 @@ class AuthenticationController extends AbstractController
         UserPasswordHasherInterface $hasher
     ): Response
     {
-        /** @var OAuthUser $oauthUser */
-        $oauthUser = $this->getUser();
-        if (!$oauthUser) {
-            throw new NotFoundHttpException();
+        $email = $request->getSession()->get('google_pending_email');
+        if (!$email) {
+            // accès direct / session perdue => retour login
+            return $this->redirectToRoute('app_login');
         }
 
         $user = new User();
-        $user
-            ->setEmail($oauthUser->getUserIdentifier())
-            ->setUsername($oauthUser->getUserIdentifier())
-            ->setPassword("")
-            ->setIsVerified(true);
+        $user->setEmail($email)
+            ->setUsername($email)
+            ->setPassword('')
+            ->setIsVerified(true)
         ;
 
         $form = $this->createForm(RegisterGoogleType::class);
