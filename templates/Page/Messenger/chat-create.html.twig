@@ -44,7 +44,17 @@
                             </div>
 
                             <div class="infos">
-                                <span>{{ chat.name }}</span>
+                                {% set chat_name = chat.name %}
+                                {% if chat.mP %}
+                                    {% if chat.owner.id == user.id %}
+                                        {% set chat_name = chat_name ? chat_name : chat.firstMemberName %}
+                                    {% else %}
+                                        {% set chat_name = chat.ownerName %}
+                                    {% endif %}
+                                {% else %}
+                                    {% set chat_name = chat_name ? chat_name : chat.firstMemberName %}
+                                {% endif %}
+                                <span>{{ chat_name }}</span>
                                 <span>{{ chat.lastMessageContent }}</span>
                             </div>
                         </div>

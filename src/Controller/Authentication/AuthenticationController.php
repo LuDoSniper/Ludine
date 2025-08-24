@@ -15,6 +15,7 @@ use App\Service\TokenService;
 use Doctrine\ORM\EntityManagerInterface;
 use KnpU\OAuth2ClientBundle\Security\User\OAuthUser;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -25,7 +26,8 @@ class AuthenticationController extends AbstractController
 {
     public function __construct(
         public EntityManagerInterface $entityManager,
-        public AppConfig $appConfig
+        public AppConfig $appConfig,
+        public Security $security,
     ){}
 
     #[Route('/login', 'app_login')]
@@ -101,10 +103,18 @@ class AuthenticationController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $user->setUsername($form->get('username')->getData());
-            $password = $form->get('password')->getData();
-            $user->setPassword($hasher->hashPassword($user, $password));
+            $user->setPassword($hasher->hashPassword($user, $form->get('password')->getData()));
+
             $this->entityManager->persist($user);
             $this->entityManager->flush();
+
+            $request->getSession()->migrate(true);
+
+            $this->security->login(
+                $user,
+                authenticatorName: 'security.authenticator.form_login.main',
+                firewallName: 'main',
+            );
 
             return $this->redirectToRoute('app_home');
         }
