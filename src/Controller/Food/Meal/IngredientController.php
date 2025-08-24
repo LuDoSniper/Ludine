@@ -104,10 +104,18 @@ class IngredientController extends AbstractController
         ]]);
     }
 
-    #[Route('/food/meal/ingredients/get', 'food_meal_ingredient_get')]
-    public function get(): JSONResponse
+    #[Route('/food/meal/ingredients/get/{id}', 'food_meal_ingredient_get', defaults: ['id' => null])]
+    public function get(
+        string | int | null $id,
+    ): JSONResponse
     {
-        $ingredients = $this->entityService->getEntityRecords($this->getUser(), Ingredient::class);
+        if ($id === null || $id === 'new') return new JsonResponse(["data" => []], Response::HTTP_OK);
+
+        $dish = $this->entityManager->getRepository(Dish::class)->find($id);
+        if (!$dish) return new JsonResponse(["data" => []], Response::HTTP_OK);
+
+//        $ingredients = $this->entityService->getEntityRecords($this->getUser(), Ingredient::class);
+        $ingredients = $dish->getIngredients();
 
         $data = ["data" => []];
         foreach ($ingredients as $ingredient) {

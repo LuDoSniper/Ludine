@@ -520,14 +520,32 @@ small {
 }
 
 #content.config div.section-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: var(--medium);
+}
+
+#content.config div.section-content .header {
+    width: 100%;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: var(--medium);
+    padding: 0 var(--medium);
+}
+
+#content.config div.section-content .body {
     padding: 0 var(--large);
     display: flex;
     gap: var(--medium);
     flex-wrap: wrap;
+    width: 100%;
 }
 
 @media (min-width: 1200px) {
-    #content.config div.section-content {
+    #content.config div.section-content .body {
         flex-wrap: nowrap;
     }
 }
@@ -634,7 +652,10 @@ input[type=checkbox]:checked {
 #table-container { overflow: auto; }
 
 /* quand un dropdown Choices est ouvert : on ne clippe plus */
-#table-container.dropdown-open { overflow: visible; }
+#table-container.dropdown-open,
+.dropdown-open form {
+    overflow: visible;
+}
 
 /* s'assurer que le menu passe au-dessus du thead sticky / autres couches */
 .choices__list--dropdown { z-index: 1000; }

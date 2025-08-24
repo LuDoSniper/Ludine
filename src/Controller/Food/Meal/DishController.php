@@ -40,6 +40,27 @@ class DishController extends AbstractController
     ): Response
     {
         $dish = new Dish();
+        if ($request->request->has('name')) {
+            $dish->setName($request->get('name'));
+        }
+        if ($request->request->has('description')) {
+            $dish->setDescription($request->get('description'));
+        }
+        if ($request->request->has('preparationTime')) {
+            $dish->setPreparationTime((int) $request->get('preparationTime'));
+        }
+        if ($request->request->has('cookingTime')) {
+            $dish->setCookingTime((int) $request->get('cookingTime'));
+        }
+        if ($request->request->has('difficulty')) {
+            $dish->setDifficulty((int) $request->get('difficulty'));
+        }
+        if ($request->request->has('instructions')) {
+            $dish->setInstructions($request->get('instructions'));
+        }
+        if ($request->request->has('dropRate')) {
+            $dish->setDropRate((float) $request->get('dropRate'));
+        }
         $dish->setOwner($this->getUser());
 
         $config = $this->entityService->getEntityRecords($this->getUser(), Config::class);
@@ -117,6 +138,28 @@ class DishController extends AbstractController
         Request $request
     ): Response
     {
+        if ($request->request->has('name')) {
+            $dish->setName($request->get('name'));
+        }
+        if ($request->request->has('description')) {
+            $dish->setDescription($request->get('description'));
+        }
+        if ($request->request->has('preparationTime')) {
+            $dish->setPreparationTime($request->get('preparationTime'));
+        }
+        if ($request->request->has('cookingTime')) {
+            $dish->setCookingTime($request->get('cookingTime'));
+        }
+        if ($request->request->has('difficulty')) {
+            $dish->setDifficulty($request->get('difficulty'));
+        }
+        if ($request->request->has('instructions')) {
+            $dish->setInstructions($request->get('instructions'));
+        }
+        if ($request->request->has('dropRate')) {
+            $dish->setDropRate((float) $request->get('dropRate'));
+        }
+
         $config = $this->entityService->getEntityRecords($this->getUser(), Config::class);
         if (count($config) >= 1) {
             $config = $config[0];
@@ -234,7 +277,7 @@ class DishController extends AbstractController
             }
         }
         $dish->setTags(new ArrayCollection($tags));
-        if ($data['ingredients']) {
+        if (isset($data['ingredients'])) {
             $dish->setIngredients($data['ingredients']);
         }
         $dish->setDropRate($data['dropRate']);

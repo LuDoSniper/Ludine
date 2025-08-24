@@ -324,7 +324,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 thead.appendChild(theadTr);
 
                 try {
-                    let response = await fetch(treeData.get_path);
+                    const tmpId = LudineApp.context.id !== 'new' ? '/' + LudineApp.context.id : ''
+                    let response = await fetch(treeData.get_path + tmpId);
                     response = await response.json();
                     const data = response.data;
 
@@ -394,36 +395,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         textField.addEventListener('input', () => autoResize(textField));
     })
-
-    // Update page
-    // if (LudineApp.context) {
-    //     if (LudineApp.context.id !== 'new') {
-    //         if (LudineApp.context.get_path) {
-    //             let object;
-    //             fetch(LudineApp.context.get_path)
-    //                 .then(res => res.json())
-    //                 .then(data => {
-    //                     // object = data;
-    //                     // const computedFields = document.querySelectorAll('[data-computed]');
-    //                     // computedFields.forEach(field => {
-    //                     //     const fieldTarget = field.dataset.computed.split('.')[1];
-    //                     //     const modelTarget = document.querySelectorAll('[data-external_id="' + field.dataset.computed.split('.')[0] + '"');
-    //                     //
-    //                     //     if (field.target) {
-    //                     //         modelTarget.forEach(model => {
-    //                     //             if (model.dataset.id === )
-    //                     //         })
-    //                     //     }
-    //                     // })
-    //
-    //                     document.querySelectorAll('[data-computed]').forEach(field => {
-    //                         const target = field.dataset.computed.split('.')[0];
-    //                         document.querySelectorAll(`[data-external_id="${target}"]`)[0].parentElement.dispatchEvent(new Event('change'));
-    //                     });
-    //                 })
-    //         }
-    //     }
-    // }
 
     // Click on kanban card
     const kanban = document.querySelector('.kanban');
@@ -577,7 +548,53 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 LudineApp.context.params.target = table.id;
                                 LudineApp.context.params.editable = record.dataset.id;
                                 if (window.location.href !== url.toString()) {
-                                    window.location.href = url.toString();
+                                    // Save temporairement les fields rempli pour éviter toute perte
+                                    const form = Array.from(document.querySelectorAll('form')).filter(f =>
+                                        !f.querySelector('table.editable') ||          // pas de table.editable dans ce form
+                                        f.querySelector('form table.editable')         // si table.editable, le table.editable doit être dans un sous-form
+                                    )[0];
+                                    const data = {'id': LudineApp.context.id ? LudineApp.context.id : ''};
+                                    LudineApp.context.fields.forEach((field) => {
+                                        if (field.type === 'action') {
+                                            data[field.name] = LudineApp.actions[field.action] ? LudineApp.actions[field.action]() : null;
+                                        } else if (form[`${LudineApp.context.model}_${field.name}`] && form[`${LudineApp.context.model}_${field.name}`].tagName === 'SELECT' && form[`${LudineApp.context.model}_${field.name}`].multiple) {
+                                            const select = form[`${LudineApp.context.model}_${field.name}`];
+                                            let options = [];
+                                            Array.from(select.selectedOptions).forEach((option) => {
+                                                options.push(option.dataset.id ? option.dataset.id : option.value);
+                                            })
+                                            data[field.name] = options.join(',');
+                                        } else {
+                                            const formattedFieldName = `${LudineApp.context.model}_${field.name}`;
+                                            const tmp = form[formattedFieldName];
+                                            if (tmp) {
+                                                if (tmp.tagName === 'INPUT' && tmp.type === 'checkbox') {
+                                                    data[field.name] = tmp ? tmp.checked : false;
+                                                } else {
+                                                    data[field.name] = tmp ? tmp.value : null;
+                                                }
+                                            }
+                                        }
+                                    });
+
+                                    const tmpForm = document.createElement("form");
+                                    tmpForm.method = "POST";
+                                    tmpForm.action = url.toString();
+
+                                    for (const key in data) {
+                                        if (data.hasOwnProperty(key)) {
+                                            const input = document.createElement("input");
+                                            input.type = "hidden";
+                                            input.name = key;
+                                            input.value = data[key];
+                                            tmpForm.appendChild(input);
+                                        }
+                                    }
+
+                                    document.body.appendChild(tmpForm);
+                                    tmpForm.submit();
+
+                                    // window.location.href = url.toString();
                                 }
                             })
                         }
@@ -741,10 +758,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     } else {
                         const formattedFieldName = `${LudineApp.context.model}_${field.name}`;
                         const tmp = form[formattedFieldName];
-                        if (form[formattedFieldName].tagName === 'INPUT' && form[formattedFieldName].type === 'checkbox') {
-                            data[field.name] = form[formattedFieldName] ? form[formattedFieldName].checked : false;
-                        } else {
-                            data[field.name] = form[formattedFieldName] ? form[formattedFieldName].value : null;
+                        if (tmp) {
+                            if (tmp.tagName === 'INPUT' && tmp.type === 'checkbox') {
+                                data[field.name] = tmp ? tmp.checked : false;
+                            } else {
+                                data[field.name] = tmp ? tmp.value : null;
+                            }
                         }
                     }
                 });

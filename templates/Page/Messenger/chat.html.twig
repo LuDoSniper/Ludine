@@ -53,16 +53,14 @@
 
                             <div class="infos">
                                 {% set chat_name = tmp_chat.name %}
-                                {% if not chat_name %}
-                                    {% if tmp_chat.mP %}
-                                        {% if tmp_chat.owner.id == user.id %}
-                                            {% set chat_name = tmp_chat.firstMemberName %}
-                                        {% else %}
-                                            {% set chat_name = tmp_chat.ownerName %}
-                                        {% endif %}
+                                {% if tmp_chat.mP %}
+                                    {% if tmp_chat.owner.id == user.id %}
+                                        {% set chat_name = chat_name ? chat_name : tmp_chat.firstMemberName %}
                                     {% else %}
-                                        {% set chat_name = tmp_chat.firstMemberName %}
+                                        {% set chat_name = tmp_chat.ownerName %}
                                     {% endif %}
+                                {% else %}
+                                    {% set chat_name = chat_name ? chat_name : tmp_chat.firstMemberName %}
                                 {% endif %}
                                 <span>{{ chat_name }}</span>
                                 <span>{{ tmp_chat.lastMessageContent }}</span>
@@ -81,19 +79,21 @@
             <div id="chat-header">
                 <div id="chat-infos">
                     <div class="user-avatar">
-                        <img src="{{ asset('img/svg/user.svg') }}">
+                        {% set img = asset('img/svg/user.svg') %}
+                        {% if not chat.mP %}
+                            {% set img = asset('img/svg/group.svg') %}
+                        {% endif %}
+                        <img src="{{ img }}">
                     </div>
                     {% set chat_name = chat.name %}
-                    {% if not chat_name %}
-                        {% if chat.mP %}
-                            {% if chat.owner.id == user.id %}
-                                {% set chat_name = chat.firstMemberName %}
-                            {% else %}
-                                {% set chat_name = chat.ownerName %}
-                            {% endif %}
+                    {% if chat.mP %}
+                        {% if chat.owner.id == user.id %}
+                            {% set chat_name = chat_name ? chat_name : chat.firstMemberName %}
                         {% else %}
-                            {% set chat_name = chat.firstMemberName %}
+                            {% set chat_name = chat.ownerName %}
                         {% endif %}
+                    {% else %}
+                        {% set chat_name = chat_name ? chat_name : chat.firstMemberName %}
                     {% endif %}
                     <span class="name">{{ chat_name }}</span>
                 </div>

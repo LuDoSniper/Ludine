@@ -97,11 +97,17 @@ aside nav a {
     margin-bottom: 0.4rem;
 }
 
-aside nav a:hover {
+aside nav a.disabled {
+    color: #757575;
+    text-decoration: line-through;
+    cursor: default;
+}
+
+aside nav a:hover:not(.disabled) {
     background-color: #2b2b30;
 }
 
-aside nav a.active {
+aside nav a.active:not(.disabled) {
     background-color: #313138;
 }
 

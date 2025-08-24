@@ -46,26 +46,45 @@ class DashboardController extends AbstractController
                 ->setTime(0, 0, 0)      // normalise à minuit => on ignore l'heure
             < $today
         ) {
-            $dashboard = new Dashboard();
-            $dashboard->setOwner($this->getUser());
+            if (!$dashboard) {
+                $dashboard = new Dashboard();
+                $dashboard->setOwner($this->getUser());
+            }
             $dashboard->setDate(new \DateTime('today', $tz));
-
-            $factor = $config->isSelectLunch() + $config->isSelectDiner();
-            $n = in_array($config->getSelectionMode(), [1, 2], true) ? 1 : 2;
+            $dashboard->setLunchDish(null);
+            $dashboard->setLunchDishDoable(null);
+            $dashboard->setDinerDish(null);
+            $dashboard->setDinerDishDoable(null);
 
             $dishes = $this->entityService->getEntityRecords($this->getUser(), Dish::class);
-            $selected = $this->pickDishesWeighted($dishes, $n * $factor);
 
-            if (count($selected) >= 1) {
-                $dashboard->setLunchDish($selected[0]);
-                $dashboard->setLunchDishDoable($selected[1]);
-                $dashboard->setDinerDish($selected[2]);
-                $dashboard->setDinerDishDoable($selected[3]);
+            if ($config->isSelectLunch() && in_array($config->getSelectionMode(), ['1', '3'])) {
+                $selection = $this->pickDishesWeighted($dishes, 1);
+                $dashboard->setLunchDish($selection ? $selection[0] : null);
+            }
+            if ($config->isSelectLunch() && in_array($config->getSelectionMode(), ['2', '3'])) {
+                $selection = $this->pickDishesWeighted($dishes, 1);
+                $dashboard->setLunchDishDoable($selection ? $selection[0] : null);
+            }
+            if ($config->isSelectDiner() && in_array($config->getSelectionMode(), ['1', '3'])) {
+                $selection = $this->pickDishesWeighted($dishes, 1);
+                $dashboard->setDinerDish($selection ? $selection[0] : null);
+            }
+            if ($config->isSelectDiner() && in_array($config->getSelectionMode(), ['2', '3'])) {
+                $selection = $this->pickDishesWeighted($dishes, 1);
+                $dashboard->setDinerDishDoable($selection ? $selection[0] : null);
+            }
 
+            if (
+                !$dashboard->getLunchDish() &&
+                !$dashboard->getLunchDishDoable() &&
+                !$dashboard->getDinerDish() &&
+                !$dashboard->getDinerDishDoable()
+            ) {
+                $dashboard = false;
+            } else {
                 $this->entityManager->persist($dashboard);
                 $this->entityManager->flush();
-            } else {
-                $dashboard = false;
             }
         }
 
@@ -73,6 +92,22 @@ class DashboardController extends AbstractController
             'config' => $config,
             'dashboard' => $dashboard,
         ]);
+    }
+
+    #[Route('/food/meal/dashboard/recompute', 'food_meal_dashboard_recompute')]
+    public function recompute(): Response
+    {
+        $dashboard = $this->entityService->getEntityRecords($this->getUser(), Dashboard::class);
+        if (count($dashboard) >= 1) {
+            $dashboard = $dashboard[0];
+        }
+
+        if ($dashboard) {
+            $dashboard->setDate((new \DateTime('today', new \DateTimeZone('Europe/Paris')))->modify('-2 days'));
+            $this->entityManager->flush();
+        }
+
+        return $this->redirectToRoute('food_meal_config');
     }
 
     public function pickDishesWeighted(array $dishes, int $count, bool $unique = false): array

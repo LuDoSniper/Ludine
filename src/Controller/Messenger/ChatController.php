@@ -86,6 +86,7 @@ class ChatController extends AbstractController
             'form' => $form->createView(),
             'chats' => $chats,
             'invalidMembers' => $invalidMembers,
+            'user' => $this->getUser(),
         ]);
     }
 
