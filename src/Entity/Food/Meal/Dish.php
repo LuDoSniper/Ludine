@@ -23,14 +23,14 @@ class Dish
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $instructions = null;
 
     #[ORM\Column]
-    private ?int $preparationTime = null;
+    private ?int $preparationTime = 0;
 
     #[ORM\Column]
-    private ?int $cookingTime = null;
+    private ?int $cookingTime = 0;
 
     #[ORM\Column]
     private ?int $difficulty = null;
@@ -48,7 +48,7 @@ class Dish
     private Collection $ingredients;
 
     #[ORM\Column]
-    private ?float $dropRate = null;
+    private ?float $dropRate = 1;
 
     #[ORM\ManyToOne(inversedBy: 'dishes')]
     #[ORM\JoinColumn(nullable: false)]

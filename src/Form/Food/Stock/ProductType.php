@@ -18,10 +18,12 @@ class ProductType extends AbstractType
                 'label' => 'Nom',
                 'label_attr' => [
                     'class' => 'h1',
-                ]
+                ],
+                'required' => true,
             ])
-            ->add('description', TextType::class, [
+            ->add('description', TextareaType::class, [
                 'label' => 'Description',
+                'required' => false,
             ])
         ;
     }

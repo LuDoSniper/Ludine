@@ -56,9 +56,6 @@ class TagController extends AbstractController
         if (empty($data['name'])) {
             $missing_fields[] = 'name';
         }
-        if (empty($data['description'])) {
-            $missing_fields[] = 'description';
-        }
         if (empty($data['color'])) {
             $missing_fields[] = 'color';
         }

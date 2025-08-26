@@ -16,13 +16,15 @@ class GeneralType extends AbstractType
         $builder
             ->add('email', EmailType::class, [
                 'label' => 'Email',
-
+                'required' => true,
             ])
             ->add('username', TextType::class, [
                 'label' => "Nom d'utilisateur",
+                'required' => true,
             ])
             ->add('displayName', TextType::class, [
                 'label' => "Nom d'affichage",
+                'required' => false,
             ])
         ;
     }
