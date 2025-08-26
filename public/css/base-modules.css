@@ -176,7 +176,8 @@ form,
     width: initial;
 }
 
-.field input:disabled {
+.field input:disabled,
+.field textarea:disabled {
     border: none;
 }
 .field textarea {
