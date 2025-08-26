@@ -19,10 +19,10 @@ class Config
     private ?int $selectionMode = null;
 
     #[ORM\Column]
-    private ?bool $selectLunch = null;
+    private ?bool $selectLunch = true;
 
     #[ORM\Column]
-    private ?bool $selectDiner = null;
+    private ?bool $selectDiner = true;
 
     #[ORM\Column(type: Types::TIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $lunchTime = null;

@@ -230,26 +230,8 @@ class DishController extends AbstractController
         if (empty($data['name'])) {
             $missing_fields[] = 'name';
         }
-        if (empty($data['description'])) {
-            $missing_fields[] = 'description';
-        }
-        if (empty($data['instructions'])) {
-            $missing_fields[] = 'instructions';
-        }
-        if (empty($data['preparationTime'])) {
-            $missing_fields[] = 'preparationTime';
-        }
-        if (empty($data['cookingTime'])) {
-            $missing_fields[] = 'cookingTime';
-        }
         if (empty($data['difficulty'])) {
             $missing_fields[] = 'difficulty';
-        }
-        if (empty($data['tags'])) {
-            $missing_fields[] = 'tags';
-        }
-        if (empty($data['dropRate'])) {
-            $missing_fields[] = 'dropRate';
         }
 
         if (!empty($missing_fields)) {

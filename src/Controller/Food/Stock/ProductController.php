@@ -106,9 +106,6 @@ class ProductController extends AbstractController
         if (empty($data['name'])) {
             $missing_fields[] = 'name';
         }
-        if (empty($data['description'])) {
-            $missing_fields[] = 'description';
-        }
 
         if (!empty($missing_fields)) {
             return new JsonResponse(['missing_fields' => $missing_fields], Response::HTTP_BAD_REQUEST);

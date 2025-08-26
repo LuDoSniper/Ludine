@@ -26,34 +26,40 @@ class ConfigType extends AbstractType
                     'Choix aléatoire' => 1,
                     'Choix aléatoire (uniquement les ingrédients disponibles)' => 2,
                     'Les deux' => 3
-                ]
+                ],
+                'required' => true,
             ])
             ->add('selectLunch', CheckboxType::class, [
                 'label' => 'Midi',
+                'required' => false,
             ])
             ->add('selectDiner', CheckboxType::class, [
                 'label' => 'Soir',
+                'required' => false,
             ])
             ->add('lunchTime', null, [
                 'label' => 'à',
                 'widget' => 'single_text',
                 'attr' => [
                     'data-widget' => 'time',
-                ]
+                ],
+                'required' => true,
             ])
             ->add('dinerTime', null, [
                 'label' => 'à',
                 'widget' => 'single_text',
                 'attr' => [
                     'data-widget' => 'time',
-                ]
+                ],
+                'required' => true,
             ])
             ->add('maxDifficulty', IntegerType::class, [
                 'label' => 'Difficulté maximum',
                 'attr' => [
                     'max' => 10,
                     'min' => 1,
-                ]
+                ],
+                'required' => true,
             ])
         ;
     }

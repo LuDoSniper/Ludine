@@ -19,13 +19,16 @@ class ContainerType extends AbstractType
                 'label' => 'Nom',
                 'label_attr' => [
                     'class' => 'h1',
-                ]
+                ],
+                'required' => true,
             ])
             ->add('description', TextType::class, [
                 'label' => 'Description',
+                'required' => false,
             ])
             ->add('cool', CheckboxType::class, [
                 'label' => 'Frais',
+                'required' => false,
             ])
             ->add('nbFloor', IntegerType::class, [
                 'label' => 'Nombre d\'étage',
@@ -33,10 +36,12 @@ class ContainerType extends AbstractType
                     'min' => 1,
                     'step' => 1,
                     'value' => 0
-                ]
+                ],
+                'required' => true,
             ])
             ->add('ref', TextType::class, [
-                'label' => 'REF'
+                'label' => 'REF',
+                'required' => false,
             ])
         ;
     }
