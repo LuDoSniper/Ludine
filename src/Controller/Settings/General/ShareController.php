@@ -117,15 +117,6 @@ class ShareController extends AbstractController
         if (empty($data['name'])) {
             $missing_fields[] = 'name';
         }
-        if (!isset($data['entities']) || $data['entities'] === "") {
-            $missing_fields[] = 'entities';
-        }
-        if (empty($data['members'])) {
-            $missing_fields[] = 'members';
-        }
-        if (!isset($data['active'])) {
-            $missing_fields[] = 'active';
-        }
 
         if (!empty($missing_fields)) {
             return new JsonResponse(['missing_fields' => $missing_fields], Response::HTTP_BAD_REQUEST);

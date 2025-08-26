@@ -22,8 +22,8 @@ class Tag
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $color = null;
+    #[ORM\Column(length: 255, nullable: false)]
+    private ?string $color = "#FDE388";
 
     /**
      * @var Collection<int, Dish>

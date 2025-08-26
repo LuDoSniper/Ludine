@@ -51,7 +51,8 @@ class ShareType extends AbstractType
                 'multiple' => true,
                 'attr' => [
                     'data-widget' => 'relational'
-                ]
+                ],
+                'required' => false
             ])
             ->add('entities', ChoiceType::class, [
                 'label' => 'Entités',

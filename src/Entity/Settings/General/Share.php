@@ -34,9 +34,9 @@ class Share
     private Collection $members;
 
     #[ORM\Column]
-    private ?bool $active = null;
+    private ?bool $active = false;
 
-    #[ORM\Column(type: Types::ARRAY)]
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
     private array $entities = [];
 
     #[ORM\Column]

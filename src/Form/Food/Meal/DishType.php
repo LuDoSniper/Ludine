@@ -4,7 +4,6 @@ namespace App\Form\Food\Meal;
 
 use App\Entity\Food\Meal\Dish;
 use App\Entity\Food\Meal\Tag;
-use App\Repository\Food\Meal\TagRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -25,19 +24,24 @@ class DishType extends AbstractType
                 'label' => 'Nom',
                 'label_attr' => [
                     'class' => 'h1',
-                ]
+                ],
+                'required' => true,
             ])
             ->add('description', TextType::class, [
                 'label' => 'Description',
+                'required' => false,
             ])
             ->add('instructions', TextAreaType::class, [
-                'label' => 'Instructions'
+                'label' => 'Instructions',
+                'required' => false,
             ])
             ->add('preparationTime', IntegerType::class, [
-                'label' => "Temps de préparation"
+                'label' => "Temps de préparation",
+                'required' => false,
             ])
             ->add('cookingTime', IntegerType::class, [
-                'label' => "Temps de cuisson"
+                'label' => "Temps de cuisson",
+                'required' => false,
             ])
             ->add('difficulty', IntegerType::class, [
                 'label' => "Difficulté",
@@ -45,6 +49,7 @@ class DishType extends AbstractType
                     'data-widget' => 'star',
                     'max' => $options['maxDifficulty']
                 ],
+                'required' => true,
             ])
             ->add('tags', EntityType::class, [
                 'class' => Tag::class,
@@ -65,6 +70,7 @@ class DishType extends AbstractType
                     ];
                 },
                 'choices' => $tags,
+                'required' => false,
 //                'query_builder' => function (TagRepository $tr) use ($user) {
 //                    $qb = $tr->createQueryBuilder('t')
 //                        ->orderBy('t.name', 'ASC');
@@ -83,7 +89,8 @@ class DishType extends AbstractType
                 'label' => 'Drop rate',
                 'attr' => [
                     'step' => '0.01',
-                ]
+                ],
+                'required' => false,
             ])
         ;
     }

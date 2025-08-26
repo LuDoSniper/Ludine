@@ -24,12 +24,12 @@ class Container
     private ?string $description = null;
 
     #[ORM\Column]
-    private ?bool $cool = null;
+    private ?bool $cool = false;
 
     #[ORM\Column]
     private ?int $nbFloor = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $ref = null;
 
     /**

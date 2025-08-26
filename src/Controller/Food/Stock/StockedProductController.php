@@ -122,12 +122,6 @@ class StockedProductController extends AbstractController
         if (empty($data['expirationDate'])) {
             $missing_fields[] = 'expirationDate';
         }
-        if (empty($data['stackable'])) {
-            $missing_fields[] = 'stackable';
-        }
-        if (empty($data['cool'])) {
-            $missing_fields[] = 'cool';
-        }
         if (empty($data['container'])) {
             $missing_fields[] = 'container';
         }

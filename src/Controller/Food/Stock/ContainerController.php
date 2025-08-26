@@ -108,15 +108,6 @@ class ContainerController extends AbstractController
         if (empty($data['name'])) {
             $missing_fields[] = 'name';
         }
-        if (empty($data['description'])) {
-            $missing_fields[] = 'description';
-        }
-        if (empty($data['ref'])) {
-            $missing_fields[] = 'ref';
-        }
-        if (empty($data['cool'])) {
-            $missing_fields[] = 'cool';
-        }
         if (empty($data['nbFloor'])) {
             $missing_fields[] = 'nbFloor';
         }

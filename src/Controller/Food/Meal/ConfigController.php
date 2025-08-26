@@ -66,12 +66,6 @@ class ConfigController extends AbstractController
         if (empty($data['selectionMode'])) {
             $missing_fields[] = 'selectionMode';
         }
-        if (empty($data['selectLunch'])) {
-            $missing_fields[] = 'selectLunch';
-        }
-        if (empty($data['selectDiner'])) {
-            $missing_fields[] = 'selectDiner';
-        }
         if (empty($data['lunchTime'])) {
             $missing_fields[] = 'lunchTime';
         }

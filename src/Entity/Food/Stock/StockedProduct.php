@@ -26,10 +26,10 @@ class StockedProduct
     private ?\DateTimeInterface $expirationDate = null;
 
     #[ORM\Column]
-    private ?bool $stackable = null;
+    private ?bool $stackable = false;
 
     #[ORM\Column]
-    private ?bool $cool = null;
+    private ?bool $cool = false;
 
     #[ORM\ManyToOne(inversedBy: 'stockedProducts')]
     #[ORM\JoinColumn(nullable: false)]

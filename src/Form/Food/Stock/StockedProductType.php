@@ -5,8 +5,6 @@ namespace App\Form\Food\Stock;
 use App\Entity\Food\Stock\Container;
 use App\Entity\Food\Stock\Product;
 use App\Entity\Food\Stock\StockedProduct;
-use App\Repository\Food\Stock\ContainerRepository;
-use App\Repository\Food\Stock\ProductRepository;
 use DateTimeInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -29,25 +27,31 @@ class StockedProductType extends AbstractType
                 'label' => 'Date d\'arrivée',
                 'attr' => [
                     'data-widget' => 'date',
-                ]
+                ],
+                'required' => true,
             ])
             ->add('expirationDate', TextType::class, [
                 'label' => 'Date de péremption',
                 'attr' => [
                     'data-widget' => 'date',
-                ]
+                ],
+                'required' => true,
             ])
             ->add('stackable', CheckboxType::class, [
                 'label' => 'Stackable',
+                'required' => false,
             ])
             ->add('cool', CheckboxType::class, [
                 'label' => 'Frais',
+                'required' => false,
             ])
             ->add('floor', TextType::class, [
                 'label' => 'Étage',
+                'required' => true,
             ])
             ->add('location', TextType::class, [
                 'label' => 'Emplacement',
+                'required' => true,
             ])
             ->add('product', EntityType::class, [
                 'class' => Product::class,
@@ -66,6 +70,7 @@ class StockedProductType extends AbstractType
                     ];
                 },
                 'choices' => $products,
+                'required' => true,
 //                'query_builder' => function (ProductRepository $pr) use ($user) {
 //                    $qb = $pr->createQueryBuilder('p')
 //                        ->orderBy('p.name', 'ASC');
@@ -97,6 +102,7 @@ class StockedProductType extends AbstractType
                     ];
                 },
                 'choices' => $containers,
+                'required' => true,
 //                'query_builder' => function (ContainerRepository $cr) use ($user) {
 //                    $qb = $cr->createQueryBuilder('c')
 //                        ->orderBy('c.name', 'ASC');
