@@ -27,7 +27,7 @@ class DishType extends AbstractType
                 ],
                 'required' => true,
             ])
-            ->add('description', TextType::class, [
+            ->add('description', TextareaType::class, [
                 'label' => 'Description',
                 'required' => false,
             ])
