@@ -67,6 +67,10 @@ class ShareController extends AbstractController
         Request $request
     ): Response
     {
+        if ($share->getOwner() !== $this->getUser()) {
+            return $this->redirectToRoute('settings_general_share');
+        }
+
         $form = $this->createForm(ShareType::class, $share, [
             'entities' => $this->entityService->getEntities(),
             'selectedEntities' => $share->getEntities(),
@@ -90,7 +94,7 @@ class ShareController extends AbstractController
         ?Share $share
     ): Response
     {
-        if (!$share) {
+        if (!$share || $share->getOwner() !== $this->getUser()) {
             return $this->redirectToRoute('settings_general_share');
         }
 

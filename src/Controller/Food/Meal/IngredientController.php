@@ -28,6 +28,10 @@ class IngredientController extends AbstractController
         RouterInterface $router,
     ): Response
     {
+        if ($ingredient->getOwner() !== $this->getUser()) {
+            return $this->redirectToRoute('food_meal_dish');
+        }
+
         $this->entityManager->remove($ingredient);
         $this->entityManager->flush();
 

@@ -95,6 +95,10 @@ class ChatController extends AbstractController
         Chat $chat,
     ): Response
     {
+        if ($chat->getOwner() !== $this->getUser()) {
+            return $this->redirectToRoute('messenger_chat_idle');
+        }
+
         $this->entityManager->remove($chat);
         $this->entityManager->flush();
 
@@ -107,6 +111,9 @@ class ChatController extends AbstractController
         Request $request,
     ): Response
     {
+        if ($chat->getOwner() !== $this->getUser()) {
+            return $this->redirectToRoute('messenger_chat_idle');
+        }
 
         $form = $this->createForm(ChatType::class, $chat, [
             'user' => $this->getUser(),
@@ -245,6 +252,10 @@ class ChatController extends AbstractController
         Chat $chat,
     ): Response
     {
+        if ($chat->getOwner() !== $this->getUser()) {
+            return $this->redirectToRoute('messenger_chat_idle');
+        }
+
         $qb = $this->entityManager->getRepository(Chat::class)->createQueryBuilder('c');
         $qb
             ->leftJoin('c.messages', 'm') // relation OneToMany Chat->messages

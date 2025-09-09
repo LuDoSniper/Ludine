@@ -33,6 +33,10 @@ class TagController extends AbstractController
         Tag $tag
     ): Response
     {
+        if ($tag->getOwner() !== $this->getUser()) {
+            return $this->redirectToRoute('food_meal_tag');
+        }
+
         $this->entityManager->remove($tag);
         $this->entityManager->flush();
 

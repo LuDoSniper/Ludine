@@ -65,6 +65,10 @@ class StockedProductController extends AbstractController
         Request $request
     ): Response
     {
+        if ($stockedProduct->getOwner() !== $this->getUser()) {
+            return $this->redirectToRoute('food_stock_stocked_product');
+        }
+
         $form = $this->createForm(StockedProductType::class, $stockedProduct, [
             'user' => $this->getUser(),
             'products' => $this->entityService->getEntityRecords($this->getUser(), Product::class),
@@ -89,7 +93,7 @@ class StockedProductController extends AbstractController
         ?StockedProduct $stockedProduct
     ): Response
     {
-        if (!$stockedProduct) {
+        if (!$stockedProduct || $stockedProduct->getOwner() !== $this->getUser()) {
             return $this->redirectToRoute('food_stock_stocked_product');
         }
 

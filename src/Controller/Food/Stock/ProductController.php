@@ -59,6 +59,10 @@ class ProductController extends AbstractController
         Request $request
     ): Response
     {
+        if ($product->getOwner() !== $this->getUser()) {
+            return $this->redirectToRoute('food_stock_product');
+        }
+
         $form = $this->createForm(ProductType::class, $product);
         $form->handleRequest($request);
 
@@ -79,7 +83,7 @@ class ProductController extends AbstractController
         ?Product $product
     ): Response
     {
-        if (!$product) {
+        if (!$product || $product->getOwner() !== $this->getUser()) {
             return $this->redirectToRoute('food_stock_product');
         }
 

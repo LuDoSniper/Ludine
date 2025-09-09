@@ -59,6 +59,10 @@ class ContainerController extends AbstractController
         Request $request
     ): Response
     {
+        if ($container->getOwner() !== $this->getUser()) {
+            return $this->redirectToRoute('food_stock_container');
+        }
+
         $form = $this->createForm(ContainerType::class, $container);
         $form->handleRequest($request);
 
@@ -81,7 +85,7 @@ class ContainerController extends AbstractController
         ?Container $container
     ): Response
     {
-        if (!$container) {
+        if (!$container || $container->getOwner() !== $this->getUser()) {
             return $this->redirectToRoute('food_stock_container');
         }
 

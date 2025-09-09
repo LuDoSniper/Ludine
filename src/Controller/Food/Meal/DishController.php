@@ -122,7 +122,7 @@ class DishController extends AbstractController
         ?Dish $dish,
     ): Response
     {
-        if (!$dish) {
+        if (!$dish || $dish->getOwner() !== $this->getUser()) {
             return $this->redirectToRoute('food_meal_dish');
         }
 
@@ -138,6 +138,10 @@ class DishController extends AbstractController
         Request $request
     ): Response
     {
+        if ($dish->getOwner() !== $this->getUser()) {
+            return $this->redirectToRoute('food_meal_dish');
+        }
+
         if ($request->request->has('name')) {
             $dish->setName($request->get('name'));
         }

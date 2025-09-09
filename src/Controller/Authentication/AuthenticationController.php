@@ -57,20 +57,26 @@ class AuthenticationController extends AbstractController
             $token = $tokenService->generateToken();
             $user->setPasswordToken($token);
             $user->setPasswordTokenExpiration((new \DateTimeImmutable())->modify('+1 day'));
+            if (!$this->appConfig->sendMail) {
+                $user->setIsVerified(true);
+            }
 
             $this->entityManager->persist($user);
             $this->entityManager->flush();
 
-            $contactMail = $this->appConfig->contactMail;
-            $mailService->send(
-                $this->appConfig->noReplyMail,
-                $user->getEmail(),
-                $this->appConfig->verifyMailSubject,
-                'verify',
-                compact('token', 'user', 'contactMail')
-            );
+            if ($this->appConfig->sendMail) {
+                $contactMail = $this->appConfig->contactMail;
+                $mailService->send(
+                    $this->appConfig->noReplyMail,
+                    $user->getEmail(),
+                    $this->appConfig->verifyMailSubject,
+                    'verify',
+                    compact('token', 'user', 'contactMail')
+                );
+                return $this->redirectToRoute('app_wait');
+            }
 
-            return $this->redirectToRoute('app_wait');
+            return $this->redirectToRoute('app_home');
         }
 
         return $this->render('Page/Authentication/register.html.twig', [
